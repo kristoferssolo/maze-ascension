@@ -3597,7 +3597,7 @@ dependencies = [
 
 [[package]]
 name = "the-labyrinth-of-echoes"
-version = "0.0.1"
+version = "0.0.3"
 dependencies = [
  "bevy",
  "log",
