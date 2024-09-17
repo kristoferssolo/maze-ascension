@@ -7,7 +7,7 @@ use bevy::prelude::*;
 ///
 /// ```
 /// use bevy::prelude::*;
-/// use the-labyrinth-of-echoes::audio::Music;
+/// use the_labyrinth_of_echoes::audio::Music;
 ///
 /// fn set_music_volume(sink_query: Query<&AudioSink, With<Music>>) {
 ///     for sink in &sink_query {
@@ -25,7 +25,7 @@ pub struct Music;
 ///
 /// ```
 /// use bevy::prelude::*;
-/// use the-labyrinth-of-echoes::audio::SoundEffect;
+/// use the_labyrinth_of_echoes::audio::SoundEffect;
 ///
 /// fn set_sound_effect_volume(sink_query: Query<&AudioSink, With<SoundEffect>>) {
 ///     for sink in &sink_query {
