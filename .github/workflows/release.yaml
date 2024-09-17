@@ -22,7 +22,7 @@ env:
   upload_to_github: true
   # The itch.io project to upload to in the format `user-name/project-name`.
   # There will be no upload to itch.io if this is commented out.
-  upload_to_itch: kristoferssolo/https://kristoferssolo.itch.io/the-labyrinth-of-echoes
+  upload_to_itch: kristoferssolo/the-labyrinth-of-echoes
   ############
   # ADVANCED #
   ############
