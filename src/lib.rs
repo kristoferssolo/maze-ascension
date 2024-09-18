@@ -1,10 +1,13 @@
 mod asset_tracking;
 pub mod audio;
+#[cfg(feature = "demo")]
 mod demo;
 #[cfg(feature = "dev")]
 mod dev_tools;
 mod screens;
 mod theme;
+#[cfg(not(feature = "demo"))]
+mod tiles;
 
 use bevy::{
     asset::AssetMetaCheck,
@@ -57,7 +60,10 @@ impl Plugin for AppPlugin {
         // Add other plugins.
         app.add_plugins((
             asset_tracking::plugin,
+            #[cfg(feature = "demo")]
             demo::plugin,
+            #[cfg(not(feature = "demo"))]
+            tiles::plugin,
             screens::plugin,
             theme::plugin,
         ));

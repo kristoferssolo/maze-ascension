@@ -2138,6 +2138,17 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "dfa686283ad6dd069f105e5ab091b04c62850d3e4cf5d67debad1933f55023df"
 
 [[package]]
+name = "hexx"
+version = "0.18.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8c40cfb11c06c0b7051c2c0df030c57c65921db962ee2b8e89de218bb749f173"
+dependencies = [
+ "bevy_reflect",
+ "glam",
+ "serde",
+]
+
+[[package]]
 name = "image"
 version = "0.25.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3600,6 +3611,7 @@ name = "the-labyrinth-of-echoes"
 version = "0.0.3"
 dependencies = [
  "bevy",
+ "hexx",
  "log",
  "rand",
  "tracing",
