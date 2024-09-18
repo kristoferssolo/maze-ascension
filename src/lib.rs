@@ -4,10 +4,10 @@ pub mod audio;
 mod demo;
 #[cfg(feature = "dev")]
 mod dev_tools;
-#[cfg(not(feature = "demo"))]
-mod grid;
 mod screens;
 mod theme;
+#[cfg(not(feature = "demo"))]
+mod tiles;
 
 use bevy::{
     asset::AssetMetaCheck,
@@ -26,10 +26,7 @@ impl Plugin for AppPlugin {
         );
 
         // Spawn the main camera.
-        #[cfg(not(feature = "demo"))]
         app.add_systems(Startup, spawn_camera);
-        #[cfg(feature = "demo")]
-        app.add_systems(Startup, spawn_2d_camera);
 
         // Add Bevy plugins.
         app.add_plugins(
@@ -54,7 +51,7 @@ impl Plugin for AppPlugin {
                 })
                 .set(AudioPlugin {
                     global_volume: GlobalVolume {
-                        volume: Volume::new(0.),
+                        volume: Volume::new(0.3),
                     },
                     ..default()
                 }),
@@ -66,7 +63,7 @@ impl Plugin for AppPlugin {
             #[cfg(feature = "demo")]
             demo::plugin,
             #[cfg(not(feature = "demo"))]
-            grid::plugin,
+            tiles::plugin,
             screens::plugin,
             theme::plugin,
         ));
@@ -90,26 +87,7 @@ enum AppSet {
     Update,
 }
 
-#[cfg(not(feature = "demo"))]
 fn spawn_camera(mut commands: Commands) {
-    commands.spawn((
-        Name::new("Camera"),
-        Camera3dBundle {
-            transform: Transform::from_xyz(0., 60., 0.).looking_at(Vec3::ZERO, Vec3::Y),
-            ..default()
-        },
-        // Render all UI to this camera.
-        // Not strictly necessary since we only use one camera,
-        // but if we don't use this component, our UI will disappear as soon
-        // as we add another camera. This includes indirect ways of adding cameras like using
-        // [ui node outlines](https://bevyengine.org/news/bevy-0-14/#ui-node-outline-gizmos)
-        // for debugging. So it's good to have this here for future-proofing.
-        IsDefaultUiCamera,
-    ));
-}
-
-#[cfg(feature = "demo")]
-fn spawn_2d_camera(mut commands: Commands) {
     commands.spawn((
         Name::new("Camera"),
         Camera2dBundle::default(),
