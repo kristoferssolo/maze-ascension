@@ -1,6 +1,8 @@
 use bevy::prelude::*;
 use hexx::EdgeDirection;
 
+pub(super) fn plugin(_app: &mut App) {}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Reflect)]
 pub enum HexDirection {
     Top,

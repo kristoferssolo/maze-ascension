@@ -1,8 +1,8 @@
 use bevy::prelude::*;
 pub mod direction;
 pub mod grid;
-pub mod level;
+pub mod tile;
 
 pub(super) fn plugin(app: &mut App) {
-    app.add_plugins(level::plugin);
+    app.add_plugins((direction::plugin, tile::plugin, grid::plugin));
 }
