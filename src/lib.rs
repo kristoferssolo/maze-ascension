@@ -4,10 +4,10 @@ pub mod audio;
 mod demo;
 #[cfg(feature = "dev")]
 mod dev_tools;
+#[cfg(not(feature = "demo"))]
+mod grid;
 mod screens;
 mod theme;
-#[cfg(not(feature = "demo"))]
-mod tiles;
 
 use bevy::{
     asset::AssetMetaCheck,
@@ -63,7 +63,7 @@ impl Plugin for AppPlugin {
             #[cfg(feature = "demo")]
             demo::plugin,
             #[cfg(not(feature = "demo"))]
-            tiles::plugin,
+            grid::plugin,
             screens::plugin,
             theme::plugin,
         ));
