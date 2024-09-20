@@ -1,4 +1,4 @@
-use super::tile::spawn_tiles;
+use super::tile::{draw_walls, spawn_tiles};
 use bevy::{
     ecs::{system::RunSystemOnce, world::Command},
     prelude::*,
@@ -12,12 +12,6 @@ pub fn spawn_grid(world: &mut World) {
     world.init_resource::<Grid>();
     world.init_resource::<RotationTimer>();
     GridSettings::default().apply(world);
-}
-
-#[derive(Debug, Reflect, Resource)]
-#[reflect(Resource)]
-pub struct Grid {
-    pub layout: HexLayout,
 }
 
 #[derive(Debug, Reflect, Resource, Deref, DerefMut)]
@@ -43,8 +37,15 @@ impl Default for GridSettings {
 
 impl Command for GridSettings {
     fn apply(self, world: &mut World) {
-        world.run_system_once_with(self, spawn_tiles)
+        world.run_system_once_with(self, spawn_tiles);
+        world.run_system_once(draw_walls);
     }
+}
+
+#[derive(Debug, Reflect, Resource)]
+#[reflect(Resource)]
+pub struct Grid {
+    pub layout: HexLayout,
 }
 
 impl Default for Grid {

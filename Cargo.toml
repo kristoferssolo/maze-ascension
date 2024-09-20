@@ -18,6 +18,7 @@ tracing = { version = "0.1", features = [
   "release_max_level_warn",
 ] }
 hexx = { version = "0.18", features = ["bevy_reflect"] }
+bevy_prototype_lyon = "0.12"
 
 [features]
 default = [
