@@ -64,7 +64,6 @@ pub fn spawn_tiles(
 fn hexagonal_plane(hex_layout: &HexLayout) -> Mesh {
     let mesh_info = PlaneMeshBuilder::new(hex_layout)
         .facing(Vec3::Z)
-        // .with_scale(Vec3::splat(0.9)) // border
         .center_aligned()
         .build();
 
