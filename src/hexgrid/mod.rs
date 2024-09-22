@@ -4,7 +4,9 @@ use bevy::{
 };
 use bevy_prototype_lyon::plugin::ShapePlugin;
 use grid::setup_system;
+pub mod direction;
 pub mod grid;
+pub mod tile;
 
 pub struct HexGrid;
 
