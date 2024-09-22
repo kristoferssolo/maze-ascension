@@ -5,8 +5,7 @@ mod demo;
 #[cfg(feature = "dev")]
 mod dev_tools;
 #[cfg(not(feature = "demo"))]
-mod grid;
-mod hex;
+mod hexgrid;
 mod screens;
 mod theme;
 
@@ -64,8 +63,7 @@ impl Plugin for AppPlugin {
             #[cfg(feature = "demo")]
             demo::plugin,
             #[cfg(not(feature = "demo"))]
-            // grid::plugin,
-            hex::plugin,
+            hexgrid::HexGrid,
             screens::plugin,
             theme::plugin,
         ));

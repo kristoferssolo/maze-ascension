@@ -8,12 +8,16 @@ use bevy_prototype_lyon::{
 };
 use rand::{thread_rng, Rng};
 
-pub(super) fn plugin(app: &mut App) {
-    app.add_plugins(ShapePlugin);
-    app.add_systems(Startup, setup_system);
+pub struct HexGrid;
+
+impl Plugin for HexGrid {
+    fn build(&self, app: &mut App) {
+        app.add_plugins(ShapePlugin);
+        app.add_systems(Startup, setup_system);
+    }
 }
 
-fn setup_system(mut commands: Commands) {
+pub(super) fn setup_system(mut commands: Commands) {
     let radius = 5;
     let hex_positions = generate_hex_grix(radius);
 
