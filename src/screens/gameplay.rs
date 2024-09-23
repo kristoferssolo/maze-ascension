@@ -5,7 +5,7 @@ use bevy::{input::common_conditions::input_just_pressed, prelude::*};
 #[cfg(feature = "demo")]
 use crate::demo::level::spawn_level as spawn_level_command;
 #[cfg(not(feature = "demo"))]
-use crate::hexgrid::spawn_grid as spawn_level_command;
+use crate::maze::spawn_grid as spawn_level_command;
 use crate::{asset_tracking::LoadResource, audio::Music, screens::Screen};
 
 pub(super) fn plugin(app: &mut App) {

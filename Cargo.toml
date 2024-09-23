@@ -17,7 +17,7 @@ tracing = { version = "0.1", features = [
   "max_level_debug",
   "release_max_level_warn",
 ] }
-hexx = { version = "0.18", features = ["bevy_reflect"] }
+hexx = { version = "0.18", features = ["bevy_reflect", "grid"] }
 bevy_prototype_lyon = "0.12"
 
 [features]
