@@ -9,6 +9,8 @@ mod maze;
 mod screens;
 mod theme;
 
+use std::f32::consts::FRAC_PI_4;
+
 use bevy::{
     asset::AssetMetaCheck,
     audio::{AudioPlugin, Volume},
@@ -90,7 +92,11 @@ enum AppSet {
 fn spawn_camera(mut commands: Commands) {
     commands.spawn((
         Name::new("Camera"),
-        Camera2dBundle::default(),
+        Camera3dBundle {
+            transform: Transform::from_xyz(0., 5., 10.).looking_at(Vec3::ZERO, Vec3::Y),
+            ..default()
+        },
+        // Camera2dBundle::default(),
         // Render all UI to this camera.
         // Not strictly necessary since we only use one camera,
         // but if we don't use this component, our UI will disappear as soon

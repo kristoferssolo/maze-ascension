@@ -20,6 +20,9 @@ tracing = { version = "0.1", features = [
 hexx = { version = "0.18", features = ["bevy_reflect", "grid"] }
 bevy_prototype_lyon = "0.12"
 
+[dev-dependencies]
+bevy-inspector-egui = "0.26"
+
 [features]
 default = [
   # Default to a native dev build.

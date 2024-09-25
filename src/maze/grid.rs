@@ -1,11 +1,12 @@
-use std::usize;
+use std::{f32::consts::PI, usize};
 
 use bevy::{
-    color::palettes::css::{BLACK, GREEN, RED},
+    color::palettes::css::{BLACK, GREEN, RED, SILVER},
+    pbr::wireframe::{Wireframe, WireframeConfig, WireframePlugin},
     prelude::*,
+    render::{mesh::PrimitiveTopology, render_asset::RenderAssetUsages},
     utils::hashbrown::HashMap,
 };
-
 use bevy_prototype_lyon::{
     draw::{Fill, Stroke},
     entity::ShapeBundle,
@@ -13,7 +14,6 @@ use bevy_prototype_lyon::{
     plugin::ShapePlugin,
 };
 use hexx::{EdgeDirection, Hex};
-use log::info;
 use rand::{prelude::SliceRandom, rngs::ThreadRng, thread_rng};
 
 use super::{
@@ -22,9 +22,28 @@ use super::{
 };
 
 pub(super) fn plugin(app: &mut App) {
-    app.add_plugins(ShapePlugin);
+    app.add_plugins((ShapePlugin, WireframePlugin));
     app.init_resource::<MazeConfig>();
     app.init_resource::<Layout>();
+    app.insert_resource(WireframeConfig {
+        global: false,
+        ..default()
+    });
+}
+
+pub(super) fn spawn_light(mut commands: Commands) {
+    commands.spawn((
+        Name::new("Light Source"),
+        PointLightBundle {
+            point_light: PointLight {
+                intensity: 5000.,
+                shadows_enabled: true,
+                ..default()
+            },
+            transform: Transform::from_xyz(5., 10., 5.),
+            ..default()
+        },
+    ));
 }
 
 pub(super) fn spawn_hex_grid(mut commands: Commands, config: Res<MazeConfig>) {
@@ -109,7 +128,7 @@ fn remove_wall_between(
 
 fn add_hex_tile(
     commands: &mut Commands,
-    position: Vec2,
+    position: Vec3,
     size: f32,
     tile: &Tile,
     walls: &Walls,
@@ -122,7 +141,7 @@ fn add_hex_tile(
         .into_iter()
         .map(|v| {
             let mut layout = layout.clone();
-            layout.origin = position;
+            layout.origin = position.xy();
             layout.hex_size = Vec2::splat(size);
             layout.hex_to_world_pos(v.origin + v.direction)
         })
@@ -137,34 +156,35 @@ fn add_hex_tile(
     let hexagon = path_builder.build();
 
     // Create the hexagon fill
-    commands.spawn((
-        ShapeBundle {
-            path: hexagon,
-            spatial: SpatialBundle {
-                transform: Transform::from_xyz(position.x, position.y, 0.),
+    commands
+        .spawn((
+            ShapeBundle {
+                path: hexagon,
+                spatial: SpatialBundle {
+                    transform: Transform::from_xyz(position.x, position.y, 0.),
+                    ..default()
+                },
                 ..default()
             },
-            ..default()
-        },
-        Fill::color(fill_color),
-    ));
-    // .with_children(|p| {
-    //     p.spawn(Text2dBundle {
-    //         text: Text {
-    //             sections: vec![TextSection {
-    //                 value: tile.to_string(),
-    //                 style: TextStyle {
-    //                     font_size: 16.,
-    //                     color: Color::BLACK,
-    //                     ..default()
-    //                 },
-    //             }],
-    //             ..default()
-    //         },
-    //         transform: Transform::from_xyz(position.x * 2., position.y * 2., 1.),
-    //         ..default()
-    //     });
-    // });
+            Fill::color(fill_color),
+        ))
+        .with_children(|p| {
+            p.spawn(Text2dBundle {
+                text: Text {
+                    sections: vec![TextSection {
+                        value: tile.to_string(),
+                        style: TextStyle {
+                            font_size: 16.,
+                            color: Color::BLACK,
+                            ..default()
+                        },
+                    }],
+                    ..default()
+                },
+                transform: Transform::from_xyz(position.x * 2., position.y * 2., 1.),
+                ..default()
+            });
+        });
 
     // Draw walls
     for direction in EdgeDirection::iter() {
@@ -199,7 +219,7 @@ pub(super) fn render_maze(
     config: Res<MazeConfig>,
 ) {
     for (tile, walls) in query.iter() {
-        let world_pos = layout.hex_to_world_pos(tile.hex);
+        let world_pos = layout.hex_to_world_pos(tile.hex).extend(0.);
         let fill_color = match tile.hex {
             pos if pos == config.start_pos => GREEN.into(),
             pos if pos == config.end_pos => RED.into(),

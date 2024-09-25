@@ -2,8 +2,9 @@ use bevy::{
     ecs::{system::RunSystemOnce, world::Command},
     prelude::*,
 };
-use grid::{generate_maze, plugin, render_maze, spawn_hex_grid};
+use grid::{generate_maze, plugin, render_maze, spawn_hex_grid, spawn_light};
 pub mod grid;
+pub mod prism;
 pub mod resource;
 pub mod tile;
 
@@ -17,9 +18,11 @@ impl Plugin for MazePlugin {
 
 impl Command for MazePlugin {
     fn apply(self, world: &mut World) {
-        world.run_system_once(spawn_hex_grid);
-        world.run_system_once(generate_maze);
-        world.run_system_once(render_maze);
+        // world.run_system_once(spawn_hex_grid);
+        // world.run_system_once(generate_maze);
+        // world.run_system_once(render_maze);
+        world.run_system_once(spawn_light);
+        world.run_system_once(prism::setup);
     }
 }
 
