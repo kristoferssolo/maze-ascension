@@ -19,9 +19,8 @@ tracing = { version = "0.1", features = [
 ] }
 hexx = { version = "0.18", features = ["bevy_reflect", "grid"] }
 bevy_prototype_lyon = "0.12"
+bevy-inspector-egui = { version = "0.26", optional = true }
 
-[dev-dependencies]
-bevy-inspector-egui = "0.26"
 
 [features]
 default = [
@@ -32,6 +31,7 @@ dev = [
   # Improve compile times for dev builds by linking Bevy as a dynamic library.
   "bevy/dynamic_linking",
   "bevy/bevy_dev_tools",
+  "bevy-inspector-egui",
 ]
 dev_native = [
   "dev",
