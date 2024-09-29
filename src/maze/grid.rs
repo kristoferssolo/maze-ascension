@@ -1,4 +1,4 @@
-use std::{f32::consts::PI, usize};
+use std::usize;
 
 use bevy::{
     color::palettes::css::{BLACK, GREEN, RED, SILVER},
@@ -29,21 +29,6 @@ pub(super) fn plugin(app: &mut App) {
         global: false,
         ..default()
     });
-}
-
-pub(super) fn spawn_light(mut commands: Commands) {
-    commands.spawn((
-        Name::new("Light Source"),
-        PointLightBundle {
-            point_light: PointLight {
-                intensity: 5000.,
-                shadows_enabled: true,
-                ..default()
-            },
-            transform: Transform::from_xyz(5., 10., 5.),
-            ..default()
-        },
-    ));
 }
 
 pub(super) fn spawn_hex_grid(mut commands: Commands, config: Res<MazeConfig>) {
