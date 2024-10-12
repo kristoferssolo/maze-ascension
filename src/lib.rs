@@ -63,7 +63,7 @@ impl Plugin for AppPlugin {
             #[cfg(feature = "demo")]
             demo::plugin,
             #[cfg(not(feature = "demo"))]
-            maze::MazePlugin,
+            maze::plugin::MazePlugin::default(),
             screens::plugin,
             theme::plugin,
         ));
@@ -91,7 +91,7 @@ fn spawn_camera(mut commands: Commands) {
     commands.spawn((
         Name::new("Camera"),
         Camera3dBundle {
-            transform: Transform::from_xyz(0., 15., 10.).looking_at(Vec3::ZERO, Vec3::Y),
+            transform: Transform::from_xyz(0., 100., 0.).looking_at(Vec3::ZERO, Vec3::Y),
             ..default()
         },
         // Render all UI to this camera.

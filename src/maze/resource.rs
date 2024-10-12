@@ -7,6 +7,7 @@ use rand::{thread_rng, Rng};
 pub struct MazeConfig {
     pub radius: u32,
     pub size: f32,
+    pub height: f32,
     pub start_pos: Hex,
     pub end_pos: Hex,
 }
@@ -27,7 +28,8 @@ impl Default for MazeConfig {
         debug!("End pos: ({},{})", end_pos.x, end_pos.y);
         Self {
             radius: radius as u32,
-            size: 10.,
+            size: 5.,
+            height: 5.,
             start_pos,
             end_pos,
         }

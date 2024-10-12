@@ -1,7 +1,7 @@
 use std::fmt::Display;
 
 use bevy::prelude::*;
-use hexx::Hex;
+use hexx::{Hex, HexLayout};
 
 #[derive(Debug, Reflect, Component, Default, PartialEq, Eq, Hash, Clone)]
 #[reflect(Component)]
@@ -30,6 +30,15 @@ impl Tile {
 
     pub fn visit(&mut self) {
         self.visited = true;
+    }
+
+    pub fn to_vec2(&self, layout: &HexLayout) -> Vec2 {
+        layout.hex_to_world_pos(self.hex)
+    }
+
+    pub fn to_vec3(&self, layout: &HexLayout) -> Vec3 {
+        let pos = self.to_vec2(layout);
+        Vec3::new(pos.x, 0., pos.y)
     }
 }
 
