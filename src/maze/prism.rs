@@ -1,4 +1,4 @@
-use bevy::prelude::*;
+use bevy::{pbr::wireframe::Wireframe, prelude::*};
 use std::f32::consts::FRAC_PI_2;
 
 use super::{
@@ -6,19 +6,7 @@ use super::{
     tile::Tile,
 };
 
-pub(super) fn plugin(app: &mut App) {
-    app.add_systems(Startup, spawn_light);
-}
-
-pub(super) fn spawn_light(mut commands: Commands) {
-    commands.spawn((
-        Name::new("Light Source"),
-        PointLightBundle {
-            transform: Transform::from_xyz(0., 50., 0.),
-            ..default()
-        },
-    ));
-}
+pub(super) fn plugin(_app: &mut App) {}
 
 pub(super) fn setup(
     mut commands: Commands,

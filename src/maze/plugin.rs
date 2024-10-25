@@ -1,5 +1,6 @@
 use bevy::{
     ecs::{system::RunSystemOnce, world::Command},
+    pbr::wireframe::WireframePlugin,
     prelude::*,
 };
 
@@ -12,6 +13,10 @@ impl Plugin for MazePlugin {
     fn build(&self, app: &mut App) {
         app.add_plugins(prism::plugin);
         app.add_plugins(grid::plugin);
+        app.insert_resource(AmbientLight {
+            brightness: f32::MAX,
+            color: Color::WHITE,
+        });
     }
 }
 

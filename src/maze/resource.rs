@@ -15,7 +15,7 @@ pub struct MazeConfig {
 impl Default for MazeConfig {
     fn default() -> Self {
         let mut rng = thread_rng();
-        let radius = 5;
+        let radius = 11;
         let start_pos = Hex::new(
             rng.gen_range(-radius..radius),
             rng.gen_range(-radius..radius),
@@ -28,8 +28,8 @@ impl Default for MazeConfig {
         debug!("End pos: ({},{})", end_pos.x, end_pos.y);
         Self {
             radius: radius as u32,
-            size: 5.,
-            height: 5.,
+            size: 1.,
+            height: 15.,
             start_pos,
             end_pos,
         }

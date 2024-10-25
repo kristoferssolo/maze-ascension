@@ -51,7 +51,7 @@ impl Plugin for AppPlugin {
                 })
                 .set(AudioPlugin {
                     global_volume: GlobalVolume {
-                        volume: Volume::new(0.3),
+                        volume: Volume::new(0.),
                     },
                     ..default()
                 }),
@@ -91,7 +91,7 @@ fn spawn_camera(mut commands: Commands) {
     commands.spawn((
         Name::new("Camera"),
         Camera3dBundle {
-            transform: Transform::from_xyz(0., 100., 0.).looking_at(Vec3::ZERO, Vec3::Y),
+            transform: Transform::from_xyz(0., 100., 100.).looking_at(Vec3::ZERO, Vec3::Y),
             ..default()
         },
         // Render all UI to this camera.
