@@ -17,7 +17,7 @@ use hexx::{EdgeDirection, Hex};
 use rand::{prelude::SliceRandom, rngs::ThreadRng, thread_rng};
 
 use super::{
-    resource::{Layout, MazeConfig},
+    resource::{Layout, MazeConfig, HEX_SIZE},
     tile::{Tile, TileBundle, Walls},
 };
 
@@ -213,7 +213,7 @@ pub(super) fn render_maze(
         add_hex_tile(
             &mut commands,
             world_pos,
-            config.size,
+            HEX_SIZE,
             tile,
             walls,
             fill_color,
