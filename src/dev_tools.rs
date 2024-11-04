@@ -9,6 +9,8 @@ use bevy::{
     prelude::*,
 };
 
+use bevy_inspector_egui::quick::WorldInspectorPlugin;
+
 use crate::screens::Screen;
 
 pub(super) fn plugin(app: &mut App) {
@@ -17,6 +19,7 @@ pub(super) fn plugin(app: &mut App) {
 
     // Toggle the debug overlay for UI.
     app.add_plugins(DebugUiPlugin);
+    app.add_plugins(WorldInspectorPlugin::default());
     app.add_systems(
         Update,
         toggle_debug_ui.run_if(input_just_pressed(TOGGLE_KEY)),

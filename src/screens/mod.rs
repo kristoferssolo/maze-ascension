@@ -24,8 +24,9 @@ pub(super) fn plugin(app: &mut App) {
 /// The game's main screen states.
 #[derive(States, Debug, Hash, PartialEq, Eq, Clone, Default)]
 pub enum Screen {
-    #[default]
+    #[cfg_attr(not(feature = "dev"), default)]
     Splash,
+    #[cfg_attr(feature = "dev", default)]
     Loading,
     Title,
     Credits,
