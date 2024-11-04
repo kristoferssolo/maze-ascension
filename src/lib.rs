@@ -1,11 +1,8 @@
 mod asset_tracking;
 pub mod audio;
-#[cfg(feature = "demo")]
 mod demo;
 #[cfg(feature = "dev")]
 mod dev_tools;
-#[cfg(not(feature = "demo"))]
-mod maze;
 mod screens;
 mod theme;
 
@@ -40,7 +37,7 @@ impl Plugin for AppPlugin {
                 })
                 .set(WindowPlugin {
                     primary_window: Window {
-                        title: "The Labyrinth of Echoes".to_string(),
+                        title: "The Labyrinth Of Echoes".to_string(),
                         canvas: Some("#bevy".to_string()),
                         fit_canvas_to_parent: true,
                         prevent_default_event_handling: true,
@@ -51,7 +48,7 @@ impl Plugin for AppPlugin {
                 })
                 .set(AudioPlugin {
                     global_volume: GlobalVolume {
-                        volume: Volume::new(0.),
+                        volume: Volume::new(0.3),
                     },
                     ..default()
                 }),
@@ -60,10 +57,7 @@ impl Plugin for AppPlugin {
         // Add other plugins.
         app.add_plugins((
             asset_tracking::plugin,
-            #[cfg(feature = "demo")]
             demo::plugin,
-            #[cfg(not(feature = "demo"))]
-            maze::plugin::MazePlugin::default(),
             screens::plugin,
             theme::plugin,
         ));
@@ -90,10 +84,7 @@ enum AppSet {
 fn spawn_camera(mut commands: Commands) {
     commands.spawn((
         Name::new("Camera"),
-        Camera3dBundle {
-            transform: Transform::from_xyz(0., 300., 300.).looking_at(Vec3::ZERO, Vec3::Y),
-            ..default()
-        },
+        Camera2dBundle::default(),
         // Render all UI to this camera.
         // Not strictly necessary since we only use one camera,
         // but if we don't use this component, our UI will disappear as soon

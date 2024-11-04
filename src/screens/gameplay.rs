@@ -2,11 +2,10 @@
 
 use bevy::{input::common_conditions::input_just_pressed, prelude::*};
 
-#[cfg(feature = "demo")]
-use crate::demo::level::spawn_level as spawn_level_command;
-#[cfg(not(feature = "demo"))]
-use crate::maze::spawn_grid as spawn_level_command;
-use crate::{asset_tracking::LoadResource, audio::Music, screens::Screen};
+use crate::{
+    asset_tracking::LoadResource, audio::Music, demo::level::spawn_level as spawn_level_command,
+    screens::Screen,
+};
 
 pub(super) fn plugin(app: &mut App) {
     app.add_systems(OnEnter(Screen::Gameplay), spawn_level);
