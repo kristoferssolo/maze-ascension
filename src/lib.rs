@@ -63,7 +63,7 @@ impl Plugin for AppPlugin {
             #[cfg(feature = "demo")]
             demo::plugin,
             #[cfg(not(feature = "demo"))]
-            maze::plugin::MazePlugin::default(),
+            maze::plugin::MazePlugin,
             screens::plugin,
             theme::plugin,
         ));

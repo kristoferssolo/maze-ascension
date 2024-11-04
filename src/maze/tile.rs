@@ -28,7 +28,7 @@ impl Tile {
         }
     }
 
-    pub fn visit(&mut self) {
+    pub fn _visit(&mut self) {
         self.visited = true;
     }
 

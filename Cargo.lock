@@ -3918,7 +3918,7 @@ dependencies = [
 
 [[package]]
 name = "the-labyrinth-of-echoes"
-version = "0.0.3"
+version = "0.0.4"
 dependencies = [
  "bevy",
  "bevy-inspector-egui",

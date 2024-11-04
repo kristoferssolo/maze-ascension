@@ -1,10 +1,7 @@
-use std::usize;
-
 use bevy::{
-    color::palettes::css::{BLACK, GREEN, RED, SILVER},
-    pbr::wireframe::{Wireframe, WireframeConfig, WireframePlugin},
+    color::palettes::css::{BLACK, GREEN, RED},
+    pbr::wireframe::{WireframeConfig, WireframePlugin},
     prelude::*,
-    render::{mesh::PrimitiveTopology, render_asset::RenderAssetUsages},
     utils::hashbrown::HashMap,
 };
 use bevy_prototype_lyon::{
@@ -31,7 +28,7 @@ pub(super) fn plugin(app: &mut App) {
     });
 }
 
-pub(super) fn spawn_hex_grid(mut commands: Commands, config: Res<MazeConfig>) {
+pub(super) fn _spawn_hex_grid(mut commands: Commands, config: Res<MazeConfig>) {
     let radius = config.radius as i32;
 
     for q in -radius..=radius {
@@ -50,7 +47,7 @@ pub(super) fn spawn_hex_grid(mut commands: Commands, config: Res<MazeConfig>) {
     }
 }
 
-pub(super) fn generate_maze(
+pub(super) fn _generate_maze(
     mut commands: Commands,
     query: Query<(Entity, &Tile, &Walls)>,
     config: Res<MazeConfig>,
@@ -61,7 +58,7 @@ pub(super) fn generate_maze(
         .collect();
 
     let mut rng = thread_rng();
-    recursive_maze(&mut tiles, config.start_pos, &mut rng);
+    _recursive_maze(&mut tiles, config.start_pos, &mut rng);
 
     for (entity, tile, walls) in tiles.values() {
         commands
@@ -71,14 +68,14 @@ pub(super) fn generate_maze(
     }
 }
 
-fn recursive_maze(
+fn _recursive_maze(
     tiles: &mut HashMap<Hex, (Entity, Tile, Walls)>,
     current_hex: Hex,
     rng: &mut ThreadRng,
 ) {
     {
         let (_, tile, _) = tiles.get_mut(&current_hex).unwrap();
-        tile.visit();
+        tile._visit();
     }
 
     let mut directions = EdgeDirection::ALL_DIRECTIONS;
@@ -88,14 +85,14 @@ fn recursive_maze(
         let neighbor_hex = current_hex + direction;
         if let Some((_, neighbor_tile, _)) = tiles.get(&neighbor_hex) {
             if !neighbor_tile.visited {
-                remove_wall_between(tiles, current_hex, neighbor_hex, direction);
-                recursive_maze(tiles, neighbor_hex, rng);
+                _remove_wall_between(tiles, current_hex, neighbor_hex, direction);
+                _recursive_maze(tiles, neighbor_hex, rng);
             }
         }
     }
 }
 
-fn remove_wall_between(
+fn _remove_wall_between(
     tiles: &mut HashMap<Hex, (Entity, Tile, Walls)>,
     current_hex: Hex,
     neighbor_hex: Hex,
@@ -111,7 +108,7 @@ fn remove_wall_between(
     }
 }
 
-fn add_hex_tile(
+fn _add_hex_tile(
     commands: &mut Commands,
     position: Vec3,
     size: f32,
@@ -197,7 +194,7 @@ fn add_hex_tile(
     }
 }
 
-pub(super) fn render_maze(
+pub(super) fn _render_maze(
     mut commands: Commands,
     query: Query<(&Tile, &mut Walls)>,
     layout: Res<Layout>,
@@ -210,7 +207,7 @@ pub(super) fn render_maze(
             pos if pos == config.end_pos => RED.into(),
             _ => Color::srgb(0.8, 0.8, 0.8),
         };
-        add_hex_tile(
+        _add_hex_tile(
             &mut commands,
             world_pos,
             HEX_SIZE,

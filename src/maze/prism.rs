@@ -1,7 +1,6 @@
-use bevy::{pbr::UvChannel, prelude::*};
+use bevy::prelude::*;
 use core::f32;
-use hexx::{EdgeDirection, GridEdge, Hex};
-use std::f32::consts::{FRAC_PI_2, FRAC_PI_3, FRAC_PI_6};
+use std::f32::consts::{FRAC_PI_2, FRAC_PI_3};
 
 use super::{
     resource::{Layout, MazeConfig, HEX_SIZE},
@@ -30,13 +29,13 @@ pub(super) fn setup(
                 ..default()
             },
         ))
-        .with_children(|mut parent| {
+        .with_children(|parent| {
             for q in -radius..=radius {
                 let r1 = (-radius).max(-q - radius);
                 let r2 = radius.min(-q + radius);
                 for r in r1..=r2 {
                     let tile = Tile::new(q, r);
-                    spawn_single_hex_tile(&mut parent, &tile, &layout, &assets, &config);
+                    spawn_single_hex_tile(parent, &tile, &layout, &assets, &config);
                 }
             }
         });
@@ -49,7 +48,7 @@ fn spawn_single_hex_tile(
     assets: &MazeAssets,
     config: &Res<MazeConfig>,
 ) {
-    let pos = tile.to_vec3(&layout);
+    let pos = tile.to_vec3(layout);
     parent
         .spawn((
             Name::new(format!("Hex {}", &tile.to_string())),

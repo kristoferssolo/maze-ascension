@@ -7,5 +7,5 @@ pub mod resource;
 pub mod tile;
 
 pub fn spawn_grid(world: &mut World) {
-    MazePlugin::default().apply(world);
+    MazePlugin.apply(world);
 }
