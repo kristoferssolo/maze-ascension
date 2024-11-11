@@ -7,7 +7,7 @@ use bevy::prelude::*;
 ///
 /// ```
 /// use bevy::prelude::*;
-/// use the_labyrinth_of_echoes::audio::Music;
+/// use maze_ascension::audio::Music;
 ///
 /// fn set_music_volume(sink_query: Query<&AudioSink, With<Music>>) {
 ///     for sink in &sink_query {
@@ -25,7 +25,7 @@ pub struct Music;
 ///
 /// ```
 /// use bevy::prelude::*;
-/// use the_labyrinth_of_echoes::audio::SoundEffect;
+/// use maze_ascension::audio::SoundEffect;
 ///
 /// fn set_sound_effect_volume(sink_query: Query<&AudioSink, With<SoundEffect>>) {
 ///     for sink in &sink_query {

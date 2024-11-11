@@ -2,7 +2,7 @@
 #![cfg_attr(not(feature = "dev"), windows_subsystem = "windows")]
 
 use bevy::prelude::*;
-use the_labyrinth_of_echoes::AppPlugin;
+use maze_ascension::AppPlugin;
 
 fn main() -> AppExit {
     App::new().add_plugins(AppPlugin).run()
