@@ -40,7 +40,7 @@ impl Plugin for AppPlugin {
                 })
                 .set(WindowPlugin {
                     primary_window: Window {
-                        title: "The Labyrinth of Echoes".to_string(),
+                        title: "Maze Ascension: The Labyrinth of Echoes".to_string(),
                         canvas: Some("#bevy".to_string()),
                         fit_canvas_to_parent: true,
                         prevent_default_event_handling: true,
