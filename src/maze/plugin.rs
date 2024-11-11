@@ -3,7 +3,7 @@ use bevy::{
     prelude::*,
 };
 
-use super::{grid, prism};
+use super::prism;
 
 #[derive(Default)]
 pub(crate) struct MazePlugin;
@@ -11,7 +11,7 @@ pub(crate) struct MazePlugin;
 impl Plugin for MazePlugin {
     fn build(&self, app: &mut App) {
         app.add_plugins(prism::plugin);
-        app.add_plugins(grid::plugin);
+        // app.add_plugins(grid::plugin);
         // app.insert_resource(AmbientLight {
         //     brightness: f32::MAX,
         //     color: Color::WHITE,

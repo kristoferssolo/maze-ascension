@@ -16,7 +16,7 @@ pub struct MazeConfig {
 impl Default for MazeConfig {
     fn default() -> Self {
         let mut rng = thread_rng();
-        let radius = 11;
+        let radius = 7;
         let start_pos = Hex::new(
             rng.gen_range(-radius..radius),
             rng.gen_range(-radius..radius),
@@ -43,7 +43,7 @@ pub struct Layout(pub HexLayout);
 impl FromWorld for Layout {
     fn from_world(_world: &mut World) -> Self {
         Self(HexLayout {
-            orientation: HexOrientation::Pointy,
+            orientation: HexOrientation::Flat,
             hex_size: Vec2::splat(HEX_SIZE),
             ..default()
         })

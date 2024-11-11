@@ -1,13 +1,14 @@
+use super::resource::{Layout, MazeConfig, HEX_SIZE};
 use bevy::prelude::*;
 use core::f32;
-use std::f32::consts::{FRAC_PI_2, FRAC_PI_3};
+use hexlab::prelude::*;
+use hexx::{HexLayout, HexOrientation};
+use std::f32::consts::{FRAC_PI_2, FRAC_PI_3, FRAC_PI_6};
 
-use super::{
-    resource::{Layout, MazeConfig, HEX_SIZE},
-    tile::Tile,
-};
-
-pub(super) fn plugin(_app: &mut App) {}
+pub(super) fn plugin(app: &mut App) {
+    app.init_resource::<MazeConfig>();
+    app.init_resource::<Layout>();
+}
 const WALL_SIZE: f32 = 1.0;
 
 pub(super) fn setup(
@@ -17,10 +18,14 @@ pub(super) fn setup(
     config: Res<MazeConfig>,
     layout: Res<Layout>,
 ) {
-    let radius = config.radius as i32;
+    let maze = MazeBuilder::new()
+        .with_radius(config.radius)
+        // .with_seed(0)
+        .with_generator(GeneratorType::RecursiveBacktracking)
+        .build()
+        .expect("Something went wrong while creating maze");
 
     let assets = create_base_assets(&mut meshes, &mut materials, &config);
-    // spawn_single_hex_tile(&mut commands, &assets, &config);
     commands
         .spawn((
             Name::new("Floor"),
@@ -30,44 +35,47 @@ pub(super) fn setup(
             },
         ))
         .with_children(|parent| {
-            for q in -radius..=radius {
-                let r1 = (-radius).max(-q - radius);
-                let r2 = radius.min(-q + radius);
-                for r in r1..=r2 {
-                    let tile = Tile::new(q, r);
-                    spawn_single_hex_tile(parent, &tile, &layout, &assets, &config);
-                }
+            for tile in maze.values() {
+                spawn_single_hex_tile(parent, &assets, tile, &layout.0, config.height)
             }
         });
 }
 
 fn spawn_single_hex_tile(
     parent: &mut ChildBuilder,
-    tile: &Tile,
-    layout: &Res<Layout>,
     assets: &MazeAssets,
-    config: &Res<MazeConfig>,
+    tile: &HexTile,
+    layout: &HexLayout,
+    hex_height: f32,
 ) {
-    let pos = tile.to_vec3(layout);
+    let world_pos = tile.to_vec3(layout);
+    let rotation = match layout.orientation {
+        HexOrientation::Pointy => Quat::from_rotation_y(0.0),
+        HexOrientation::Flat => Quat::from_rotation_y(FRAC_PI_6), // 30 degrees rotation
+    };
+
     parent
         .spawn((
-            Name::new(format!("Hex {}", &tile.to_string())),
+            Name::new(format!("Hex {}", tile.to_string())),
             PbrBundle {
                 mesh: assets.hex_mesh.clone(),
                 material: assets.hex_material.clone(),
-                transform: Transform::from_translation(pos),
+                transform: Transform::from_translation(world_pos).with_rotation(rotation),
                 ..default()
             },
         ))
-        .with_children(|parent| spawn_walls(parent, assets, config));
+        .with_children(|parent| spawn_walls(parent, assets, hex_height / 2., &tile.walls()));
 }
 
-fn spawn_walls(parent: &mut ChildBuilder, asstets: &MazeAssets, config: &Res<MazeConfig>) {
-    let y_offset = config.height / 2.;
+fn spawn_walls(parent: &mut ChildBuilder, assets: &MazeAssets, y_offset: f32, walls: &Walls) {
     let z_rotation = Quat::from_rotation_z(-FRAC_PI_2);
 
     for i in 0..6 {
-        let wall_angle = FRAC_PI_3 * i as f32;
+        if !walls.contains(i) {
+            continue;
+        }
+
+        let wall_angle = -FRAC_PI_3 * i as f32;
 
         let x_offset = (HEX_SIZE - WALL_SIZE) * f32::cos(wall_angle);
         let z_offset = (HEX_SIZE - WALL_SIZE) * f32::sin(wall_angle);
@@ -76,7 +84,7 @@ fn spawn_walls(parent: &mut ChildBuilder, asstets: &MazeAssets, config: &Res<Maz
         let x_rotation = Quat::from_rotation_x(wall_angle + FRAC_PI_2);
         let final_rotation = z_rotation * x_rotation;
 
-        spawn_single_wall(parent, asstets, final_rotation, pos);
+        spawn_single_wall(parent, assets, final_rotation, pos);
     }
 }
 

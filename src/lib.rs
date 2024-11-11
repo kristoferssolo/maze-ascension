@@ -91,7 +91,7 @@ fn spawn_camera(mut commands: Commands) {
     commands.spawn((
         Name::new("Camera"),
         Camera3dBundle {
-            transform: Transform::from_xyz(0., 300., 300.).looking_at(Vec3::ZERO, Vec3::Y),
+            transform: Transform::from_xyz(200., 200., 0.).looking_at(Vec3::ZERO, Vec3::Y),
             ..default()
         },
         // Render all UI to this camera.
