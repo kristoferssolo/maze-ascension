@@ -1,8 +1,6 @@
 use bevy::prelude::*;
 
-use crate::maze::{
-    components::MazeFloor, events::RecreateMazeEvent, resources::Layout, MazeConfig,
-};
+use crate::maze::{components::MazeFloor, events::RecreateMazeEvent, MazeConfig};
 
 use super::setup::setup_maze;
 
@@ -11,13 +9,12 @@ pub(crate) fn handle_maze_recreation_event(
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
     config: Res<MazeConfig>,
-    layout: Res<Layout>,
     query: Query<(Entity, &MazeFloor)>,
     mut event_reader: EventReader<RecreateMazeEvent>,
 ) {
     for event in event_reader.read() {
         despawn_floor(&mut commands, &query, event.floor);
-        setup_maze(&mut commands, &mut meshes, &mut materials, &config, &layout);
+        setup_maze(&mut commands, &mut meshes, &mut materials, &config);
     }
 }
 

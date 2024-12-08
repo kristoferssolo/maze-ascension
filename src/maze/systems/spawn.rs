@@ -7,7 +7,6 @@ use hexx::HexOrientation;
 use crate::maze::{
     assets::MazeAssets,
     components::{MazeTile, MazeWall},
-    resources::WALL_SIZE,
     MazeConfig,
 };
 
@@ -15,11 +14,10 @@ pub(super) fn spawn_single_hex_tile(
     parent: &mut ChildBuilder,
     assets: &MazeAssets,
     tile: &HexTile,
-    layout: &HexLayout,
     config: &MazeConfig,
 ) {
-    let world_pos = tile.to_vec3(layout);
-    let rotation = match layout.orientation {
+    let world_pos = tile.to_vec3(&config.layout);
+    let rotation = match config.layout.orientation {
         HexOrientation::Pointy => Quat::from_rotation_y(0.0),
         HexOrientation::Flat => Quat::from_rotation_y(FRAC_PI_6), // 30 degrees rotation
     };
@@ -49,8 +47,8 @@ fn spawn_walls(parent: &mut ChildBuilder, assets: &MazeAssets, config: &MazeConf
 
         let wall_angle = -FRAC_PI_3 * i as f32;
 
-        let x_offset = (config.size - WALL_SIZE) * f32::cos(wall_angle);
-        let z_offset = (config.size - WALL_SIZE) * f32::sin(wall_angle);
+        let x_offset = config.wall_offset() * f32::cos(wall_angle);
+        let z_offset = config.wall_offset() * f32::sin(wall_angle);
         let pos = Vec3::new(x_offset, y_offset, z_offset);
 
         let x_rotation = Quat::from_rotation_x(wall_angle + FRAC_PI_2);

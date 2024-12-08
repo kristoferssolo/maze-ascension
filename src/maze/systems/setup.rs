@@ -1,9 +1,7 @@
 use bevy::prelude::*;
 use hexlab::{GeneratorType, MazeBuilder};
 
-use crate::maze::{
-    assets::create_base_assets, components::MazeFloor, resources::Layout, MazeConfig,
-};
+use crate::maze::{assets::MazeAssets, components::MazeFloor, MazeConfig};
 
 use super::spawn::spawn_single_hex_tile;
 
@@ -12,9 +10,8 @@ pub(crate) fn setup(
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
     config: Res<MazeConfig>,
-    layout: Res<Layout>,
 ) {
-    setup_maze(&mut commands, &mut meshes, &mut materials, &config, &layout);
+    setup_maze(&mut commands, &mut meshes, &mut materials, &config);
 }
 
 pub(super) fn setup_maze(
@@ -22,7 +19,6 @@ pub(super) fn setup_maze(
     meshes: &mut ResMut<Assets<Mesh>>,
     materials: &mut ResMut<Assets<StandardMaterial>>,
     config: &MazeConfig,
-    layout: &Layout,
 ) {
     let maze = MazeBuilder::new()
         .with_radius(config.radius)
@@ -31,7 +27,7 @@ pub(super) fn setup_maze(
         .build()
         .expect("Something went wrong while creating maze");
 
-    let assets = create_base_assets(meshes, materials, config);
+    let assets = MazeAssets::new(meshes, materials, config);
     commands
         .spawn((
             Name::new("Floor"),
@@ -43,7 +39,7 @@ pub(super) fn setup_maze(
         ))
         .with_children(|parent| {
             for tile in maze.values() {
-                spawn_single_hex_tile(parent, &assets, tile, &layout.0, &config)
+                spawn_single_hex_tile(parent, &assets, tile, &config)
             }
         });
 }

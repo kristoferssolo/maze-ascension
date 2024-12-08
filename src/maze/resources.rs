@@ -9,7 +9,6 @@ use thiserror::Error;
 #[reflect(Resource)]
 pub struct MazePluginLoaded;
 
-pub(crate) const WALL_SIZE: f32 = 1.0;
 #[derive(Debug, Error)]
 pub enum MazeConfigError {
     #[error("Failed to convert radius from u32 to i32: {0}")]
@@ -21,17 +20,19 @@ pub enum MazeConfigError {
 pub struct MazeConfig {
     pub radius: u32,
     pub height: f32,
-    pub size: f32,
+    pub hex_size: f32,
     pub start_pos: Hex,
     pub end_pos: Hex,
     pub seed: u64,
+    pub layout: HexLayout,
 }
 
 impl MazeConfig {
     fn new(
         radius: u32,
         height: f32,
-        size: f32,
+        hex_size: f32,
+        orientation: HexOrientation,
         seed: Option<u64>,
     ) -> Result<Self, MazeConfigError> {
         let seed = seed.unwrap_or_else(|| thread_rng().gen());
@@ -43,40 +44,50 @@ impl MazeConfig {
         debug!("Start pos: ({},{})", start_pos.x, start_pos.y);
         debug!("End pos: ({},{})", end_pos.x, end_pos.y);
 
+        let layout = HexLayout {
+            orientation,
+            hex_size: Vec2::splat(hex_size),
+            ..default()
+        };
+
         Ok(Self {
             radius: radius as u32,
             height,
-            size,
+            hex_size,
             start_pos,
             end_pos,
             seed,
+            layout,
         })
     }
 
-    pub fn new_unchecked(radius: u32, height: f32, hex_size: f32, seed: Option<u64>) -> Self {
-        Self::new(radius, height, hex_size, seed)
+    pub fn new_unchecked(
+        radius: u32,
+        height: f32,
+        hex_size: f32,
+        orientation: HexOrientation,
+        seed: Option<u64>,
+    ) -> Self {
+        Self::new(radius, height, hex_size, orientation, seed)
             .expect("Failed to create MazeConfig with supposedly safe values")
+    }
+
+    pub fn wall_size(&self) -> f32 {
+        self.hex_size / 6.
+    }
+
+    pub fn wall_offset(&self) -> f32 {
+        self.hex_size - self.wall_size()
+    }
+
+    pub fn update(&mut self) {
+        self.layout.hex_size = Vec2::splat(self.hex_size);
     }
 }
 
 impl Default for MazeConfig {
     fn default() -> Self {
-        Self::new_unchecked(7, 20., 6., None)
-    }
-}
-
-#[derive(Debug, Reflect, Resource, Deref, DerefMut, Clone)]
-#[reflect(Resource)]
-pub struct Layout(pub HexLayout);
-
-impl FromWorld for Layout {
-    fn from_world(world: &mut World) -> Self {
-        let config = world.resource::<MazeConfig>();
-        Self(HexLayout {
-            orientation: HexOrientation::Flat,
-            hex_size: Vec2::splat(config.size),
-            ..default()
-        })
+        Self::new_unchecked(7, 20., 6., HexOrientation::Flat, None)
     }
 }
 

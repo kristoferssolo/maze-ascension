@@ -1,7 +1,7 @@
 use std::ops::RangeInclusive;
 
 use bevy::{prelude::*, window::PrimaryWindow};
-use hexx::Hex;
+use hexx::{Hex, HexOrientation};
 use rand::{thread_rng, Rng};
 
 use crate::maze::{events::RecreateMazeEvent, MazeConfig, MazePluginLoaded};
@@ -34,12 +34,22 @@ pub(crate) fn maze_controls_ui(world: &mut World) {
             changed |= add_drag_value_control(ui, "Radius:", &mut maze_config.radius, 1.0, 1..=100);
             changed |=
                 add_drag_value_control(ui, "Height:", &mut maze_config.height, 0.5, 1.0..=50.0);
+            changed |= add_drag_value_control(
+                ui,
+                "Hex Size:",
+                &mut maze_config.hex_size,
+                1.0,
+                1.0..=100.0,
+            );
+
+            changed |= add_orientation_control(ui, &mut maze_config.layout.orientation);
 
             changed |= add_position_control(ui, "Start Position:", &mut maze_config.start_pos);
             changed |= add_position_control(ui, "End Position:", &mut maze_config.end_pos);
 
             // Trigger recreation if any value changed
             if changed {
+                maze_config.update();
                 if let Some(mut event_writer) =
                     world.get_resource_mut::<Events<RecreateMazeEvent>>()
                 {
@@ -111,6 +121,22 @@ fn add_seed_control(ui: &mut Ui, seed: &mut u64) -> bool {
         if ui.button("📋").clicked() {
             ui.output_mut(|o| o.copied_text = seed.to_string());
         }
+    });
+
+    changed
+}
+
+fn add_orientation_control(ui: &mut Ui, orientation: &mut HexOrientation) -> bool {
+    let mut changed = false;
+
+    ui.horizontal(|ui| {
+        ui.label("Orientation:");
+
+        let response = ui.radio_value(orientation, HexOrientation::Flat, "Flat");
+        changed |= response.changed();
+
+        let response = ui.radio_value(orientation, HexOrientation::Pointy, "Pointy");
+        changed |= response.changed();
     });
 
     changed

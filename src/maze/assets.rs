@@ -1,8 +1,10 @@
+use super::MazeConfig;
+use bevy::prelude::*;
 use std::f32::consts::FRAC_PI_2;
 
-use bevy::prelude::*;
-
-use super::{resources::WALL_SIZE, MazeConfig};
+const WALL_OVERLAP_MODIFIER: f32 = 1.25;
+const HEX_SIDES: usize = 6;
+const WHITE_EMISSION_INTENSITY: f32 = 10.;
 
 pub(crate) struct MazeAssets {
     pub(crate) hex_mesh: Handle<Mesh>,
@@ -11,22 +13,27 @@ pub(crate) struct MazeAssets {
     pub(crate) wall_material: Handle<StandardMaterial>,
 }
 
-pub(crate) fn create_base_assets(
-    meshes: &mut ResMut<Assets<Mesh>>,
-    materials: &mut ResMut<Assets<StandardMaterial>>,
-    config: &MazeConfig,
-) -> MazeAssets {
-    MazeAssets {
-        hex_mesh: meshes.add(generate_hex_mesh(config.size, config.height)),
-        wall_mesh: meshes.add(generate_square_mesh(config.size)),
-        hex_material: materials.add(white_material()),
-        wall_material: materials.add(Color::BLACK),
+impl MazeAssets {
+    pub(crate) fn new(
+        meshes: &mut ResMut<Assets<Mesh>>,
+        materials: &mut ResMut<Assets<StandardMaterial>>,
+        config: &MazeConfig,
+    ) -> MazeAssets {
+        MazeAssets {
+            hex_mesh: meshes.add(generate_hex_mesh(config.hex_size, config.height)),
+            wall_mesh: meshes.add(generate_square_mesh(
+                config.hex_size + config.wall_size() / WALL_OVERLAP_MODIFIER,
+                config.wall_size(),
+            )),
+            hex_material: materials.add(white_material()),
+            wall_material: materials.add(Color::BLACK),
+        }
     }
 }
 
 fn generate_hex_mesh(radius: f32, depth: f32) -> Mesh {
     let hexagon = RegularPolygon {
-        sides: 6,
+        sides: HEX_SIDES,
         circumcircle: Circle::new(radius),
     };
     let prism_shape = Extrusion::new(hexagon, depth);
@@ -35,8 +42,8 @@ fn generate_hex_mesh(radius: f32, depth: f32) -> Mesh {
     Mesh::from(prism_shape).rotated_by(rotation)
 }
 
-fn generate_square_mesh(depth: f32) -> Mesh {
-    let square = Rectangle::new(WALL_SIZE, WALL_SIZE);
+fn generate_square_mesh(depth: f32, wall_size: f32) -> Mesh {
+    let square = Rectangle::new(wall_size, wall_size);
     let rectangular_prism = Extrusion::new(square, depth);
     let rotation = Quat::from_rotation_x(FRAC_PI_2);
 
@@ -44,10 +51,14 @@ fn generate_square_mesh(depth: f32) -> Mesh {
 }
 
 fn white_material() -> StandardMaterial {
-    let val = 10.;
     StandardMaterial {
         base_color: Color::WHITE,
-        emissive: LinearRgba::new(val, val, val, val),
+        emissive: LinearRgba::new(
+            WHITE_EMISSION_INTENSITY,
+            WHITE_EMISSION_INTENSITY,
+            WHITE_EMISSION_INTENSITY,
+            WHITE_EMISSION_INTENSITY,
+        ),
         ..default()
     }
 }
