@@ -3,6 +3,7 @@ use hexx::{Hex, HexLayout, HexOrientation};
 use rand::{thread_rng, Rng};
 
 pub(crate) const HEX_SIZE: f32 = 6.;
+pub(crate) const WALL_SIZE: f32 = 1.0;
 
 #[derive(Debug, Reflect, Resource)]
 #[reflect(Resource)]

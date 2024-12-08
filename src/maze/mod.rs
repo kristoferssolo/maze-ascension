@@ -1,8 +1,12 @@
 use bevy::{ecs::world::Command, prelude::*};
 use plugin::MazePlugin;
+mod assets;
+mod components;
 pub mod plugin;
-pub mod prism;
-pub mod resource;
+mod resources;
+mod systems;
+
+pub use resources::MazeConfig;
 
 pub fn spawn_grid(world: &mut World) {
     MazePlugin.apply(world);
