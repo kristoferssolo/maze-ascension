@@ -8,9 +8,9 @@ use bevy::{
     prelude::*,
 };
 use bevy_egui::EguiPlugin;
-use bevy_inspector_egui::DefaultInspectorConfigPlugin;
+use bevy_inspector_egui::quick::WorldInspectorPlugin;
 
-use super::ui::{inspector_ui, maze_controls_ui};
+use super::ui::maze_controls_ui;
 
 #[derive(Debug)]
 pub struct DevToolsPlugin;
@@ -19,9 +19,9 @@ impl Plugin for DevToolsPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(Update, log_transitions::<Screen>)
             .add_plugins(EguiPlugin)
+            .add_plugins(WorldInspectorPlugin::new())
             .add_plugins(DebugUiPlugin)
-            .add_plugins(DefaultInspectorConfigPlugin)
-            .add_systems(Update, (inspector_ui, maze_controls_ui))
+            .add_systems(Update, maze_controls_ui)
             .add_systems(
                 Update,
                 toggle_debug_ui.run_if(input_just_pressed(TOGGLE_KEY)),
