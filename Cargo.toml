@@ -1,7 +1,7 @@
 [package]
 name = "maze-ascension"
 authors = ["Kristofers Solo <dev@kristofers.xyz>"]
-version = "0.0.5"
+version = "0.0.6"
 edition = "2021"
 
 [dependencies]
@@ -18,8 +18,10 @@ tracing = { version = "0.1", features = [
   "release_max_level_warn",
 ] }
 hexx = { version = "0.18", features = ["bevy_reflect", "grid"] }
-bevy_prototype_lyon = "0.12"
+hexlab = { version = "0.1", features = ["bevy"] }
 bevy-inspector-egui = { version = "0.27", optional = true }
+bevy_egui = { version = "0.30", optional = true }
+thiserror = "2.0"
 
 
 [features]
@@ -31,7 +33,8 @@ dev = [
   # Improve compile times for dev builds by linking Bevy as a dynamic library.
   "bevy/dynamic_linking",
   "bevy/bevy_dev_tools",
-  "bevy-inspector-egui",
+  "dep:bevy-inspector-egui",
+  "dep:bevy_egui",
 ]
 dev_native = [
   "dev",
@@ -40,7 +43,6 @@ dev_native = [
   # Enable embedded asset hot reloading for native dev builds.
   "bevy/embedded_watcher",
 ]
-demo = []
 
 
 # Idiomatic Bevy code often triggers these lints, and the CI workflow treats them as errors.
