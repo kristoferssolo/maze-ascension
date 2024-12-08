@@ -51,7 +51,7 @@ impl MazeConfig {
         };
 
         Ok(Self {
-            radius: radius as u32,
+            radius,
             height,
             hex_size,
             start_pos,

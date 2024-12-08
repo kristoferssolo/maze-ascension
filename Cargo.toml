@@ -43,7 +43,6 @@ dev_native = [
   # Enable embedded asset hot reloading for native dev builds.
   "bevy/embedded_watcher",
 ]
-demo = []
 
 
 # Idiomatic Bevy code often triggers these lints, and the CI workflow treats them as errors.

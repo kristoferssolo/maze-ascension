@@ -1,10 +1,7 @@
 mod asset_tracking;
 pub mod audio;
-#[cfg(feature = "demo")]
-mod demo;
 #[cfg(feature = "dev")]
 mod dev_tools;
-#[cfg(not(feature = "demo"))]
 mod maze;
 mod screens;
 mod theme;
@@ -60,9 +57,6 @@ impl Plugin for AppPlugin {
         // Add other plugins.
         app.add_plugins((
             asset_tracking::plugin,
-            #[cfg(feature = "demo")]
-            demo::plugin,
-            #[cfg(not(feature = "demo"))]
             maze::plugin::MazePlugin,
             screens::plugin,
             theme::plugin,

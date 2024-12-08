@@ -24,7 +24,7 @@ pub(super) fn spawn_single_hex_tile(
 
     parent
         .spawn((
-            Name::new(format!("Hex {}", tile.to_string())),
+            Name::new(format!("Hex {}", tile)),
             MazeTile,
             PbrBundle {
                 mesh: assets.hex_mesh.clone(),
@@ -33,7 +33,7 @@ pub(super) fn spawn_single_hex_tile(
                 ..default()
             },
         ))
-        .with_children(|parent| spawn_walls(parent, assets, config, &tile.walls()));
+        .with_children(|parent| spawn_walls(parent, assets, config, tile.walls()));
 }
 
 fn spawn_walls(parent: &mut ChildBuilder, assets: &MazeAssets, config: &MazeConfig, walls: &Walls) {

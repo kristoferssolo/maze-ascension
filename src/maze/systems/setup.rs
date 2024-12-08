@@ -39,7 +39,7 @@ pub(super) fn setup_maze(
         ))
         .with_children(|parent| {
             for tile in maze.values() {
-                spawn_single_hex_tile(parent, &assets, tile, &config)
+                spawn_single_hex_tile(parent, &assets, tile, config)
             }
         });
 }
