@@ -5,7 +5,7 @@ mod dev_tools;
 mod maze;
 mod player;
 mod screens;
-mod theme;
+pub mod theme;
 
 use bevy::{
     asset::AssetMetaCheck,

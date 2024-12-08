@@ -1,7 +1,6 @@
 //! Reusable UI widgets & theming.
 
 // Unused utilities may trigger this lints undesirably.
-#![allow(dead_code)]
 
 pub mod interaction;
 pub mod palette;
