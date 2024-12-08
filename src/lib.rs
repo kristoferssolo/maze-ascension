@@ -1,10 +1,7 @@
 mod asset_tracking;
 pub mod audio;
-#[cfg(feature = "demo")]
-mod demo;
 #[cfg(feature = "dev")]
 mod dev_tools;
-#[cfg(not(feature = "demo"))]
 mod maze;
 mod screens;
 mod theme;
@@ -60,9 +57,6 @@ impl Plugin for AppPlugin {
         // Add other plugins.
         app.add_plugins((
             asset_tracking::plugin,
-            #[cfg(feature = "demo")]
-            demo::plugin,
-            #[cfg(not(feature = "demo"))]
             maze::plugin::MazePlugin,
             screens::plugin,
             theme::plugin,
@@ -70,7 +64,7 @@ impl Plugin for AppPlugin {
 
         // Enable dev tools for dev builds.
         #[cfg(feature = "dev")]
-        app.add_plugins(dev_tools::plugin);
+        app.add_plugins(dev_tools::DevToolsPlugin);
     }
 }
 
@@ -91,7 +85,7 @@ fn spawn_camera(mut commands: Commands) {
     commands.spawn((
         Name::new("Camera"),
         Camera3dBundle {
-            transform: Transform::from_xyz(0., 300., 300.).looking_at(Vec3::ZERO, Vec3::Y),
+            transform: Transform::from_xyz(200., 200., 0.).looking_at(Vec3::ZERO, Vec3::Y),
             ..default()
         },
         // Render all UI to this camera.

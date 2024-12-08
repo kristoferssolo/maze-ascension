@@ -3,27 +3,26 @@ use bevy::{
     prelude::*,
 };
 
-use super::{grid, prism};
+use super::{
+    events::RecreateMazeEvent,
+    systems::{self, recreation::handle_maze_recreation_event},
+    MazeConfig, MazePluginLoaded,
+};
 
 #[derive(Default)]
 pub(crate) struct MazePlugin;
 
 impl Plugin for MazePlugin {
     fn build(&self, app: &mut App) {
-        app.add_plugins(prism::plugin);
-        app.add_plugins(grid::plugin);
-        // app.insert_resource(AmbientLight {
-        //     brightness: f32::MAX,
-        //     color: Color::WHITE,
-        // });
+        app.init_resource::<MazeConfig>()
+            .add_event::<RecreateMazeEvent>()
+            .add_systems(Update, handle_maze_recreation_event);
     }
 }
 
 impl Command for MazePlugin {
     fn apply(self, world: &mut World) {
-        // world.run_system_once(spawn_hex_grid);
-        // world.run_system_once(generate_maze);
-        // world.run_system_once(render_maze);
-        world.run_system_once(prism::setup);
+        world.insert_resource(MazePluginLoaded);
+        world.run_system_once(systems::setup::setup);
     }
 }
