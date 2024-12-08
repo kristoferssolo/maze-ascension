@@ -1,8 +1,7 @@
-use std::num::TryFromIntError;
-
 use bevy::prelude::*;
 use hexx::{Hex, HexLayout, HexOrientation};
 use rand::{rngs::StdRng, thread_rng, Rng, SeedableRng};
+use std::num::TryFromIntError;
 use thiserror::Error;
 
 #[derive(Debug, Default, Reflect, Resource)]

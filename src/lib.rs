@@ -3,6 +3,7 @@ pub mod audio;
 #[cfg(feature = "dev")]
 mod dev_tools;
 mod maze;
+mod player;
 mod screens;
 mod theme;
 
@@ -57,14 +58,15 @@ impl Plugin for AppPlugin {
         // Add other plugins.
         app.add_plugins((
             asset_tracking::plugin,
-            maze::plugin::MazePlugin,
             screens::plugin,
             theme::plugin,
+            maze::plugin,
+            player::plugin,
         ));
 
         // Enable dev tools for dev builds.
         #[cfg(feature = "dev")]
-        app.add_plugins(dev_tools::DevToolsPlugin);
+        app.add_plugins(dev_tools::plugin);
     }
 }
 
