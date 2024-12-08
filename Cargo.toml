@@ -21,6 +21,7 @@ hexx = { version = "0.18", features = ["bevy_reflect", "grid"] }
 hexlab = { version = "0.1", features = ["bevy"] }
 bevy-inspector-egui = { version = "0.27", optional = true }
 bevy_egui = { version = "0.30", optional = true }
+thiserror = "2.0"
 
 
 [features]

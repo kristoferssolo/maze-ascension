@@ -12,9 +12,12 @@ use bevy::{
 
 use bevy_inspector_egui::{bevy_egui::EguiContext, DefaultInspectorConfigPlugin};
 
-use crate::{maze::events::RecreateMazeEvent, screens::Screen};
+use crate::{
+    maze::{events::RecreateMazeEvent, MazeConfig},
+    screens::Screen,
+};
 use bevy_egui::{
-    egui::{self, Button, Color32, ScrollArea},
+    egui::{self, Button, Color32, DragValue, ScrollArea},
     EguiPlugin,
 };
 
@@ -52,14 +55,71 @@ fn inspector_ui(world: &mut World) {
         ScrollArea::vertical().show(ui, |ui| {
             bevy_inspector_egui::bevy_inspector::ui_for_world(world, ui);
         });
+    });
 
-        ui.add_space(8.);
+    egui::Window::new("Maze Controls").show(egui_context.get_mut(), |ui| {
+        if let Some(mut maze_config) = world.get_resource_mut::<MazeConfig>() {
+            ui.heading("Maze Configuration");
 
-        let button = Button::new("Recreate maze").fill(Color32::from_rgb(108, 108, 108));
+            // radius controls
+            ui.horizontal(|ui| {
+                ui.label("Radius:");
+                ui.add(
+                    DragValue::new(&mut maze_config.radius)
+                        .speed(1)
+                        .range(1..=100),
+                );
+            });
 
-        if ui.add(button).clicked() {
-            if let Some(mut event_writer) = world.get_resource_mut::<Events<RecreateMazeEvent>>() {
-                event_writer.send(RecreateMazeEvent { floor: 1 });
+            // height controls
+            ui.horizontal(|ui| {
+                ui.label("Height:");
+                ui.add(
+                    DragValue::new(&mut maze_config.height)
+                        .speed(0.5)
+                        .range(1.0..=50.),
+                );
+            });
+
+            // start position
+            ui.horizontal(|ui| {
+                ui.label("Start Position:");
+                ui.add(
+                    DragValue::new(&mut maze_config.start_pos.x)
+                        .speed(1)
+                        .prefix("x: "),
+                );
+                ui.add(
+                    DragValue::new(&mut maze_config.start_pos.y)
+                        .speed(1)
+                        .prefix("y: "),
+                );
+            });
+
+            // end position
+            ui.horizontal(|ui| {
+                ui.label("End Position:");
+                ui.add(
+                    DragValue::new(&mut maze_config.end_pos.x)
+                        .speed(1)
+                        .prefix("x: "),
+                );
+                ui.add(
+                    DragValue::new(&mut maze_config.end_pos.y)
+                        .speed(1)
+                        .prefix("y: "),
+                );
+            });
+
+            ui.add_space(8.);
+
+            let button = Button::new("Recreate maze").fill(Color32::from_rgb(108, 108, 108));
+            if ui.add(button).clicked() {
+                if let Some(mut event_writer) =
+                    world.get_resource_mut::<Events<RecreateMazeEvent>>()
+                {
+                    event_writer.send(RecreateMazeEvent { floor: 1 });
+                }
             }
         }
     });

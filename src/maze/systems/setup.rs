@@ -26,7 +26,7 @@ pub(super) fn setup_maze(
 ) {
     let maze = MazeBuilder::new()
         .with_radius(config.radius)
-        // .with_seed(0)
+        .with_seed(config.seed)
         .with_generator(GeneratorType::RecursiveBacktracking)
         .build()
         .expect("Something went wrong while creating maze");
@@ -43,7 +43,7 @@ pub(super) fn setup_maze(
         ))
         .with_children(|parent| {
             for tile in maze.values() {
-                spawn_single_hex_tile(parent, &assets, tile, &layout.0, config.height)
+                spawn_single_hex_tile(parent, &assets, tile, &layout.0, &config)
             }
         });
 }

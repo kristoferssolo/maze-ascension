@@ -7,7 +7,8 @@ use hexx::HexOrientation;
 use crate::maze::{
     assets::MazeAssets,
     components::{MazeTile, MazeWall},
-    resources::{HEX_SIZE, WALL_SIZE},
+    resources::WALL_SIZE,
+    MazeConfig,
 };
 
 pub(super) fn spawn_single_hex_tile(
@@ -15,7 +16,7 @@ pub(super) fn spawn_single_hex_tile(
     assets: &MazeAssets,
     tile: &HexTile,
     layout: &HexLayout,
-    hex_height: f32,
+    config: &MazeConfig,
 ) {
     let world_pos = tile.to_vec3(layout);
     let rotation = match layout.orientation {
@@ -34,11 +35,12 @@ pub(super) fn spawn_single_hex_tile(
                 ..default()
             },
         ))
-        .with_children(|parent| spawn_walls(parent, assets, hex_height / 2., &tile.walls()));
+        .with_children(|parent| spawn_walls(parent, assets, config, &tile.walls()));
 }
 
-fn spawn_walls(parent: &mut ChildBuilder, assets: &MazeAssets, y_offset: f32, walls: &Walls) {
+fn spawn_walls(parent: &mut ChildBuilder, assets: &MazeAssets, config: &MazeConfig, walls: &Walls) {
     let z_rotation = Quat::from_rotation_z(-FRAC_PI_2);
+    let y_offset = config.height / 2.;
 
     for i in 0..6 {
         if !walls.contains(i) {
@@ -47,8 +49,8 @@ fn spawn_walls(parent: &mut ChildBuilder, assets: &MazeAssets, y_offset: f32, wa
 
         let wall_angle = -FRAC_PI_3 * i as f32;
 
-        let x_offset = (HEX_SIZE - WALL_SIZE) * f32::cos(wall_angle);
-        let z_offset = (HEX_SIZE - WALL_SIZE) * f32::sin(wall_angle);
+        let x_offset = (config.size - WALL_SIZE) * f32::cos(wall_angle);
+        let z_offset = (config.size - WALL_SIZE) * f32::sin(wall_angle);
         let pos = Vec3::new(x_offset, y_offset, z_offset);
 
         let x_rotation = Quat::from_rotation_x(wall_angle + FRAC_PI_2);

@@ -2,10 +2,7 @@ use std::f32::consts::FRAC_PI_2;
 
 use bevy::prelude::*;
 
-use super::{
-    resources::{HEX_SIZE, WALL_SIZE},
-    MazeConfig,
-};
+use super::{resources::WALL_SIZE, MazeConfig};
 
 pub(crate) struct MazeAssets {
     pub(crate) hex_mesh: Handle<Mesh>,
@@ -20,8 +17,8 @@ pub(crate) fn create_base_assets(
     config: &MazeConfig,
 ) -> MazeAssets {
     MazeAssets {
-        hex_mesh: meshes.add(generate_hex_mesh(HEX_SIZE, config.height)),
-        wall_mesh: meshes.add(generate_square_mesh(HEX_SIZE)),
+        hex_mesh: meshes.add(generate_hex_mesh(config.size, config.height)),
+        wall_mesh: meshes.add(generate_square_mesh(config.size)),
         hex_material: materials.add(white_material()),
         wall_material: materials.add(Color::BLACK),
     }
