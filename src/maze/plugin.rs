@@ -7,7 +7,7 @@ use super::{
     events::RecreateMazeEvent,
     resources::Layout,
     systems::{self, recreation::handle_maze_recreation_event},
-    MazeConfig,
+    MazeConfig, MazePluginLoaded,
 };
 
 #[derive(Default)]
@@ -24,6 +24,7 @@ impl Plugin for MazePlugin {
 
 impl Command for MazePlugin {
     fn apply(self, world: &mut World) {
+        world.insert_resource(MazePluginLoaded);
         world.run_system_once(systems::setup::setup);
     }
 }

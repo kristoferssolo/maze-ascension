@@ -5,6 +5,10 @@ use hexx::{Hex, HexLayout, HexOrientation};
 use rand::{rngs::StdRng, thread_rng, Rng, SeedableRng};
 use thiserror::Error;
 
+#[derive(Debug, Default, Reflect, Resource)]
+#[reflect(Resource)]
+pub struct MazePluginLoaded;
+
 pub(crate) const WALL_SIZE: f32 = 1.0;
 #[derive(Debug, Error)]
 pub enum MazeConfigError {

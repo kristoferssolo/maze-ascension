@@ -7,8 +7,8 @@ pub mod plugin;
 mod resources;
 mod systems;
 
-pub use resources::MazeConfig;
+pub use resources::{MazeConfig, MazePluginLoaded};
 
-pub fn spawn_grid(world: &mut World) {
+pub fn spawn_maze(world: &mut World) {
     MazePlugin.apply(world);
 }
