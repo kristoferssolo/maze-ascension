@@ -3,14 +3,22 @@ use bevy::{
     prelude::*,
 };
 
-use super::{resources::Layout, systems, MazeConfig};
+use super::{
+    events::RecreateMazeEvent,
+    resources::Layout,
+    systems::{self, recreation::handle_maze_recreation_event},
+    MazeConfig,
+};
 
 #[derive(Default)]
 pub(crate) struct MazePlugin;
 
 impl Plugin for MazePlugin {
     fn build(&self, app: &mut App) {
-        app.init_resource::<MazeConfig>().init_resource::<Layout>();
+        app.init_resource::<MazeConfig>()
+            .init_resource::<Layout>()
+            .add_event::<RecreateMazeEvent>()
+            .add_systems(Update, handle_maze_recreation_event);
     }
 }
 

@@ -17,7 +17,7 @@ pub(crate) struct MazeAssets {
 pub(crate) fn create_base_assets(
     meshes: &mut ResMut<Assets<Mesh>>,
     materials: &mut ResMut<Assets<StandardMaterial>>,
-    config: &Res<MazeConfig>,
+    config: &MazeConfig,
 ) -> MazeAssets {
     MazeAssets {
         hex_mesh: meshes.add(generate_hex_mesh(HEX_SIZE, config.height)),
