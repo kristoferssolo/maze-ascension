@@ -1,12 +1,14 @@
 mod assets;
-mod components;
+pub mod components;
 mod systems;
 
-use bevy::prelude::*;
+use bevy::{ecs::system::RunSystemOnce, prelude::*};
 use components::Player;
-use systems::spawn_player;
 
 pub(super) fn plugin(app: &mut App) {
-    app.register_type::<Player>()
-        .add_systems(Startup, spawn_player);
+    app.register_type::<Player>().add_plugins(systems::plugin);
+}
+
+pub fn spawn_player_command(world: &mut World) {
+    world.run_system_once(systems::spawn::spawn_player);
 }

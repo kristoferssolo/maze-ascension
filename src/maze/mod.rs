@@ -15,7 +15,7 @@ pub(super) fn plugin(app: &mut App) {
         .add_systems(Update, handle_maze_recreation_event);
 }
 
-pub fn spawn_maze(world: &mut World) {
+pub fn spawn_level_command(world: &mut World) {
     world.insert_resource(MazePluginLoaded);
     world.run_system_once(systems::setup::setup);
 }

@@ -1,8 +1,10 @@
-use super::{
-    assets::{blue_material, generate_pill_mesh},
-    components::Player,
+use crate::{
+    maze::MazeConfig,
+    player::{
+        assets::{blue_material, generate_pill_mesh},
+        components::Player,
+    },
 };
-use crate::maze::{events::RecreateMazeEvent, MazeConfig};
 use bevy::prelude::*;
 
 pub fn spawn_player(
@@ -16,7 +18,7 @@ pub fn spawn_player(
 
     commands.spawn((
         Name::new("Player"),
-        Player,
+        Player { speed: 50. },
         PbrBundle {
             mesh: meshes.add(generate_pill_mesh(player_radius, player_height / 2.)),
             material: materials.add(blue_material()),

@@ -2,7 +2,8 @@
 
 use bevy::{input::common_conditions::input_just_pressed, prelude::*};
 
-use crate::maze::spawn_maze as spawn_level_command;
+use crate::maze::spawn_level_command;
+use crate::player::spawn_player_command;
 use crate::{asset_tracking::LoadResource, audio::Music, screens::Screen};
 
 pub(super) fn plugin(app: &mut App) {
@@ -21,6 +22,7 @@ pub(super) fn plugin(app: &mut App) {
 
 fn spawn_level(mut commands: Commands) {
     commands.queue(spawn_level_command);
+    commands.queue(spawn_player_command);
 }
 
 #[derive(Resource, Asset, Reflect, Clone)]
