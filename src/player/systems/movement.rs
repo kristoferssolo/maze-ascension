@@ -1,52 +1,66 @@
 use crate::{maze::MazeConfig, player::components::Player};
 use bevy::prelude::*;
-use hexx::EdgeDirection;
+use hexx::Hex;
 
-const fn create_direction(key: &KeyCode) -> Option<EdgeDirection> {
-    match key {
-        KeyCode::KeyD => Some(EdgeDirection::FLAT_SOUTH),
-        KeyCode::KeyS => Some(EdgeDirection::FLAT_NORTH_EAST),
-        KeyCode::KeyA => Some(EdgeDirection::FLAT_NORTH),
-        KeyCode::KeyQ => Some(EdgeDirection::FLAT_NORTH_WEST),
-        KeyCode::KeyW => Some(EdgeDirection::FLAT_SOUTH_WEST),
-        KeyCode::KeyE => Some(EdgeDirection::FLAT_SOUTH_EAST),
-        _ => None,
-    }
-}
-
-pub fn player_movement(
+pub(super) fn player_movement(
     time: Res<Time>,
-    input: Res<ButtonInput<KeyCode>>,
     mut player_query: Query<(&mut Player, &mut Transform)>,
     maze_config: Res<MazeConfig>,
 ) {
     for (mut player, mut transform) in player_query.iter_mut() {
-        if let Some(direction) = input.get_pressed().find_map(|key| create_direction(key)) {
-            let next_hex = player.current_hex + direction.into_hex();
-            player.target_hex = Some(next_hex);
-        }
-
         if let Some(target_hex) = player.target_hex {
             let current_pos = transform.translation;
-            let target_pos = {
-                let world_pos = maze_config.layout.hex_to_world_pos(target_hex);
-                Vec3::new(world_pos.x, current_pos.y, world_pos.y)
-            };
-            let direction = target_pos - current_pos;
-            let distance = direction.length();
+            let target_pos = calculate_target_position(&maze_config, target_hex, current_pos.y);
 
-            if distance < 0.1 {
-                transform.translation = target_pos;
-                player.current_hex = target_hex;
-                player.target_hex = None;
-            } else {
-                let movement = direction.normalize() * player.speed * time.delta_seconds();
-                if movement.length() > distance {
-                    transform.translation = target_pos;
-                } else {
-                    transform.translation += movement;
-                }
+            if should_complete_movement(current_pos, target_pos) {
+                complete_movement(&mut player, &mut transform, target_pos, target_hex);
+                continue;
             }
+
+            update_position(
+                &mut transform,
+                current_pos,
+                target_pos,
+                player.speed,
+                time.delta_seconds(),
+            );
         }
     }
+}
+
+fn calculate_target_position(maze_config: &MazeConfig, target_hex: Hex, y: f32) -> Vec3 {
+    let world_pos = maze_config.layout.hex_to_world_pos(target_hex);
+    Vec3::new(world_pos.x, y, world_pos.y)
+}
+
+fn should_complete_movement(current_pos: Vec3, target_pos: Vec3) -> bool {
+    (target_pos - current_pos).length() < 0.1
+}
+
+fn complete_movement(
+    player: &mut Player,
+    transform: &mut Transform,
+    target_pos: Vec3,
+    target_hex: Hex,
+) {
+    transform.translation = target_pos;
+    player.current_hex = target_hex;
+    player.target_hex = None;
+}
+
+fn update_position(
+    transform: &mut Transform,
+    current_pos: Vec3,
+    target_pos: Vec3,
+    speed: f32,
+    delta_time: f32,
+) {
+    let direction = target_pos - current_pos;
+    let movement = direction.normalize() * speed * delta_time;
+
+    if movement.length() > direction.length() {
+        transform.translation = target_pos;
+        return;
+    }
+    transform.translation += movement;
 }
