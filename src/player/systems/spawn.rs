@@ -18,7 +18,7 @@ pub fn spawn_player(
 
     commands.spawn((
         Name::new("Player"),
-        Player { speed: 50. },
+        Player::default(),
         PbrBundle {
             mesh: meshes.add(generate_pill_mesh(player_radius, player_height / 2.)),
             material: materials.add(blue_material()),
