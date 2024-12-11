@@ -20,7 +20,7 @@ impl<T: SpawnUi> Widgets for T {
     fn button(&mut self, text: impl Into<String>) -> EntityCommands {
         let mut entity = self.spawn_ui((
             Name::new("Button"),
-            Button::default(),
+            Button,
             ImageNode {
                 color: NODE_BACKGROUND,
                 ..default()

@@ -30,7 +30,7 @@ pub(super) fn spawn_single_hex_tile(
             MeshMaterial3d(assets.hex_material.clone()),
             Transform::from_translation(world_pos).with_rotation(rotation),
         ))
-        .with_children(|parent| spawn_walls(parent, assets, config, &tile.walls()));
+        .with_children(|parent| spawn_walls(parent, assets, config, tile.walls()));
 }
 
 fn spawn_walls(parent: &mut ChildBuilder, assets: &MazeAssets, config: &MazeConfig, walls: &Walls) {
