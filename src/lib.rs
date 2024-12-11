@@ -84,10 +84,8 @@ enum AppSet {
 fn spawn_camera(mut commands: Commands) {
     commands.spawn((
         Name::new("Camera"),
-        Camera3dBundle {
-            transform: Transform::from_xyz(200., 200., 0.).looking_at(Vec3::ZERO, Vec3::Y),
-            ..default()
-        },
+        Camera3d::default(),
+        Transform::from_xyz(200., 200., 0.).looking_at(Vec3::ZERO, Vec3::Y),
         // Render all UI to this camera.
         // Not strictly necessary since we only use one camera,
         // but if we don't use this component, our UI will disappear as soon

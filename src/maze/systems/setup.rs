@@ -32,10 +32,8 @@ pub(super) fn setup_maze(
         .spawn((
             Name::new("Floor"),
             MazeFloor(1),
-            SpatialBundle {
-                transform: Transform::from_translation(Vec3::ZERO),
-                ..default()
-            },
+            Transform::from_translation(Vec3::ZERO),
+            Visibility::Visible,
         ))
         .with_children(|parent| {
             for tile in maze.values() {

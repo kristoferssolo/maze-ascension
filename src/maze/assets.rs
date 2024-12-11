@@ -3,7 +3,7 @@ use bevy::prelude::*;
 use std::f32::consts::FRAC_PI_2;
 
 const WALL_OVERLAP_MODIFIER: f32 = 1.25;
-const HEX_SIDES: usize = 6;
+const HEX_SIDES: u32 = 6;
 const WHITE_EMISSION_INTENSITY: f32 = 10.;
 
 pub(crate) struct MazeAssets {
