@@ -23,6 +23,6 @@ impl Plugin for MazePlugin {
 impl Command for MazePlugin {
     fn apply(self, world: &mut World) {
         world.insert_resource(MazePluginLoaded);
-        world.run_system_once(systems::setup::setup);
+        let _ = world.run_system_once(systems::setup::setup);
     }
 }

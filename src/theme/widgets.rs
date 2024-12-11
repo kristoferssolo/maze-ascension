@@ -16,19 +16,20 @@ pub trait Widgets {
     fn label(&mut self, text: impl Into<String>) -> EntityCommands;
 }
 
-impl<T: Spawn> Widgets for T {
+impl<T: SpawnUi> Widgets for T {
     fn button(&mut self, text: impl Into<String>) -> EntityCommands {
-        let mut entity = self.spawn((
+        let mut entity = self.spawn_ui((
             Name::new("Button"),
-            ButtonBundle {
-                style: Style {
-                    width: Px(200.0),
-                    height: Px(65.0),
-                    justify_content: JustifyContent::Center,
-                    align_items: AlignItems::Center,
-                    ..default()
-                },
-                background_color: BackgroundColor(NODE_BACKGROUND),
+            Button::default(),
+            ImageNode {
+                color: NODE_BACKGROUND,
+                ..default()
+            },
+            Node {
+                width: Px(200.0),
+                height: Px(65.0),
+                justify_content: JustifyContent::Center,
+                align_items: AlignItems::Center,
                 ..default()
             },
             InteractionPalette {
@@ -38,16 +39,14 @@ impl<T: Spawn> Widgets for T {
             },
         ));
         entity.with_children(|children| {
-            children.spawn((
+            children.spawn_ui((
                 Name::new("Button Text"),
-                TextBundle::from_section(
-                    text,
-                    TextStyle {
-                        font_size: 40.0,
-                        color: BUTTON_TEXT,
-                        ..default()
-                    },
-                ),
+                Text(text.into()),
+                TextFont {
+                    font_size: 40.0,
+                    ..default()
+                },
+                TextColor(BUTTON_TEXT),
             ));
         });
 
@@ -55,51 +54,47 @@ impl<T: Spawn> Widgets for T {
     }
 
     fn header(&mut self, text: impl Into<String>) -> EntityCommands {
-        let mut entity = self.spawn((
+        let mut entity = self.spawn_ui((
             Name::new("Header"),
-            NodeBundle {
-                style: Style {
-                    width: Px(500.0),
-                    height: Px(65.0),
-                    justify_content: JustifyContent::Center,
-                    align_items: AlignItems::Center,
-                    ..default()
-                },
-                background_color: BackgroundColor(NODE_BACKGROUND),
+            Node {
+                width: Px(500.0),
+                height: Px(65.0),
+                justify_content: JustifyContent::Center,
+                align_items: AlignItems::Center,
                 ..default()
             },
+            BackgroundColor(NODE_BACKGROUND),
         ));
         entity.with_children(|children| {
-            children.spawn((
+            children.spawn_ui((
                 Name::new("Header Text"),
-                TextBundle::from_section(
-                    text,
-                    TextStyle {
-                        font_size: 40.0,
-                        color: HEADER_TEXT,
-                        ..default()
-                    },
-                ),
+                Text(text.into()),
+                TextFont {
+                    font_size: 40.0,
+                    ..default()
+                },
+                TextColor(HEADER_TEXT),
             ));
         });
         entity
     }
 
-    fn label(&mut self, text: impl Into<String>) -> EntityCommands {
-        let entity = self.spawn((
+    fn label(&mut self, _text: impl Into<String>) -> EntityCommands {
+        let entity = self.spawn_ui((
             Name::new("Label"),
-            TextBundle::from_section(
-                text,
-                TextStyle {
-                    font_size: 24.0,
-                    color: LABEL_TEXT,
-                    ..default()
-                },
-            )
-            .with_style(Style {
-                width: Px(500.0),
-                ..default()
-            }),
+            Text::default(),
+            // TextBundle::from_section(
+            //     text,
+            //     TextStyle {
+            //         font_size: 24.0,
+            //         color: LABEL_TEXT,
+            //         ..default()
+            //     },
+            // )
+            // .with_style(Style {
+            //     width: Px(500.0),
+            //     ..default()
+            // }),
         ));
         entity
     }
@@ -116,17 +111,14 @@ impl Containers for Commands<'_, '_> {
     fn ui_root(&mut self) -> EntityCommands {
         self.spawn((
             Name::new("UI Root"),
-            NodeBundle {
-                style: Style {
-                    width: Percent(100.0),
-                    height: Percent(100.0),
-                    justify_content: JustifyContent::Center,
-                    align_items: AlignItems::Center,
-                    flex_direction: FlexDirection::Column,
-                    row_gap: Px(10.0),
-                    position_type: PositionType::Absolute,
-                    ..default()
-                },
+            Node {
+                width: Percent(100.0),
+                height: Percent(100.0),
+                justify_content: JustifyContent::Center,
+                align_items: AlignItems::Center,
+                flex_direction: FlexDirection::Column,
+                row_gap: Px(10.0),
+                position_type: PositionType::Absolute,
                 ..default()
             },
         ))
@@ -137,18 +129,18 @@ impl Containers for Commands<'_, '_> {
 /// This is here so that [`Widgets`] can be implemented on all types that
 /// are able to spawn entities.
 /// Ideally, this trait should be [part of Bevy itself](https://github.com/bevyengine/bevy/issues/14231).
-trait Spawn {
-    fn spawn<B: Bundle>(&mut self, bundle: B) -> EntityCommands;
+trait SpawnUi {
+    fn spawn_ui<B: Bundle>(&mut self, bundle: B) -> EntityCommands;
 }
 
-impl Spawn for Commands<'_, '_> {
-    fn spawn<B: Bundle>(&mut self, bundle: B) -> EntityCommands {
+impl SpawnUi for Commands<'_, '_> {
+    fn spawn_ui<B: Bundle>(&mut self, bundle: B) -> EntityCommands {
         self.spawn(bundle)
     }
 }
 
-impl Spawn for ChildBuilder<'_> {
-    fn spawn<B: Bundle>(&mut self, bundle: B) -> EntityCommands {
+impl SpawnUi for ChildBuilder<'_> {
+    fn spawn_ui<B: Bundle>(&mut self, bundle: B) -> EntityCommands {
         self.spawn(bundle)
     }
 }

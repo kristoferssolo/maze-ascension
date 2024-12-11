@@ -26,14 +26,11 @@ pub(super) fn spawn_single_hex_tile(
         .spawn((
             Name::new(format!("Hex {}", tile)),
             MazeTile,
-            PbrBundle {
-                mesh: assets.hex_mesh.clone(),
-                material: assets.hex_material.clone(),
-                transform: Transform::from_translation(world_pos).with_rotation(rotation),
-                ..default()
-            },
+            Mesh3d(assets.hex_mesh.clone()),
+            MeshMaterial3d(assets.hex_material.clone()),
+            Transform::from_translation(world_pos).with_rotation(rotation),
         ))
-        .with_children(|parent| spawn_walls(parent, assets, config, tile.walls()));
+        .with_children(|parent| spawn_walls(parent, assets, config, &tile.walls()));
 }
 
 fn spawn_walls(parent: &mut ChildBuilder, assets: &MazeAssets, config: &MazeConfig, walls: &Walls) {
@@ -58,20 +55,12 @@ fn spawn_walls(parent: &mut ChildBuilder, assets: &MazeAssets, config: &MazeConf
     }
 }
 
-fn spawn_single_wall(
-    parent: &mut ChildBuilder,
-    asstets: &MazeAssets,
-    rotation: Quat,
-    offset: Vec3,
-) {
+fn spawn_single_wall(parent: &mut ChildBuilder, assets: &MazeAssets, rotation: Quat, offset: Vec3) {
     parent.spawn((
         Name::new("Wall"),
         MazeWall,
-        PbrBundle {
-            mesh: asstets.wall_mesh.clone(),
-            material: asstets.wall_material.clone(),
-            transform: Transform::from_translation(offset).with_rotation(rotation),
-            ..default()
-        },
+        Mesh3d(assets.wall_mesh.clone()),
+        MeshMaterial3d(assets.wall_material.clone()),
+        Transform::from_translation(offset).with_rotation(rotation),
     ));
 }
