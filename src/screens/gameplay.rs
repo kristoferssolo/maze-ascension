@@ -7,7 +7,13 @@ use crate::player::spawn_player_command;
 use crate::{asset_tracking::LoadResource, audio::Music, screens::Screen};
 
 pub(super) fn plugin(app: &mut App) {
-    app.add_systems(OnEnter(Screen::Gameplay), spawn_level);
+    app.add_systems(
+        OnEnter(Screen::Gameplay),
+        (
+            spawn_level_command,
+            spawn_player_command.after(spawn_level_command),
+        ),
+    );
 
     app.load_resource::<GameplayMusic>();
     app.add_systems(OnEnter(Screen::Gameplay), play_gameplay_music);
@@ -18,11 +24,6 @@ pub(super) fn plugin(app: &mut App) {
         return_to_title_screen
             .run_if(in_state(Screen::Gameplay).and(input_just_pressed(KeyCode::Escape))),
     );
-}
-
-fn spawn_level(mut commands: Commands) {
-    commands.queue(spawn_level_command);
-    commands.queue(spawn_player_command);
 }
 
 #[derive(Resource, Asset, Reflect, Clone)]

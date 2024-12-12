@@ -2,10 +2,11 @@ use crate::{
     maze::MazeConfig,
     player::{
         assets::{blue_material, generate_pill_mesh},
-        components::Player,
+        components::{CurrentPosition, Player},
     },
 };
 use bevy::prelude::*;
+use hexx::Hex;
 
 pub fn spawn_player(
     mut commands: Commands,
@@ -18,12 +19,10 @@ pub fn spawn_player(
 
     commands.spawn((
         Name::new("Player"),
-        Player::default(),
-        PbrBundle {
-            mesh: meshes.add(generate_pill_mesh(player_radius, player_height / 2.)),
-            material: materials.add(blue_material()),
-            transform: Transform::from_xyz(0., player_height * 2., 0.),
-            ..default()
-        },
+        Player,
+        CurrentPosition(Hex::new(1, 1)),
+        Mesh3d(meshes.add(generate_pill_mesh(player_radius, player_height / 2.))),
+        MeshMaterial3d(materials.add(blue_material())),
+        Transform::from_xyz(0., player_height * 2., 0.),
     ));
 }

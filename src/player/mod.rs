@@ -10,5 +10,5 @@ pub(super) fn plugin(app: &mut App) {
 }
 
 pub fn spawn_player_command(world: &mut World) {
-    world.run_system_once(systems::spawn::spawn_player);
+    let _ = world.run_system_once(systems::spawn::spawn_player);
 }

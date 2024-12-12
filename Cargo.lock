@@ -2590,8 +2590,6 @@ checksum = "dfa686283ad6dd069f105e5ab091b04c62850d3e4cf5d67debad1933f55023df"
 [[package]]
 name = "hexlab"
 version = "0.2.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9414db96618050e085e36c92ed9e87f0140d3a611914764ee73c7c0e4ebaa2de"
 dependencies = [
  "bevy",
  "hexx",

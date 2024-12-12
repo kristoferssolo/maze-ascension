@@ -1,7 +1,11 @@
 use bevy::prelude::*;
 use hexlab::{GeneratorType, MazeBuilder};
 
-use crate::maze::{assets::MazeAssets, components::MazeFloor, MazeConfig};
+use crate::maze::{
+    assets::MazeAssets,
+    components::{Floor, Maze},
+    MazeConfig,
+};
 
 use super::spawn::spawn_single_hex_tile;
 
@@ -31,7 +35,8 @@ pub(super) fn setup_maze(
     commands
         .spawn((
             Name::new("Floor"),
-            MazeFloor(1),
+            Maze(maze.clone()),
+            Floor(1),
             Transform::from_translation(Vec3::ZERO),
             Visibility::Visible,
         ))

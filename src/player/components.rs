@@ -1,20 +1,25 @@
 use bevy::prelude::*;
 use hexx::Hex;
 
-#[derive(Component, Debug, Clone, Copy, PartialEq, Reflect)]
+#[derive(Debug, Reflect, Component)]
 #[reflect(Component)]
-pub struct Player {
-    pub speed: f32,
-    pub current_hex: Hex,
-    pub target_hex: Option<Hex>,
-}
+#[require(CurrentPosition, MovementSpeed, MovementTarget)]
+pub struct Player;
 
-impl Default for Player {
+#[derive(Debug, Reflect, Component, Deref, DerefMut, Default)]
+#[reflect(Component)]
+pub struct CurrentPosition(pub Hex);
+
+#[derive(Debug, Reflect, Component, Deref, DerefMut)]
+#[reflect(Component)]
+pub struct MovementSpeed(pub f32);
+
+impl Default for MovementSpeed {
     fn default() -> Self {
-        Self {
-            speed: 50.,
-            current_hex: Hex::ZERO,
-            target_hex: None,
-        }
+        Self(50.)
     }
 }
+
+#[derive(Debug, Reflect, Component, Deref, DerefMut, Default)]
+#[reflect(Component)]
+pub struct MovementTarget(pub Option<Hex>);

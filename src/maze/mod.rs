@@ -1,7 +1,7 @@
 use bevy::{ecs::system::RunSystemOnce, prelude::*};
 use events::RecreateMazeEvent;
 mod assets;
-mod components;
+pub mod components;
 pub mod events;
 mod resources;
 mod systems;
@@ -17,5 +17,5 @@ pub(super) fn plugin(app: &mut App) {
 
 pub fn spawn_level_command(world: &mut World) {
     world.insert_resource(MazePluginLoaded);
-    world.run_system_once(systems::setup::setup);
+    let _ = world.run_system_once(systems::setup::setup);
 }

@@ -6,7 +6,7 @@ use hexx::HexOrientation;
 
 use crate::maze::{
     assets::MazeAssets,
-    components::{MazeTile, MazeWall},
+    components::{Tile, Wall},
     MazeConfig,
 };
 
@@ -25,7 +25,7 @@ pub(super) fn spawn_single_hex_tile(
     parent
         .spawn((
             Name::new(format!("Hex {}", tile)),
-            MazeTile,
+            Tile,
             Mesh3d(assets.hex_mesh.clone()),
             MeshMaterial3d(assets.hex_material.clone()),
             Transform::from_translation(world_pos).with_rotation(rotation),
@@ -58,7 +58,7 @@ fn spawn_walls(parent: &mut ChildBuilder, assets: &MazeAssets, config: &MazeConf
 fn spawn_single_wall(parent: &mut ChildBuilder, assets: &MazeAssets, rotation: Quat, offset: Vec3) {
     parent.spawn((
         Name::new("Wall"),
-        MazeWall,
+        Wall,
         Mesh3d(assets.wall_mesh.clone()),
         MeshMaterial3d(assets.wall_material.clone()),
         Transform::from_translation(offset).with_rotation(rotation),
