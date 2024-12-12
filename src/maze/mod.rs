@@ -7,12 +7,11 @@ mod resources;
 mod systems;
 
 pub use resources::{MazeConfig, MazePluginLoaded};
-use systems::recreation::handle_maze_recreation_event;
 
 pub(super) fn plugin(app: &mut App) {
     app.init_resource::<MazeConfig>()
         .add_event::<RecreateMazeEvent>()
-        .add_systems(Update, handle_maze_recreation_event);
+        .add_plugins(systems::plugin);
 }
 
 pub fn spawn_level_command(world: &mut World) {

@@ -40,8 +40,8 @@ impl MazeConfig {
         let start_pos = generate_pos(radius, &mut rng)?;
         let end_pos = generate_pos(radius, &mut rng)?;
 
-        debug!("Start pos: ({},{})", start_pos.x, start_pos.y);
-        debug!("End pos: ({},{})", end_pos.x, end_pos.y);
+        info!("Start pos: (q={}, r={})", start_pos.x, start_pos.y);
+        info!("End pos: (q={}, r={})", end_pos.x, end_pos.y);
 
         let layout = HexLayout {
             orientation,

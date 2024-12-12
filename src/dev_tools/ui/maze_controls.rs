@@ -1,14 +1,15 @@
-use std::ops::RangeInclusive;
-
+use crate::{
+    maze::{events::RecreateMazeEvent, MazeConfig, MazePluginLoaded},
+    player::events::RespawnPlayer,
+};
 use bevy::{prelude::*, window::PrimaryWindow};
-use hexx::{Hex, HexOrientation};
-use rand::{thread_rng, Rng};
-
-use crate::maze::{events::RecreateMazeEvent, MazeConfig, MazePluginLoaded};
 use bevy_egui::{
     egui::{self, emath::Numeric, DragValue, TextEdit, Ui},
     EguiContext,
 };
+use hexx::{Hex, HexOrientation};
+use rand::{thread_rng, Rng};
+use std::ops::RangeInclusive;
 
 pub(crate) fn maze_controls_ui(world: &mut World) {
     if world.get_resource::<MazePluginLoaded>().is_none() {
@@ -55,6 +56,9 @@ pub(crate) fn maze_controls_ui(world: &mut World) {
                 {
                     event_writer.send(RecreateMazeEvent { floor: 1 });
                 }
+                if let Some(mut event_writer) = world.get_resource_mut::<Events<RespawnPlayer>>() {
+                    event_writer.send(RespawnPlayer);
+                }
             }
         }
     });
@@ -82,9 +86,9 @@ fn add_position_control(ui: &mut Ui, label: &str, pos: &mut Hex) -> bool {
 
     ui.horizontal(|ui| {
         ui.label(label);
-        let response_x = ui.add(DragValue::new(&mut pos.x).speed(1).prefix("x: "));
-        let response_y = ui.add(DragValue::new(&mut pos.y).speed(1).prefix("y: "));
-        changed = response_x.changed() || response_y.changed();
+        let response_q = ui.add(DragValue::new(&mut pos.x).speed(1).prefix("q: "));
+        let response_r = ui.add(DragValue::new(&mut pos.y).speed(1).prefix("r: "));
+        changed = response_r.changed() || response_q.changed();
     });
     changed
 }

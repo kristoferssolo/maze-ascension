@@ -1,14 +1,41 @@
-use std::f32::consts::{FRAC_PI_2, FRAC_PI_3, FRAC_PI_6};
-
+use crate::maze::{
+    assets::MazeAssets,
+    components::{Floor, Maze, Tile, Wall},
+    MazeConfig,
+};
 use bevy::prelude::*;
 use hexlab::prelude::*;
 use hexx::HexOrientation;
+use std::f32::consts::{FRAC_PI_2, FRAC_PI_3, FRAC_PI_6};
 
-use crate::maze::{
-    assets::MazeAssets,
-    components::{Tile, Wall},
-    MazeConfig,
-};
+pub(super) fn spawn_floor(
+    commands: &mut Commands,
+    meshes: &mut ResMut<Assets<Mesh>>,
+    materials: &mut ResMut<Assets<StandardMaterial>>,
+    config: &MazeConfig,
+) {
+    let maze = MazeBuilder::new()
+        .with_radius(config.radius)
+        .with_seed(config.seed)
+        .with_generator(GeneratorType::RecursiveBacktracking)
+        .build()
+        .expect("Something went wrong while creating maze");
+
+    let assets = MazeAssets::new(meshes, materials, config);
+    commands
+        .spawn((
+            Name::new("Floor"),
+            Maze(maze.clone()),
+            Floor(1),
+            Transform::from_translation(Vec3::ZERO),
+            Visibility::Visible,
+        ))
+        .with_children(|parent| {
+            for tile in maze.values() {
+                spawn_single_hex_tile(parent, &assets, tile, config)
+            }
+        });
+}
 
 pub(super) fn spawn_single_hex_tile(
     parent: &mut ChildBuilder,
