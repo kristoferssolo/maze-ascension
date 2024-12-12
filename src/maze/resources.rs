@@ -1,8 +1,7 @@
-use std::num::TryFromIntError;
-
 use bevy::prelude::*;
 use hexx::{Hex, HexLayout, HexOrientation};
 use rand::{rngs::StdRng, thread_rng, Rng, SeedableRng};
+use std::num::TryFromIntError;
 use thiserror::Error;
 
 #[derive(Debug, Default, Reflect, Resource)]
@@ -41,8 +40,8 @@ impl MazeConfig {
         let start_pos = generate_pos(radius, &mut rng)?;
         let end_pos = generate_pos(radius, &mut rng)?;
 
-        debug!("Start pos: ({},{})", start_pos.x, start_pos.y);
-        debug!("End pos: ({},{})", end_pos.x, end_pos.y);
+        info!("Start pos: (q={}, r={})", start_pos.x, start_pos.y);
+        info!("End pos: (q={}, r={})", end_pos.x, end_pos.y);
 
         let layout = HexLayout {
             orientation,

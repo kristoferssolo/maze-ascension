@@ -1,6 +1,8 @@
-use super::spawn::spawn_floor;
-use crate::maze::MazeConfig;
 use bevy::prelude::*;
+
+use crate::maze::MazeConfig;
+
+use super::spawn::spawn_player;
 
 pub(crate) fn setup(
     mut commands: Commands,
@@ -8,5 +10,5 @@ pub(crate) fn setup(
     mut materials: ResMut<Assets<StandardMaterial>>,
     config: Res<MazeConfig>,
 ) {
-    spawn_floor(&mut commands, &mut meshes, &mut materials, &config);
+    spawn_player(&mut commands, &mut meshes, &mut materials, &config);
 }

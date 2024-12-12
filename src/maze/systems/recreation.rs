@@ -1,27 +1,19 @@
 use bevy::prelude::*;
 
-use crate::maze::{components::MazeFloor, events::RecreateMazeEvent, MazeConfig};
+use crate::maze::{components::Floor, events::RecreateMazeEvent, MazeConfig};
 
-use super::setup::setup_maze;
+use super::{despawn::despawn_floor, spawn::spawn_floor};
 
-pub(crate) fn handle_maze_recreation_event(
+pub(crate) fn recreate_maze(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
     config: Res<MazeConfig>,
-    query: Query<(Entity, &MazeFloor)>,
+    query: Query<(Entity, &Floor)>,
     mut event_reader: EventReader<RecreateMazeEvent>,
 ) {
     for event in event_reader.read() {
         despawn_floor(&mut commands, &query, event.floor);
-        setup_maze(&mut commands, &mut meshes, &mut materials, &config);
-    }
-}
-
-fn despawn_floor(commands: &mut Commands, query: &Query<(Entity, &MazeFloor)>, floor_num: u8) {
-    for (entity, maze_floor) in query.iter() {
-        if maze_floor.0 == floor_num {
-            commands.entity(entity).despawn_recursive();
-        }
+        spawn_floor(&mut commands, &mut meshes, &mut materials, &config);
     }
 }

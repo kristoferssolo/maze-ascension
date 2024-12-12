@@ -1,14 +1,20 @@
-use bevy::{ecs::world::Command, prelude::*};
-use plugin::MazePlugin;
+use bevy::{ecs::system::RunSystemOnce, prelude::*};
+use events::RecreateMazeEvent;
 mod assets;
-mod components;
+pub mod components;
 pub mod events;
-pub mod plugin;
 mod resources;
 mod systems;
 
 pub use resources::{MazeConfig, MazePluginLoaded};
 
-pub fn spawn_maze(world: &mut World) {
-    MazePlugin.apply(world);
+pub(super) fn plugin(app: &mut App) {
+    app.init_resource::<MazeConfig>()
+        .add_event::<RecreateMazeEvent>()
+        .add_plugins(systems::plugin);
+}
+
+pub fn spawn_level_command(world: &mut World) {
+    world.insert_resource(MazePluginLoaded);
+    let _ = world.run_system_once(systems::setup::setup);
 }

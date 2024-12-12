@@ -1,7 +1,7 @@
 [package]
 name = "maze-ascension"
 authors = ["Kristofers Solo <dev@kristofers.xyz>"]
-version = "0.1.0"
+version = "0.2.0"
 edition = "2021"
 
 [dependencies]
@@ -18,7 +18,7 @@ tracing = { version = "0.1", features = [
   "release_max_level_warn",
 ] }
 hexx = { version = "0.19", features = ["bevy_reflect", "grid"] }
-hexlab = { version = "0.2", features = ["bevy"] }
+hexlab = { version = "0.3", features = ["bevy"] }
 bevy-inspector-egui = { version = "0.28", optional = true }
 bevy_egui = { version = "0.31", optional = true }
 thiserror = "2.0"
