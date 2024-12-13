@@ -1,8 +1,6 @@
 use crate::{
-    maze::{
-        components::{Floor, Maze},
-        MazeConfig,
-    },
+    floor::components::{CurrentFloor, Floor},
+    maze::components::{Maze, MazeConfig},
     player::components::{CurrentPosition, MovementTarget, Player},
 };
 use bevy::prelude::*;
@@ -47,10 +45,9 @@ fn create_direction(
 pub(super) fn player_input(
     input: Res<ButtonInput<KeyCode>>,
     mut player_query: Query<(&mut MovementTarget, &CurrentPosition), With<Player>>,
-    maze_query: Query<(&Maze, &Floor)>,
-    maze_config: Res<MazeConfig>,
+    maze_query: Query<(&Maze, &MazeConfig), With<CurrentFloor>>,
 ) {
-    let Ok((maze, _floor)) = maze_query.get_single() else {
+    let Ok((maze, maze_config)) = maze_query.get_single() else {
         return;
     };
 

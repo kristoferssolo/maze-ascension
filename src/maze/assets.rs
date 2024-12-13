@@ -1,4 +1,4 @@
-use super::MazeConfig;
+use super::resources::GlobalMazeConfig;
 use bevy::prelude::*;
 use std::f32::consts::FRAC_PI_2;
 
@@ -17,13 +17,16 @@ impl MazeAssets {
     pub(crate) fn new(
         meshes: &mut ResMut<Assets<Mesh>>,
         materials: &mut ResMut<Assets<StandardMaterial>>,
-        config: &MazeConfig,
+        global_config: &GlobalMazeConfig,
     ) -> MazeAssets {
         MazeAssets {
-            hex_mesh: meshes.add(generate_hex_mesh(config.hex_size, config.height)),
+            hex_mesh: meshes.add(generate_hex_mesh(
+                global_config.hex_size,
+                global_config.height,
+            )),
             wall_mesh: meshes.add(generate_square_mesh(
-                config.hex_size + config.wall_size() / WALL_OVERLAP_MODIFIER,
-                config.wall_size(),
+                global_config.hex_size + global_config.wall_size() / WALL_OVERLAP_MODIFIER,
+                global_config.wall_size(),
             )),
             hex_material: materials.add(white_material()),
             wall_material: materials.add(Color::BLACK),

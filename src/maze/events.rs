@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
 #[derive(Debug, Event)]
-pub(crate) struct RecreateMazeEvent {
-    pub(crate) floor: u8,
+pub struct RecreateMazeEvent {
+    pub floor: u8,
 }

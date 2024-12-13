@@ -2,8 +2,9 @@ mod asset_tracking;
 pub mod audio;
 #[cfg(feature = "dev")]
 mod dev_tools;
-mod maze;
-mod player;
+pub mod floor;
+pub mod maze;
+pub mod player;
 mod screens;
 pub mod theme;
 

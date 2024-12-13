@@ -1,5 +1,6 @@
 use crate::{
-    maze::MazeConfig,
+    floor::components::CurrentFloor,
+    maze::components::MazeConfig,
     player::components::{CurrentPosition, MovementSpeed, MovementTarget, Player},
 };
 use bevy::prelude::*;
@@ -16,8 +17,9 @@ pub(super) fn player_movement(
         ),
         With<Player>,
     >,
-    maze_config: Res<MazeConfig>,
+    maze_config_query: Query<&MazeConfig, With<CurrentFloor>>,
 ) {
+    let maze_config = maze_config_query.single();
     for (mut target, speed, mut current_hex, mut transform) in query.iter_mut() {
         if let Some(target_hex) = target.0 {
             let current_pos = transform.translation;

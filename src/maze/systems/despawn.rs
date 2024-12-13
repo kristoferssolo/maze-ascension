@@ -1,4 +1,4 @@
-use crate::maze::components::Floor;
+use crate::floor::components::Floor;
 use bevy::prelude::*;
 
 pub(crate) fn despawn_floor(
