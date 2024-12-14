@@ -1,4 +1,8 @@
 use bevy::prelude::*;
 
 #[derive(Debug, Event)]
-pub(crate) struct RespawnPlayer;
+pub enum PlayerEvent {
+    Spawn,
+    Respawn,
+    Despawn,
+}

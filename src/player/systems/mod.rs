@@ -1,16 +1,15 @@
-pub mod despawn;
+mod despawn;
+mod event_handler;
 mod input;
 mod movement;
-pub mod respawn;
+mod respawn;
 pub mod setup;
-pub mod spawn;
+mod spawn;
 
 use bevy::prelude::*;
+use event_handler::handle_player_events;
 use input::player_input;
 use movement::player_movement;
-use respawn::respawn_player;
-
-use crate::maze::MazePluginLoaded;
 
 pub(super) fn plugin(app: &mut App) {
     app.add_systems(
@@ -18,8 +17,7 @@ pub(super) fn plugin(app: &mut App) {
         (
             player_input,
             player_movement.after(player_input),
-            respawn_player,
-        )
-            .run_if(resource_exists::<MazePluginLoaded>),
+            handle_player_events,
+        ),
     );
 }

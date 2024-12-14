@@ -1,7 +1,4 @@
-use super::{
-    common::generate_maze,
-    spawn::{spawn_maze_tiles, spawn_single_hex_tile},
-};
+use super::{common::generate_maze, spawn::spawn_maze_tiles};
 use crate::{
     floor::components::Floor,
     maze::{

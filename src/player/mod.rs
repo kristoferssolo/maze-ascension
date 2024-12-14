@@ -5,11 +5,11 @@ mod systems;
 
 use bevy::{ecs::system::RunSystemOnce, prelude::*};
 use components::Player;
-use events::RespawnPlayer;
+use events::PlayerEvent;
 
 pub(super) fn plugin(app: &mut App) {
     app.register_type::<Player>()
-        .add_event::<RespawnPlayer>()
+        .add_event::<PlayerEvent>()
         .add_plugins(systems::plugin);
 }
 

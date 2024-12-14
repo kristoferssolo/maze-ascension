@@ -18,6 +18,6 @@ pub(super) fn plugin(app: &mut App) {
 }
 
 pub fn spawn_level_command(world: &mut World) {
-    world.insert_resource(MazePluginLoaded);
     let _ = world.run_system_once(systems::setup::setup);
+    world.insert_resource(MazePluginLoaded);
 }

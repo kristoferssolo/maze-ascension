@@ -24,7 +24,7 @@ pub(super) fn player_input(
             continue;
         };
 
-        let Some(tile) = maze.0.get_tile(&current_pos) else {
+        let Some(tile) = maze.0.get_tile(current_pos) else {
             continue;
         };
 

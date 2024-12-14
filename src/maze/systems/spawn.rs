@@ -49,7 +49,7 @@ pub(super) fn spawn_maze_tiles(
 ) {
     commands.entity(parent_entity).with_children(|parent| {
         for tile in maze.values() {
-            spawn_single_hex_tile(parent, &assets, tile, maze_config, global_config);
+            spawn_single_hex_tile(parent, assets, tile, maze_config, global_config);
         }
     });
 }

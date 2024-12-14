@@ -20,14 +20,14 @@ pub(super) fn player_movement(
     maze_config_query: Query<&MazeConfig, With<CurrentFloor>>,
 ) {
     let Ok(maze_config) = maze_config_query.get_single() else {
-        error!("Failed to get maze configuration for current floor - cannot move player");
+        warn!("Failed to get maze configuration for current floor - cannot move player");
         return;
     };
 
     for (mut target, speed, mut current_hex, mut transform) in query.iter_mut() {
         if let Some(target_hex) = target.0 {
             let current_pos = transform.translation;
-            let target_pos = calculate_target_position(&maze_config, target_hex, current_pos.y);
+            let target_pos = calculate_target_position(maze_config, target_hex, current_pos.y);
 
             if should_complete_movement(current_pos, target_pos) {
                 transform.translation = target_pos;
