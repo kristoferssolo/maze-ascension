@@ -11,6 +11,8 @@ use hexlab::prelude::*;
 use hexx::HexOrientation;
 use std::f32::consts::{FRAC_PI_2, FRAC_PI_3, FRAC_PI_6};
 
+use super::common::generate_maze;
+
 pub(super) fn spawn_floor(
     commands: &mut Commands,
     meshes: &mut ResMut<Assets<Mesh>>,
@@ -19,15 +21,9 @@ pub(super) fn spawn_floor(
     maze_config: &MazeConfig,
     global_config: &GlobalMazeConfig,
 ) {
-    let maze = MazeBuilder::new()
-        .with_radius(maze_config.radius)
-        .with_seed(maze_config.seed)
-        .with_generator(GeneratorType::RecursiveBacktracking)
-        .build()
-        .expect("Something went wrong while creating maze");
+    let maze = generate_maze(maze_config).expect("Failed to generate maze during spawn");
 
-    let assets = MazeAssets::new(meshes, materials, &global_config);
-    commands
+    let entity = commands
         .spawn((
             Name::new(format!("Floor {}", floor)),
             Maze(maze.clone()),
@@ -37,11 +33,25 @@ pub(super) fn spawn_floor(
             Transform::from_translation(Vec3::ZERO),
             Visibility::Visible,
         ))
-        .with_children(|parent| {
-            for tile in maze.values() {
-                spawn_single_hex_tile(parent, &assets, tile, &maze_config, &global_config)
-            }
-        });
+        .id();
+
+    let assets = MazeAssets::new(meshes, materials, global_config);
+    spawn_maze_tiles(commands, entity, &maze, &assets, maze_config, global_config);
+}
+
+pub(super) fn spawn_maze_tiles(
+    commands: &mut Commands,
+    parent_entity: Entity,
+    maze: &HexMaze,
+    assets: &MazeAssets,
+    maze_config: &MazeConfig,
+    global_config: &GlobalMazeConfig,
+) {
+    commands.entity(parent_entity).with_children(|parent| {
+        for tile in maze.values() {
+            spawn_single_hex_tile(parent, &assets, tile, maze_config, global_config);
+        }
+    });
 }
 
 pub(super) fn spawn_single_hex_tile(

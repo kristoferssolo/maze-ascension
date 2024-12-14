@@ -1,5 +1,5 @@
 use crate::{
-    floor::components::{CurrentFloor, Floor},
+    floor::components::CurrentFloor,
     maze::components::{Maze, MazeConfig},
     player::components::{CurrentPosition, MovementTarget, Player},
 };

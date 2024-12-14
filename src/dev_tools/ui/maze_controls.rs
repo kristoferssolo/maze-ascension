@@ -34,11 +34,10 @@ pub(crate) fn maze_controls_ui(world: &mut World) {
     let mut maze_config = maze_config.clone();
     let floor_value = floor.0;
 
-    let global_config = world.get_resource::<GlobalMazeConfig>().cloned();
     let mut changed = false;
 
     egui::Window::new("Maze Controls").show(egui_context.get_mut(), |ui| {
-        if let Some(mut global_config) = global_config.clone() {
+        if let Some(mut global_config) = world.get_resource_mut::<GlobalMazeConfig>() {
             ui.heading("Maze Configuration");
 
             changed |= add_seed_control(ui, &mut maze_config.seed);

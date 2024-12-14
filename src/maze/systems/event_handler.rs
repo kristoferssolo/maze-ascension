@@ -10,13 +10,13 @@ pub(crate) fn handle_maze_events(
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
     mut event_reader: EventReader<MazeEvent>,
-    mut maze_query: Query<(Entity, &Floor, &Children, &mut Maze)>,
+    mut maze_query: Query<(Entity, &Floor, &mut Maze)>,
     global_config: Res<GlobalMazeConfig>,
 ) {
     for event in event_reader.read() {
         match event {
             MazeEvent::Create { floor, config } => {
-                if maze_query.iter().any(|(_, f, _, _)| f.0 == *floor) {
+                if maze_query.iter().any(|(_, f, _)| f.0 == *floor) {
                     warn!("Floor {} already exists, skipping creation", floor);
                     continue;
                 }
@@ -44,8 +44,8 @@ pub(crate) fn handle_maze_events(
                 }
             }
             MazeEvent::Remove { floor } => {
-                match maze_query.iter().find(|(_, f, _, _)| f.0 == *floor) {
-                    Some((entity, _, _, _)) => commands.entity(entity).despawn_recursive(),
+                match maze_query.iter().find(|(_, f, _)| f.0 == *floor) {
+                    Some((entity, _, _)) => commands.entity(entity).despawn_recursive(),
                     _ => warn!("Floor {} not found for removal", floor),
                 }
             }
