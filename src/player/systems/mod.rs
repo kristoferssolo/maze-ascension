@@ -10,6 +10,8 @@ use input::player_input;
 use movement::player_movement;
 use respawn::respawn_player;
 
+use crate::maze::MazePluginLoaded;
+
 pub(super) fn plugin(app: &mut App) {
     app.add_systems(
         Update,
@@ -17,6 +19,7 @@ pub(super) fn plugin(app: &mut App) {
             player_input,
             player_movement.after(player_input),
             respawn_player,
-        ),
+        )
+            .run_if(resource_exists::<MazePluginLoaded>),
     );
 }

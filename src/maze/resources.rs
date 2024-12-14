@@ -4,7 +4,7 @@ use bevy::prelude::*;
 #[reflect(Resource)]
 pub struct MazePluginLoaded;
 
-#[derive(Debug, Reflect, Resource)]
+#[derive(Debug, Reflect, Resource, Clone)]
 #[reflect(Resource)]
 pub struct GlobalMazeConfig {
     pub hex_size: f32,

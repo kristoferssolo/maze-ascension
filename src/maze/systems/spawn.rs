@@ -1,5 +1,5 @@
 use crate::{
-    floor::components::Floor,
+    floor::components::{CurrentFloor, Floor},
     maze::{
         assets::MazeAssets,
         components::{Maze, MazeConfig, Tile, Wall},
@@ -15,6 +15,7 @@ pub(super) fn spawn_floor(
     commands: &mut Commands,
     meshes: &mut ResMut<Assets<Mesh>>,
     materials: &mut ResMut<Assets<StandardMaterial>>,
+    floor: u8,
     maze_config: &MazeConfig,
     global_config: &GlobalMazeConfig,
 ) {
@@ -25,18 +26,20 @@ pub(super) fn spawn_floor(
         .build()
         .expect("Something went wrong while creating maze");
 
-    let assets = MazeAssets::new(meshes, materials, global_config);
+    let assets = MazeAssets::new(meshes, materials, &global_config);
     commands
         .spawn((
-            Name::new("Floor"),
+            Name::new(format!("Floor {}", floor)),
             Maze(maze.clone()),
-            Floor(1),
+            Floor(floor),
+            CurrentFloor, // TODO: remove
+            maze_config.clone(),
             Transform::from_translation(Vec3::ZERO),
             Visibility::Visible,
         ))
         .with_children(|parent| {
             for tile in maze.values() {
-                spawn_single_hex_tile(parent, &assets, tile, maze_config, global_config)
+                spawn_single_hex_tile(parent, &assets, tile, &maze_config, &global_config)
             }
         });
 }

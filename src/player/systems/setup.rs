@@ -14,7 +14,11 @@ pub(crate) fn setup(
     maze_config_query: Query<&MazeConfig, With<CurrentFloor>>,
     global_config: Res<GlobalMazeConfig>,
 ) {
-    let maze_config = maze_config_query.single();
+    let Ok(maze_config) = maze_config_query.get_single() else {
+        error!("Failed to get maze configuration for current floor - cannot spawn player");
+        return;
+    };
+
     spawn_player(
         &mut commands,
         &mut meshes,

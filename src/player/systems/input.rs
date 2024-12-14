@@ -6,6 +6,37 @@ use crate::{
 use bevy::prelude::*;
 use hexx::{EdgeDirection, HexOrientation};
 
+pub(super) fn player_input(
+    input: Res<ButtonInput<KeyCode>>,
+    mut player_query: Query<(&mut MovementTarget, &CurrentPosition), With<Player>>,
+    maze_query: Query<(&Maze, &MazeConfig), With<CurrentFloor>>,
+) {
+    let Ok((maze, maze_config)) = maze_query.get_single() else {
+        return;
+    };
+
+    for (mut target_pos, current_pos) in player_query.iter_mut() {
+        if target_pos.is_some() {
+            continue;
+        }
+
+        let Some(direction) = create_direction(&input, &maze_config.layout.orientation) else {
+            continue;
+        };
+
+        let Some(tile) = maze.0.get_tile(&current_pos) else {
+            continue;
+        };
+
+        if tile.walls().contains(direction) {
+            continue;
+        }
+
+        let next_hex = current_pos.0.neighbor(direction);
+        target_pos.0 = Some(next_hex);
+    }
+}
+
 fn create_direction(
     input: &ButtonInput<KeyCode>,
     orientation: &HexOrientation,
@@ -40,35 +71,4 @@ fn create_direction(
         }
     }?;
     Some(direction.rotate_cw(0))
-}
-
-pub(super) fn player_input(
-    input: Res<ButtonInput<KeyCode>>,
-    mut player_query: Query<(&mut MovementTarget, &CurrentPosition), With<Player>>,
-    maze_query: Query<(&Maze, &MazeConfig), With<CurrentFloor>>,
-) {
-    let Ok((maze, maze_config)) = maze_query.get_single() else {
-        return;
-    };
-
-    for (mut target_pos, current_pos) in player_query.iter_mut() {
-        if target_pos.is_some() {
-            continue;
-        }
-
-        let Some(direction) = create_direction(&input, &maze_config.layout.orientation) else {
-            continue;
-        };
-
-        let Some(tile) = maze.0.get_tile(&current_pos) else {
-            continue;
-        };
-
-        if tile.walls().contains(direction) {
-            continue;
-        }
-
-        let next_hex = current_pos.0.neighbor(direction);
-        target_pos.0 = Some(next_hex);
-    }
 }

@@ -16,7 +16,10 @@ pub(crate) fn respawn_player(
     mut materials: ResMut<Assets<StandardMaterial>>,
     global_config: Res<GlobalMazeConfig>,
 ) {
-    let maze_config = maze_config_query.single();
+    let Ok(maze_config) = maze_config_query.get_single() else {
+        error!("Failed to get maze configuration for current floor - cannot respawn player");
+        return;
+    };
     for _ in event_reader.read() {
         despawn_players(&mut commands, &query);
         spawn_player(

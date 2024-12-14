@@ -1,6 +1,6 @@
 use crate::{
     floor::components::{CurrentFloor, Floor},
-    maze::{components::MazeConfig, events::RecreateMazeEvent, GlobalMazeConfig, MazePluginLoaded},
+    maze::{components::MazeConfig, events::MazeEvent, GlobalMazeConfig, MazePluginLoaded},
     player::events::RespawnPlayer,
 };
 use bevy::{prelude::*, window::PrimaryWindow};
@@ -25,21 +25,23 @@ pub(crate) fn maze_controls_ui(world: &mut World) {
     };
     let mut egui_context = egui_context.clone();
 
-    let Ok((mut maze_config, floor)) = world
-        .query_filtered::<(&mut MazeConfig, &Floor), With<CurrentFloor>>()
+    let Ok((maze_config, floor)) = world
+        .query_filtered::<(&MazeConfig, &Floor), With<CurrentFloor>>()
         .get_single(world)
     else {
         return;
     };
-    let mut maze_config = (*maze_config).clone();
+    let mut maze_config = maze_config.clone();
+    let floor_value = floor.0;
+
+    let global_config = world.get_resource::<GlobalMazeConfig>().cloned();
+    let mut changed = false;
 
     egui::Window::new("Maze Controls").show(egui_context.get_mut(), |ui| {
-        if let Some(mut global_config) = world.get_resource_mut::<GlobalMazeConfig>() {
-            let mut changed = false;
+        if let Some(mut global_config) = global_config.clone() {
             ui.heading("Maze Configuration");
 
             changed |= add_seed_control(ui, &mut maze_config.seed);
-
             changed |= add_drag_value_control(ui, "Radius:", &mut maze_config.radius, 1.0, 1..=100);
             changed |=
                 add_drag_value_control(ui, "Height:", &mut global_config.height, 0.5, 1.0..=50.0);
@@ -50,27 +52,19 @@ pub(crate) fn maze_controls_ui(world: &mut World) {
                 1.0,
                 1.0..=100.0,
             );
-
             changed |= add_orientation_control(ui, &mut maze_config.layout.orientation);
-
             changed |= add_position_control(ui, "Start Position:", &mut maze_config.start_pos);
             changed |= add_position_control(ui, "End Position:", &mut maze_config.end_pos);
 
-            // Trigger recreation if any value changed
+            // Handle updates
             if changed {
                 maze_config.update(&global_config);
 
-                if let Ok(mut actual_maze_config) = world
-                    .query_filtered::<&mut MazeConfig, With<CurrentFloor>>()
-                    .get_single_mut(world)
-                {
-                    *actual_maze_config = maze_config;
-                }
-
-                if let Some(mut event_writer) =
-                    world.get_resource_mut::<Events<RecreateMazeEvent>>()
-                {
-                    event_writer.send(RecreateMazeEvent { floor: floor.0 });
+                if let Some(mut event_writer) = world.get_resource_mut::<Events<MazeEvent>>() {
+                    event_writer.send(MazeEvent::Recreate {
+                        floor: floor_value,
+                        config: maze_config,
+                    });
                 }
                 if let Some(mut event_writer) = world.get_resource_mut::<Events<RespawnPlayer>>() {
                     event_writer.send(RespawnPlayer);

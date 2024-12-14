@@ -1,11 +1,11 @@
-pub mod despawn;
-pub mod recreation;
+pub mod event_handler;
 pub mod setup;
 pub mod spawn;
+pub mod update;
 
 use bevy::prelude::*;
-use recreation::recreate_maze;
+use event_handler::handle_maze_events;
 
 pub(super) fn plugin(app: &mut App) {
-    app.add_systems(Update, recreate_maze);
+    app.add_systems(Update, handle_maze_events);
 }
