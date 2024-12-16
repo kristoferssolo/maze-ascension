@@ -1,21 +1,18 @@
+use super::{despawn::despawn_players, spawn::spawn_player};
 use crate::{
-    maze::MazeConfig,
-    player::{components::Player, events::RespawnPlayer},
+    maze::{components::MazeConfig, GlobalMazeConfig},
+    player::components::Player,
 };
 use bevy::prelude::*;
 
-use super::{despawn::despawn_players, spawn::spawn_player};
-
-pub(crate) fn respawn_player(
-    mut commands: Commands,
-    mut meshes: ResMut<Assets<Mesh>>,
-    mut materials: ResMut<Assets<StandardMaterial>>,
-    config: Res<MazeConfig>,
-    query: Query<Entity, With<Player>>,
-    mut event_reader: EventReader<RespawnPlayer>,
+pub(super) fn respawn_player(
+    commands: &mut Commands,
+    meshes: &mut ResMut<Assets<Mesh>>,
+    materials: &mut ResMut<Assets<StandardMaterial>>,
+    query: &Query<Entity, With<Player>>,
+    maze_config: &MazeConfig,
+    global_config: &GlobalMazeConfig,
 ) {
-    for _ in event_reader.read() {
-        despawn_players(&mut commands, &query);
-        spawn_player(&mut commands, &mut meshes, &mut materials, &config);
-    }
+    despawn_players(commands, query);
+    spawn_player(commands, meshes, materials, maze_config, global_config);
 }

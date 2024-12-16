@@ -1,6 +1,10 @@
 use bevy::prelude::*;
 
+use super::components::MazeConfig;
+
 #[derive(Debug, Event)]
-pub(crate) struct RecreateMazeEvent {
-    pub(crate) floor: u8,
+pub enum MazeEvent {
+    Create { floor: u8, config: MazeConfig },
+    Recreate { floor: u8, config: MazeConfig },
+    Remove { floor: u8 },
 }
