@@ -1,19 +1,25 @@
 use crate::{
+    floor::components::CurrentFloor,
     maze::{components::MazeConfig, GlobalMazeConfig},
     player::{
         assets::{blue_material, generate_pill_mesh},
         components::{CurrentPosition, Player},
+        events::SpawnPlayer,
     },
 };
 use bevy::prelude::*;
 
 pub(super) fn spawn_player(
-    commands: &mut Commands,
-    meshes: &mut ResMut<Assets<Mesh>>,
-    materials: &mut ResMut<Assets<StandardMaterial>>,
-    maze_config: &MazeConfig,
-    global_config: &GlobalMazeConfig,
+    _trigger: Trigger<SpawnPlayer>,
+    mut commands: Commands,
+    mut meshes: ResMut<Assets<Mesh>>,
+    mut materials: ResMut<Assets<StandardMaterial>>,
+    maze_config_query: Query<&MazeConfig, With<CurrentFloor>>,
+    global_config: Res<GlobalMazeConfig>,
 ) {
+    let Ok(maze_config) = maze_config_query.get_single() else {
+        return;
+    };
     let player_radius = global_config.hex_size * 0.5;
     let player_height = player_radius * 3.5;
 

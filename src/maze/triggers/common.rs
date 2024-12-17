@@ -4,7 +4,7 @@ use crate::maze::{
 };
 use hexlab::{GeneratorType, HexMaze, MazeBuilder};
 
-pub(super) fn generate_maze(config: &MazeConfig) -> MazeResult<HexMaze> {
+pub(crate) fn generate_maze(config: &MazeConfig) -> MazeResult<HexMaze> {
     MazeBuilder::new()
         .with_radius(config.radius)
         .with_seed(config.seed)

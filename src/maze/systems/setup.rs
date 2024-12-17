@@ -1,7 +1,7 @@
-use crate::maze::{components::MazeConfig, events::MazeEvent};
+use crate::maze::{components::MazeConfig, events::SpawnMaze};
 use bevy::prelude::*;
 
-pub(crate) fn setup(mut event_writer: EventWriter<MazeEvent>) {
+pub(crate) fn setup(mut commands: Commands) {
     let config = MazeConfig::default();
-    event_writer.send(MazeEvent::Create { floor: 1, config });
+    commands.trigger(SpawnMaze { floor: 1, config });
 }

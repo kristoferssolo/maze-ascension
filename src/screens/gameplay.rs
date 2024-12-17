@@ -9,10 +9,7 @@ use crate::{asset_tracking::LoadResource, audio::Music, screens::Screen};
 pub(super) fn plugin(app: &mut App) {
     app.add_systems(
         OnEnter(Screen::Gameplay),
-        (
-            spawn_level_command,
-            spawn_player_command.after(spawn_level_command),
-        ),
+        (spawn_level_command, spawn_player_command).chain(),
     );
 
     app.load_resource::<GameplayMusic>();

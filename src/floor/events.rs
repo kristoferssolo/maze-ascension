@@ -1,20 +1,20 @@
 use bevy::prelude::*;
 
-use super::components::MazeConfig;
+use crate::maze::components::MazeConfig;
 
 #[derive(Debug, Reflect, Event)]
-pub struct SpawnMaze {
+pub struct SpawnFloor {
     pub floor: u8,
     pub config: MazeConfig,
 }
 
 #[derive(Debug, Reflect, Event)]
-pub struct RespawnMaze {
+pub struct RespawnFloor {
     pub floor: u8,
     pub config: MazeConfig,
 }
 
 #[derive(Debug, Reflect, Event)]
-pub struct DespawnMaze {
+pub struct DespawnFloor {
     pub floor: u8,
 }

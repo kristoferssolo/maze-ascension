@@ -1,7 +1,7 @@
 use crate::{
     floor::components::{CurrentFloor, Floor},
-    maze::{components::MazeConfig, events::MazeEvent, GlobalMazeConfig, MazePluginLoaded},
-    player::events::PlayerEvent,
+    maze::{components::MazeConfig, events::RespawnMaze, GlobalMazeConfig, MazePluginLoaded},
+    player::events::RespawnPlayer,
 };
 use bevy::{prelude::*, window::PrimaryWindow};
 use bevy_egui::{
@@ -58,16 +58,11 @@ pub(crate) fn maze_controls_ui(world: &mut World) {
             // Handle updates
             if changed {
                 maze_config.update(&global_config);
-
-                if let Some(mut event_writer) = world.get_resource_mut::<Events<MazeEvent>>() {
-                    event_writer.send(MazeEvent::Recreate {
-                        floor: floor_value,
-                        config: maze_config,
-                    });
-                }
-                if let Some(mut event_writer) = world.get_resource_mut::<Events<PlayerEvent>>() {
-                    event_writer.send(PlayerEvent::Respawn);
-                }
+                world.trigger(RespawnMaze {
+                    floor: floor_value,
+                    config: maze_config,
+                });
+                world.trigger(RespawnPlayer);
             }
         }
     });
