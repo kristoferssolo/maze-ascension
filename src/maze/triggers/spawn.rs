@@ -3,6 +3,7 @@ use crate::{
     maze::{
         assets::MazeAssets,
         components::{Maze, MazeConfig, Tile, Wall},
+        events::SpawnMaze,
         resources::GlobalMazeConfig,
     },
 };
@@ -13,30 +14,43 @@ use std::f32::consts::{FRAC_PI_2, FRAC_PI_3, FRAC_PI_6};
 
 use super::common::generate_maze;
 
-pub(super) fn spawn_floor(
-    commands: &mut Commands,
-    meshes: &mut ResMut<Assets<Mesh>>,
-    materials: &mut ResMut<Assets<StandardMaterial>>,
-    floor: u8,
-    maze_config: &MazeConfig,
-    global_config: &GlobalMazeConfig,
+pub(super) fn spawn_maze(
+    trigger: Trigger<SpawnMaze>,
+    mut commands: Commands,
+    mut meshes: ResMut<Assets<Mesh>>,
+    mut materials: ResMut<Assets<StandardMaterial>>,
+    maze_query: Query<(Entity, &Floor, &Maze)>,
+    global_config: Res<GlobalMazeConfig>,
 ) {
-    let maze = generate_maze(maze_config).expect("Failed to generate maze during spawn");
+    let SpawnMaze { floor, config } = trigger.event();
+    if maze_query.iter().any(|(_, f, _)| f.0 == *floor) {
+        warn!("Floor {} already exists, skipping creation", floor);
+        return;
+    }
+
+    let maze = generate_maze(config).expect("Failed to generate maze during spawn");
 
     let entity = commands
         .spawn((
             Name::new(format!("Floor {}", floor)),
             Maze(maze.clone()),
-            Floor(floor),
+            Floor(*floor),
             CurrentFloor, // TODO: remove
-            maze_config.clone(),
+            config.clone(),
             Transform::from_translation(Vec3::ZERO),
             Visibility::Visible,
         ))
         .id();
 
-    let assets = MazeAssets::new(meshes, materials, global_config);
-    spawn_maze_tiles(commands, entity, &maze, &assets, maze_config, global_config);
+    let assets = MazeAssets::new(&mut meshes, &mut materials, &global_config);
+    spawn_maze_tiles(
+        &mut commands,
+        entity,
+        &maze,
+        &assets,
+        config,
+        &global_config,
+    );
 }
 
 pub(super) fn spawn_maze_tiles(

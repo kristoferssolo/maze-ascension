@@ -62,6 +62,7 @@ impl Plugin for AppPlugin {
             screens::plugin,
             theme::plugin,
             maze::plugin,
+            floor::plugin,
             player::plugin,
         ));
 
