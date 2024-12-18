@@ -6,13 +6,15 @@ mod triggers;
 
 use bevy::{ecs::system::RunSystemOnce, prelude::*};
 use components::Player;
-use events::{DespawnPlayer, RespawnPlayer, SpawnPlayer};
+use events::{AscendPlayer, DescendPlayer, DespawnPlayer, RespawnPlayer, SpawnPlayer};
 
 pub(super) fn plugin(app: &mut App) {
     app.register_type::<Player>()
         .add_event::<SpawnPlayer>()
         .add_event::<RespawnPlayer>()
         .add_event::<DespawnPlayer>()
+        .add_event::<AscendPlayer>()
+        .add_event::<DescendPlayer>()
         .add_plugins((triggers::plugin, systems::plugin));
 }
 

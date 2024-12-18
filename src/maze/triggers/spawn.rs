@@ -81,12 +81,28 @@ pub(super) fn spawn_single_hex_tile(
         HexOrientation::Flat => Quat::from_rotation_y(FRAC_PI_6), // 30 degrees rotation
     };
 
+    let material = match tile.pos() {
+        pos if pos == maze_config.start_pos => assets
+            .custom_materials
+            .get("PINE")
+            .cloned()
+            .to_owned()
+            .unwrap(),
+        pos if pos == maze_config.end_pos => assets
+            .custom_materials
+            .get("LOVE")
+            .cloned()
+            .to_owned()
+            .unwrap(),
+        _ => assets.hex_material.clone(),
+    };
+
     parent
         .spawn((
             Name::new(format!("Hex {}", tile)),
             Tile,
             Mesh3d(assets.hex_mesh.clone()),
-            MeshMaterial3d(assets.hex_material.clone()),
+            MeshMaterial3d(material),
             Transform::from_translation(world_pos).with_rotation(rotation),
         ))
         .with_children(|parent| spawn_walls(parent, assets, tile.walls(), global_config));
