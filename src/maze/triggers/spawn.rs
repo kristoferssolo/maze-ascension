@@ -14,6 +14,8 @@ use std::f32::consts::{FRAC_PI_2, FRAC_PI_3, FRAC_PI_6};
 
 use super::common::generate_maze;
 
+const FLOOR_Y_OFFSET: u8 = 100;
+
 pub(super) fn spawn_maze(
     trigger: Trigger<SpawnMaze>,
     mut commands: Commands,
@@ -24,11 +26,11 @@ pub(super) fn spawn_maze(
 ) {
     let SpawnMaze { floor, config } = trigger.event();
     if maze_query.iter().any(|(_, f, _)| f.0 == *floor) {
-        warn!("Floor {} already exists, skipping creation", floor);
         return;
     }
 
     let maze = generate_maze(config).expect("Failed to generate maze during spawn");
+    let y_offset = (floor - 1) * FLOOR_Y_OFFSET;
 
     let entity = commands
         .spawn((
@@ -37,7 +39,7 @@ pub(super) fn spawn_maze(
             Floor(*floor),
             CurrentFloor, // TODO: remove
             config.clone(),
-            Transform::from_translation(Vec3::ZERO),
+            Transform::from_translation(Vec3::ZERO.with_y(y_offset as f32)),
             Visibility::Visible,
         ))
         .id();

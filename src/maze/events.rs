@@ -2,7 +2,7 @@ use bevy::prelude::*;
 
 use super::components::MazeConfig;
 
-#[derive(Debug, Reflect, Event)]
+#[derive(Debug, Reflect, Event, Default)]
 pub struct SpawnMaze {
     pub floor: u8,
     pub config: MazeConfig,

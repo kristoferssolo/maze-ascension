@@ -18,3 +18,8 @@ pub struct RespawnFloor {
 pub struct DespawnFloor {
     pub floor: u8,
 }
+
+#[derive(Debug, Reflect, Event)]
+pub struct TransitionFloor {
+    pub floor: u8,
+}
