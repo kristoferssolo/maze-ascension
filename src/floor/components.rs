@@ -4,10 +4,6 @@ use bevy::prelude::*;
 #[reflect(Component)]
 pub struct Floor(pub u8);
 
-#[derive(Debug, Reflect, Component, Deref, DerefMut)]
-#[reflect(Component)]
-pub struct TargetFloor(pub u8);
-
 #[derive(Debug, Reflect, Component)]
 #[reflect(Component)]
 pub struct CurrentFloor;
@@ -25,5 +21,31 @@ impl Floor {
 
     pub fn decrease(&self) -> Self {
         Self(self.0.saturating_sub(1).max(1))
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use rstest::rstest;
+
+    #[rstest]
+    #[case(0, 1)]
+    #[case(1, 2)]
+    #[case(254, 255)]
+    #[case(255, 255)]
+    fn increase(#[case] input: u8, #[case] expected: u8) {
+        let floor = Floor(input);
+        assert_eq!(*floor.increase(), expected);
+    }
+
+    #[rstest]
+    #[case(0, 1)] // clamps to 1
+    #[case(1, 1)] // clamps to 1
+    #[case(2, 1)]
+    #[case(255, 254)]
+    fn decrease(#[case] input: u8, #[case] expected: u8) {
+        let floor = Floor(input);
+        assert_eq!(*floor.decrease(), expected);
     }
 }
