@@ -26,6 +26,7 @@ pub(super) fn spawn_maze(
 ) {
     let SpawnMaze { floor, config } = trigger.event();
     if maze_query.iter().any(|(_, f, _)| f.0 == *floor) {
+        warn!("Floor {} already exists, skipping creation", floor);
         return;
     }
 

@@ -19,7 +19,9 @@ pub struct DespawnFloor {
     pub floor: u8,
 }
 
-#[derive(Debug, Reflect, Event)]
-pub struct TransitionFloor {
-    pub floor: u8,
+#[derive(Debug, Reflect, Event, Default)]
+pub enum TransitionFloor {
+    #[default]
+    Ascend,
+    Descent,
 }

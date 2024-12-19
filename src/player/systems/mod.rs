@@ -3,6 +3,7 @@ mod descend;
 mod input;
 mod movement;
 pub mod setup;
+mod transition_floor;
 
 use crate::maze::MazePluginLoaded;
 use ascend::ascend_player;
