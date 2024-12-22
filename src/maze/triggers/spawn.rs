@@ -1,5 +1,5 @@
 use crate::{
-    floor::components::{CurrentFloor, Floor},
+    floor::components::{CurrentFloor, Floor, NextFloor},
     maze::{
         assets::MazeAssets,
         components::{Maze, MazeConfig, Tile, Wall},
@@ -14,7 +14,7 @@ use std::f32::consts::{FRAC_PI_2, FRAC_PI_3, FRAC_PI_6};
 
 use super::common::generate_maze;
 
-const FLOOR_Y_OFFSET: u8 = 100;
+pub(crate) const FLOOR_Y_OFFSET: u8 = 100;
 
 pub(super) fn spawn_maze(
     trigger: Trigger<SpawnMaze>,
@@ -38,7 +38,7 @@ pub(super) fn spawn_maze(
             Name::new(format!("Floor {}", floor)),
             Maze(maze.clone()),
             Floor(*floor),
-            CurrentFloor, // TODO: remove
+            NextFloor,
             config.clone(),
             Transform::from_translation(Vec3::ZERO.with_y(y_offset as f32)),
             Visibility::Visible,
@@ -56,7 +56,7 @@ pub(super) fn spawn_maze(
     );
 }
 
-pub(super) fn spawn_maze_tiles(
+pub(crate) fn spawn_maze_tiles(
     commands: &mut Commands,
     parent_entity: Entity,
     maze: &HexMaze,

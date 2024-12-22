@@ -8,6 +8,10 @@ pub struct Floor(pub u8);
 #[reflect(Component)]
 pub struct CurrentFloor;
 
+#[derive(Debug, Reflect, Component)]
+#[reflect(Component)]
+pub struct NextFloor;
+
 impl Default for Floor {
     fn default() -> Self {
         Self(1)
@@ -15,11 +19,11 @@ impl Default for Floor {
 }
 
 impl Floor {
-    pub fn increase(&self) -> Self {
+    pub fn increased(&self) -> Self {
         Self(self.0.saturating_add(1))
     }
 
-    pub fn decrease(&self) -> Self {
+    pub fn decreased(&self) -> Self {
         Self(self.0.saturating_sub(1).max(1))
     }
 }
@@ -36,7 +40,7 @@ mod tests {
     #[case(255, 255)]
     fn increase(#[case] input: u8, #[case] expected: u8) {
         let floor = Floor(input);
-        assert_eq!(*floor.increase(), expected);
+        assert_eq!(*floor.increased(), expected);
     }
 
     #[rstest]
@@ -46,6 +50,6 @@ mod tests {
     #[case(255, 254)]
     fn decrease(#[case] input: u8, #[case] expected: u8) {
         let floor = Floor(input);
-        assert_eq!(*floor.decrease(), expected);
+        assert_eq!(*floor.decreased(), expected);
     }
 }

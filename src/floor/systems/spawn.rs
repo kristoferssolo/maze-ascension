@@ -1,5 +1,3 @@
-use bevy::prelude::*;
-
 use crate::{
     floor::{
         components::{CurrentFloor, Floor},
@@ -7,30 +5,30 @@ use crate::{
     },
     maze::events::SpawnMaze,
 };
+use bevy::prelude::*;
 
 pub(super) fn spawn_floor(
     mut commands: Commands,
-    query: Query<(Entity, &Floor), With<CurrentFloor>>,
+    query: Query<&mut Floor, With<CurrentFloor>>,
     mut event_reader: EventReader<TransitionFloor>,
 ) {
-    let Ok((entity, floor)) = query.get_single() else {
+    let Ok(floor) = query.get_single() else {
         return;
     };
 
     for event in event_reader.read() {
-        dbg!(event);
         let floor = match event {
-            TransitionFloor::Ascend => *floor.increase(),
-            TransitionFloor::Descent => *floor.decrease(),
+            TransitionFloor::Ascend => *floor.increased(),
+            TransitionFloor::Descent => *floor.decreased(),
         };
 
         if floor == 1 {
+            warn!("Cannot descend below floor 1");
             return;
         }
 
         info!("Creating level for floor {}", floor);
 
-        commands.entity(entity).remove::<CurrentFloor>();
         commands.trigger(SpawnMaze { floor, ..default() });
     }
 }

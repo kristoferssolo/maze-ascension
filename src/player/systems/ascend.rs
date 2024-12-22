@@ -1,10 +1,9 @@
-use bevy::prelude::*;
-
 use crate::{
     floor::{components::CurrentFloor, events::TransitionFloor},
     maze::components::MazeConfig,
     player::components::{CurrentPosition, Player},
 };
+use bevy::prelude::*;
 
 pub(super) fn ascend_player(
     query: Query<&CurrentPosition, With<Player>>,
