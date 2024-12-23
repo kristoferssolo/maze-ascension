@@ -3,21 +3,40 @@ use crate::{
         components::{CurrentFloor, MovementState, NextFloor},
         events::TransitionFloor,
     },
-    maze::{components::Maze, GlobalMazeConfig},
+    maze::components::Maze,
     player::components::{MovementSpeed, Player},
 };
 use bevy::prelude::*;
 
 const MOVEMENT_THRESHOLD: f32 = 0.001;
 
-pub(super) fn floor_movement(
+pub(super) fn move_floors(
+    mut commands: Commands,
+    mut maze_query: Query<(Entity, &mut Transform, Option<&mut MovementState>), With<Maze>>,
+    player_query: Query<&MovementSpeed, With<Player>>,
+    time: Res<Time>,
+) {
+    let speed = player_query.get_single().map_or(100., |s| s.0);
+    let movement_distance = speed * time.delta_secs();
+    for (entity, mut transform, mut movement_state) in maze_query.iter_mut() {
+        if let Some(state) = movement_state.as_mut() {
+            let delta = state.target_y - transform.translation.y;
+            if delta.abs() > MOVEMENT_THRESHOLD {
+                let movement = delta.signum() * movement_distance.min(delta.abs());
+                transform.translation.y += movement;
+            } else {
+                transform.translation.y = state.target_y;
+                commands.entity(entity).remove::<MovementState>();
+            }
+        }
+    }
+}
+
+pub(super) fn handle_floor_transition_events(
     mut commands: Commands,
     mut maze_query: Query<(Entity, &mut Transform, Option<&mut MovementState>), With<Maze>>,
     current_query: Query<Entity, With<CurrentFloor>>,
     next_query: Query<Entity, With<NextFloor>>,
-    player_query: Query<&MovementSpeed, With<Player>>,
-    time: Res<Time>,
-    _global_config: Res<GlobalMazeConfig>,
     mut event_reader: EventReader<TransitionFloor>,
 ) {
     for event in event_reader.read() {
@@ -45,21 +64,6 @@ pub(super) fn floor_movement(
         }
 
         update_current_next_floor(&mut commands, current_entity, next_entity);
-    }
-
-    let speed = player_query.get_single().map_or(100., |s| s.0);
-    let movement_distance = speed * time.delta_secs();
-    for (entity, mut transform, mut movement_state) in maze_query.iter_mut() {
-        if let Some(state) = movement_state.as_mut() {
-            let delta = state.target_y - transform.translation.y;
-            if delta.abs() > MOVEMENT_THRESHOLD {
-                let movement = delta.signum() * movement_distance.min(delta.abs());
-                transform.translation.y += movement;
-            } else {
-                transform.translation.y = state.target_y;
-                commands.entity(entity).remove::<MovementState>();
-            }
-        }
     }
 }
 
