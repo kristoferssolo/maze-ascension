@@ -25,12 +25,20 @@ pub(super) fn spawn_maze(
     global_config: Res<GlobalMazeConfig>,
 ) {
     let SpawnMaze { floor, config } = trigger.event();
+
     if maze_query.iter().any(|(_, f, _)| f.0 == *floor) {
         warn!("Floor {} already exists, skipping creation", floor);
         return;
     }
 
-    let maze = generate_maze(config).expect("Failed to generate maze during spawn");
+    let maze = match generate_maze(&config) {
+        Ok(m) => m,
+        Err(e) => {
+            error!("Failed to generate maze for floor {floor}: {:?}", e);
+            return;
+        }
+    };
+
     let y_offset = (floor - 1) * FLOOR_Y_OFFSET;
 
     let entity = commands
@@ -38,11 +46,12 @@ pub(super) fn spawn_maze(
             Name::new(format!("Floor {}", floor)),
             Maze(maze.clone()),
             Floor(*floor),
-            NextFloor,
             config.clone(),
             Transform::from_translation(Vec3::ZERO.with_y(y_offset as f32)),
             Visibility::Visible,
         ))
+        .insert_if(CurrentFloor, || *floor == 1)
+        .insert_if(NextFloor, || *floor != 1)
         .id();
 
     let assets = MazeAssets::new(&mut meshes, &mut materials, &global_config);
@@ -51,7 +60,7 @@ pub(super) fn spawn_maze(
         entity,
         &maze,
         &assets,
-        config,
+        &config,
         &global_config,
     );
 }

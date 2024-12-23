@@ -1,5 +1,3 @@
-use bevy::prelude::*;
-
 use crate::{
     floor::{
         components::{CurrentFloor, NextFloor},
@@ -8,12 +6,13 @@ use crate::{
     maze::{components::Maze, GlobalMazeConfig},
     player::components::{MovementSpeed, Player},
 };
+use bevy::prelude::*;
 
 pub(super) fn floor_movement(
     mut commands: Commands,
-    mut maze_transforms: Query<(Entity, &mut Transform), With<Maze>>,
-    current_floor: Query<Entity, With<CurrentFloor>>,
-    next_floor: Query<Entity, With<NextFloor>>,
+    mut maze_query: Query<(Entity, &mut Transform), With<Maze>>,
+    current_query: Query<Entity, With<CurrentFloor>>,
+    next_query: Query<Entity, With<NextFloor>>,
     player_query: Query<&MovementSpeed, With<Player>>,
     time: Res<Time>,
     global_config: Res<GlobalMazeConfig>,
@@ -23,37 +22,31 @@ pub(super) fn floor_movement(
     let movement_distance = speed * time.delta_secs();
 
     for event in event_reader.read() {
-        let (direction, target_y) = match event {
-            TransitionFloor::Ascend => (Vec3::Y, -global_config.height),
-            TransitionFloor::Descend => (Vec3::NEG_Y, global_config.height),
+        let y_offset = match event {
+            TransitionFloor::Ascend => -global_config.height,
+            TransitionFloor::Descend => global_config.height,
         };
 
-        let movement = direction * movement_distance;
-
-        for (_, mut transform) in maze_transforms.iter_mut() {
-            transform.translation += movement;
+        for (_, mut transforms) in maze_query.iter_mut() {
+            let target_y = transforms.translation.y + y_offset;
+            let delta = target_y - transforms.translation.y;
+            if delta.abs() > 0.001 {
+                let movement = delta.signum() * movement_distance.min(delta.abs());
+                transforms.translation.y += movement;
+            } else {
+                transforms.translation.y = target_y;
+            }
         }
 
-        let is_movement_complete = maze_transforms
-            .iter()
-            .any(|(_, t)| t.translation.y.abs() >= target_y.abs());
-
-        if is_movement_complete {
-            if let Ok(current_floor_entity) = current_floor.get_single() {
-                commands
-                    .entity(current_floor_entity)
-                    .remove::<CurrentFloor>();
-            }
-
-            if let Ok(next_floor_entity) = next_floor.get_single() {
-                if let Ok((entity, mut transform)) = maze_transforms.get_mut(next_floor_entity) {
-                    transform.translation.y = 0.;
-                    commands
-                        .entity(entity)
-                        .remove::<NextFloor>()
-                        .insert(CurrentFloor);
-                }
-            }
+        // Update current/next floor
+        if let (Ok(current_entity), Ok(next_entity)) =
+            (current_query.get_single(), next_query.get_single())
+        {
+            commands.entity(current_entity).remove::<CurrentFloor>();
+            commands
+                .entity(next_entity)
+                .remove::<NextFloor>()
+                .insert(CurrentFloor);
         }
     }
 }
