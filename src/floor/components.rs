@@ -12,6 +12,13 @@ pub struct CurrentFloor;
 #[reflect(Component)]
 pub struct NextFloor;
 
+#[derive(Debug, Reflect, Component)]
+#[reflect(Component)]
+pub struct MovementState {
+    pub target_y: f32,
+    pub direction: f32,
+}
+
 impl Default for Floor {
     fn default() -> Self {
         Self(1)

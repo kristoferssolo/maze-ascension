@@ -6,6 +6,8 @@ use crate::{
 use bevy::prelude::*;
 use hexx::Hex;
 
+const MOVEMENT_THRESHOLD: f32 = 0.1;
+
 pub(super) fn player_movement(
     time: Res<Time>,
     mut query: Query<
@@ -48,7 +50,7 @@ pub(super) fn player_movement(
 }
 
 fn should_complete_movement(current_pos: Vec3, target_pos: Vec3) -> bool {
-    (target_pos - current_pos).length() < 0.1
+    (target_pos - current_pos).length() < MOVEMENT_THRESHOLD
 }
 
 fn update_position(
