@@ -21,7 +21,7 @@ pub(super) fn descend_player(
 
     for current_hex in query.iter() {
         if current_hex.0 == config.start_pos && floor.0 != 1 {
-            event_writer.send(TransitionFloor::Descent);
+            event_writer.send(TransitionFloor::Descend);
             return;
         }
     }

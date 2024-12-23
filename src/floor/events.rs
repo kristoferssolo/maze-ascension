@@ -23,5 +23,5 @@ pub struct DespawnFloor {
 pub enum TransitionFloor {
     #[default]
     Ascend,
-    Descent,
+    Descend,
 }

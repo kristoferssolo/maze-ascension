@@ -25,7 +25,7 @@ pub(super) fn floor_movement(
     for event in event_reader.read() {
         let (direction, target_y) = match event {
             TransitionFloor::Ascend => (Vec3::Y, -global_config.height),
-            TransitionFloor::Descent => (Vec3::NEG_Y, global_config.height),
+            TransitionFloor::Descend => (Vec3::NEG_Y, global_config.height),
         };
 
         let movement = direction * movement_distance;

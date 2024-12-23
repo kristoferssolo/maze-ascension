@@ -19,7 +19,7 @@ pub(super) fn spawn_floor(
     for event in event_reader.read() {
         let floor = match event {
             TransitionFloor::Ascend => *floor.increased(),
-            TransitionFloor::Descent => *floor.decreased(),
+            TransitionFloor::Descend => *floor.decreased(),
         };
 
         if floor == 1 {
