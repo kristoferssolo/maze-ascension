@@ -32,7 +32,7 @@ impl MazeError {
         Self::ConfigurationError(msg.into())
     }
 
-    pub fn generation_failed(radius: u32, seed: u64) -> Self {
+    pub const fn generation_failed(radius: u32, seed: u64) -> Self {
         Self::GenerationFailed { radius, seed }
     }
 }

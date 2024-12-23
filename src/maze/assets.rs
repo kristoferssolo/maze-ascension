@@ -8,26 +8,26 @@ const WALL_OVERLAP_MODIFIER: f32 = 1.25;
 const HEX_SIDES: u32 = 6;
 const WHITE_EMISSION_INTENSITY: f32 = 10.;
 
-pub(crate) struct MazeAssets {
-    pub(crate) hex_mesh: Handle<Mesh>,
-    pub(crate) wall_mesh: Handle<Mesh>,
-    pub(crate) hex_material: Handle<StandardMaterial>,
-    pub(crate) wall_material: Handle<StandardMaterial>,
-    pub(crate) custom_materials: HashMap<String, Handle<StandardMaterial>>,
+pub struct MazeAssets {
+    pub hex_mesh: Handle<Mesh>,
+    pub wall_mesh: Handle<Mesh>,
+    pub hex_material: Handle<StandardMaterial>,
+    pub wall_material: Handle<StandardMaterial>,
+    pub custom_materials: HashMap<String, Handle<StandardMaterial>>,
 }
 
 impl MazeAssets {
-    pub(crate) fn new(
+    pub fn new(
         meshes: &mut ResMut<Assets<Mesh>>,
         materials: &mut ResMut<Assets<StandardMaterial>>,
         global_config: &GlobalMazeConfig,
-    ) -> MazeAssets {
+    ) -> Self {
         let mut custom_materials = HashMap::new();
         custom_materials.extend(vec![
             ("LOVE".to_string(), materials.add(red_material())),
             ("PINE".to_string(), materials.add(blue_material())),
         ]);
-        MazeAssets {
+        Self {
             hex_mesh: meshes.add(generate_hex_mesh(
                 global_config.hex_size,
                 global_config.height,
@@ -62,7 +62,7 @@ fn generate_square_mesh(depth: f32, wall_size: f32) -> Mesh {
     Mesh::from(rectangular_prism).rotated_by(rotation)
 }
 
-pub(crate) fn white_material() -> StandardMaterial {
+pub fn white_material() -> StandardMaterial {
     StandardMaterial {
         emissive: LinearRgba::new(
             WHITE_EMISSION_INTENSITY,
@@ -74,14 +74,14 @@ pub(crate) fn white_material() -> StandardMaterial {
     }
 }
 
-pub(crate) fn red_material() -> StandardMaterial {
+pub fn red_material() -> StandardMaterial {
     StandardMaterial {
         emissive: LOVE.to_linear(),
         ..default()
     }
 }
 
-pub(crate) fn blue_material() -> StandardMaterial {
+pub fn blue_material() -> StandardMaterial {
     StandardMaterial {
         emissive: PINE.to_linear(),
         ..default()

@@ -19,7 +19,7 @@ impl Default for Floor {
 }
 
 impl Floor {
-    pub fn increased(&self) -> Self {
+    pub const fn increased(&self) -> Self {
         Self(self.0.saturating_add(1))
     }
 

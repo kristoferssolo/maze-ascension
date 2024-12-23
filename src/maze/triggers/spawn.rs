@@ -1,3 +1,4 @@
+use super::common::generate_maze;
 use crate::{
     floor::components::{CurrentFloor, Floor, NextFloor},
     maze::{
@@ -12,9 +13,7 @@ use hexlab::prelude::*;
 use hexx::HexOrientation;
 use std::f32::consts::{FRAC_PI_2, FRAC_PI_3, FRAC_PI_6};
 
-use super::common::generate_maze;
-
-pub(crate) const FLOOR_Y_OFFSET: u8 = 100;
+pub const FLOOR_Y_OFFSET: u8 = 100;
 
 pub(super) fn spawn_maze(
     trigger: Trigger<SpawnMaze>,
@@ -31,7 +30,7 @@ pub(super) fn spawn_maze(
         return;
     }
 
-    let maze = match generate_maze(&config) {
+    let maze = match generate_maze(config) {
         Ok(m) => m,
         Err(e) => {
             error!("Failed to generate maze for floor {floor}: {:?}", e);
@@ -60,12 +59,12 @@ pub(super) fn spawn_maze(
         entity,
         &maze,
         &assets,
-        &config,
+        config,
         &global_config,
     );
 }
 
-pub(crate) fn spawn_maze_tiles(
+pub fn spawn_maze_tiles(
     commands: &mut Commands,
     parent_entity: Entity,
     maze: &HexMaze,
@@ -98,14 +97,12 @@ pub(super) fn spawn_single_hex_tile(
             .custom_materials
             .get("PINE")
             .cloned()
-            .to_owned()
-            .unwrap(),
+            .unwrap_or_default(),
         pos if pos == maze_config.end_pos => assets
             .custom_materials
             .get("LOVE")
             .cloned()
-            .to_owned()
-            .unwrap(),
+            .unwrap_or_default(),
         _ => assets.hex_material.clone(),
     };
 
