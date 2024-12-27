@@ -7,6 +7,7 @@ use crate::{
         events::SpawnMaze,
         resources::GlobalMazeConfig,
     },
+    theme::palette::rose_pine::RosePine,
 };
 use bevy::prelude::*;
 use hexlab::prelude::*;
@@ -100,12 +101,12 @@ pub(super) fn spawn_single_hex_tile(
     let material = match tile.pos() {
         pos if pos == maze_config.start_pos => assets
             .custom_materials
-            .get("PINE")
+            .get(&RosePine::Pine)
             .cloned()
             .unwrap_or_default(),
         pos if pos == maze_config.end_pos => assets
             .custom_materials
-            .get("LOVE")
+            .get(&RosePine::Love)
             .cloned()
             .unwrap_or_default(),
         _ => assets.hex_material.clone(),

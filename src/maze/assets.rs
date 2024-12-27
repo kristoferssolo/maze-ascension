@@ -1,8 +1,8 @@
-use crate::theme::palette::rose_pine::{LOVE, PINE};
-
 use super::resources::GlobalMazeConfig;
+use crate::theme::{palette::rose_pine::RosePine, prelude::ColorScheme};
 use bevy::{prelude::*, utils::HashMap};
 use std::f32::consts::FRAC_PI_2;
+use strum::IntoEnumIterator;
 
 const WALL_OVERLAP_MODIFIER: f32 = 1.25;
 const HEX_SIDES: u32 = 6;
@@ -13,7 +13,7 @@ pub struct MazeAssets {
     pub wall_mesh: Handle<Mesh>,
     pub hex_material: Handle<StandardMaterial>,
     pub wall_material: Handle<StandardMaterial>,
-    pub custom_materials: HashMap<String, Handle<StandardMaterial>>,
+    pub custom_materials: HashMap<RosePine, Handle<StandardMaterial>>,
 }
 
 impl MazeAssets {
@@ -22,11 +22,9 @@ impl MazeAssets {
         materials: &mut ResMut<Assets<StandardMaterial>>,
         global_config: &GlobalMazeConfig,
     ) -> Self {
-        let mut custom_materials = HashMap::new();
-        custom_materials.extend(vec![
-            ("LOVE".to_string(), materials.add(red_material())),
-            ("PINE".to_string(), materials.add(blue_material())),
-        ]);
+        let custom_materials = RosePine::iter()
+            .map(|color| (color, materials.add(color.to_standart_material())))
+            .collect();
         Self {
             hex_mesh: meshes.add(generate_hex_mesh(
                 global_config.hex_size,
@@ -70,20 +68,6 @@ pub fn white_material() -> StandardMaterial {
             WHITE_EMISSION_INTENSITY,
             WHITE_EMISSION_INTENSITY,
         ),
-        ..default()
-    }
-}
-
-pub fn red_material() -> StandardMaterial {
-    StandardMaterial {
-        emissive: LOVE.to_linear(),
-        ..default()
-    }
-}
-
-pub fn blue_material() -> StandardMaterial {
-    StandardMaterial {
-        emissive: PINE.to_linear(),
         ..default()
     }
 }

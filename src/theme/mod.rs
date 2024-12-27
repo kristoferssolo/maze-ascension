@@ -2,6 +2,7 @@
 
 // Unused utilities may trigger this lints undesirably.
 
+mod colorscheme;
 pub mod interaction;
 pub mod palette;
 mod widgets;
@@ -9,6 +10,7 @@ mod widgets;
 #[allow(unused_imports)]
 pub mod prelude {
     pub use super::{
+        colorscheme::{ColorScheme, ColorSchemeWrapper},
         interaction::{InteractionPalette, OnPress},
         palette as ui_palette,
         widgets::{Containers as _, Widgets as _},

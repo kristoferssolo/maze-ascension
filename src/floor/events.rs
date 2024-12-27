@@ -14,7 +14,7 @@ impl TransitionFloor {
         self.into()
     }
 
-    pub fn opposite(&self) -> Self {
+    pub const fn opposite(&self) -> Self {
         match self {
             Self::Ascend => Self::Descend,
             Self::Descend => Self::Ascend,
@@ -31,7 +31,7 @@ impl TransitionFloor {
 
 impl From<TransitionFloor> for f32 {
     fn from(value: TransitionFloor) -> Self {
-        f32::from(&value)
+        Self::from(&value)
     }
 }
 
