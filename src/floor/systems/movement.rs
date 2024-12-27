@@ -39,11 +39,16 @@ pub(super) fn handle_floor_transition_events(
     next_query: Query<Entity, With<NextFloor>>,
     mut event_reader: EventReader<TransitionFloor>,
 ) {
+    let is_moving = maze_query
+        .iter()
+        .any(|(_, _, movement_state)| movement_state.is_some());
+
+    if is_moving {
+        return;
+    }
+
     for event in event_reader.read() {
-        let direction = match event {
-            TransitionFloor::Ascend => -1.,
-            TransitionFloor::Descend => 1.,
-        };
+        let direction = event.into();
 
         let Some((current_entity, current_y)) = get_floor_info(&maze_query, &current_query) else {
             continue;
@@ -64,6 +69,7 @@ pub(super) fn handle_floor_transition_events(
         }
 
         update_current_next_floor(&mut commands, current_entity, next_entity);
+        break;
     }
 }
 

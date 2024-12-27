@@ -38,7 +38,12 @@ pub(super) fn spawn_maze(
         }
     };
 
-    let y_offset = (floor - 1) * FLOOR_Y_OFFSET;
+    let y_offset = match *floor {
+        1 => 0,
+        _ => FLOOR_Y_OFFSET,
+    } as f32;
+
+    // (floor - 1) * FLOOR_Y_OFFSET
 
     let entity = commands
         .spawn((
@@ -46,7 +51,7 @@ pub(super) fn spawn_maze(
             Maze(maze.clone()),
             Floor(*floor),
             config.clone(),
-            Transform::from_translation(Vec3::ZERO.with_y(y_offset as f32)),
+            Transform::from_translation(Vec3::ZERO.with_y(y_offset)),
             Visibility::Visible,
         ))
         .insert_if(CurrentFloor, || *floor == 1)

@@ -11,10 +11,12 @@ pub const HEADER_TEXT: Color = Color::srgb(0.867, 0.827, 0.412);
 
 pub const NODE_BACKGROUND: Color = Color::srgb(0.286, 0.478, 0.773);
 
+const MAX_COLOR_VALUE: f32 = 255.;
+
 pub(super) const fn rgb_u8(red: u8, green: u8, blue: u8) -> Color {
     Color::srgb(scale(red), scale(green), scale(blue))
 }
 
 const fn scale(value: u8) -> f32 {
-    value as f32 / 255.
+    value as f32 / MAX_COLOR_VALUE
 }

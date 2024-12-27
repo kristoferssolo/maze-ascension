@@ -1,27 +1,45 @@
 use bevy::prelude::*;
 
-use crate::maze::components::MazeConfig;
+use super::components::Floor;
 
-#[derive(Debug, Reflect, Event)]
-pub struct SpawnFloor {
-    pub floor: u8,
-    pub config: MazeConfig,
-}
-
-#[derive(Debug, Reflect, Event)]
-pub struct RespawnFloor {
-    pub floor: u8,
-    pub config: MazeConfig,
-}
-
-#[derive(Debug, Reflect, Event)]
-pub struct DespawnFloor {
-    pub floor: u8,
-}
-
-#[derive(Debug, Reflect, Event, Default)]
+#[derive(Debug, Clone, Copy, Reflect, Event, Default, PartialEq, Eq)]
 pub enum TransitionFloor {
     #[default]
     Ascend,
     Descend,
+}
+
+impl TransitionFloor {
+    pub fn into_direction(&self) -> f32 {
+        self.into()
+    }
+
+    pub fn opposite(&self) -> Self {
+        match self {
+            Self::Ascend => Self::Descend,
+            Self::Descend => Self::Ascend,
+        }
+    }
+
+    pub fn next_floor_num(&self, floor: &Floor) -> u8 {
+        match self {
+            Self::Ascend => *floor.increased(),
+            Self::Descend => *floor.decreased(),
+        }
+    }
+}
+
+impl From<TransitionFloor> for f32 {
+    fn from(value: TransitionFloor) -> Self {
+        f32::from(&value)
+    }
+}
+
+impl From<&TransitionFloor> for f32 {
+    fn from(value: &TransitionFloor) -> Self {
+        match value {
+            TransitionFloor::Ascend => -1.,
+            TransitionFloor::Descend => 1.,
+        }
+    }
 }

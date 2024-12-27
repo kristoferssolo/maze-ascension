@@ -17,4 +17,3 @@ web-dev:
 # Run web release
 web-release:
     trunk serve --release --no-default-features
-

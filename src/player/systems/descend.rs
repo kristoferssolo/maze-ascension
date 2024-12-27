@@ -11,10 +11,10 @@ use crate::{
 
 pub(super) fn descend_player(
     query: Query<&CurrentPosition, With<Player>>,
-    maze_config_query: Query<(&MazeConfig, &Floor), With<CurrentFloor>>,
+    maze_config: Query<(&MazeConfig, &Floor), With<CurrentFloor>>,
     mut event_writer: EventWriter<TransitionFloor>,
 ) {
-    let Ok((config, floor)) = maze_config_query.get_single() else {
+    let Ok((config, floor)) = maze_config.get_single() else {
         warn!("Failed to get maze configuration for current floor - cannot descend player");
         return;
     };

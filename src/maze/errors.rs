@@ -14,7 +14,7 @@ pub enum MazeError {
     #[error("Floor {0} not found")]
     FloorNotFound(u8),
     #[error("Failed to generate maze with config: {radius}, seed: {seed}")]
-    GenerationFailed { radius: u32, seed: u64 },
+    GenerationFailed { radius: u16, seed: u64 },
     #[error("Invalid tile entity: {0:?}")]
     TileNotFound(bevy::prelude::Entity),
     #[error("Failed to create maze assets")]
@@ -32,7 +32,7 @@ impl MazeError {
         Self::ConfigurationError(msg.into())
     }
 
-    pub const fn generation_failed(radius: u32, seed: u64) -> Self {
+    pub const fn generation_failed(radius: u16, seed: u64) -> Self {
         Self::GenerationFailed { radius, seed }
     }
 }
