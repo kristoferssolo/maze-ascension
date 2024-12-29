@@ -10,7 +10,7 @@ use crate::{
     theme::palette::rose_pine::RosePine,
 };
 use bevy::prelude::*;
-use hexlab::prelude::*;
+use hexlab::prelude::{Maze as HexMaze, Tile as HexTile, *};
 use hexx::HexOrientation;
 use std::f32::consts::{FRAC_PI_2, FRAC_PI_3, FRAC_PI_6};
 

@@ -2,7 +2,7 @@ use crate::floor::components::Floor;
 
 use super::GlobalMazeConfig;
 use bevy::prelude::*;
-use hexlab::HexMaze;
+use hexlab::Maze as HexMaze;
 use hexx::{Hex, HexLayout, HexOrientation};
 use rand::{rngs::StdRng, thread_rng, Rng, SeedableRng};
 

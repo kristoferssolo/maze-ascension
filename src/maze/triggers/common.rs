@@ -2,7 +2,7 @@ use crate::maze::{
     components::MazeConfig,
     errors::{MazeError, MazeResult},
 };
-use hexlab::{GeneratorType, HexMaze, MazeBuilder};
+use hexlab::prelude::{Maze as HexMaze, *};
 
 pub fn generate_maze(config: &MazeConfig) -> MazeResult<HexMaze> {
     MazeBuilder::new()
