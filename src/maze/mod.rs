@@ -7,7 +7,7 @@ mod systems;
 mod triggers;
 
 use bevy::{ecs::system::RunSystemOnce, prelude::*};
-use components::Maze;
+use components::HexMaze;
 use events::{DespawnMaze, RespawnMaze, SpawnMaze};
 pub use resources::{GlobalMazeConfig, MazePluginLoaded};
 
@@ -16,7 +16,7 @@ pub(super) fn plugin(app: &mut App) {
         .add_event::<SpawnMaze>()
         .add_event::<RespawnMaze>()
         .add_event::<DespawnMaze>()
-        .register_type::<Maze>()
+        .register_type::<HexMaze>()
         .add_plugins((systems::plugin, triggers::plugin));
 }
 

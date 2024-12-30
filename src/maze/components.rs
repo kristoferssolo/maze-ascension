@@ -2,14 +2,14 @@ use crate::floor::components::Floor;
 
 use super::GlobalMazeConfig;
 use bevy::prelude::*;
-use hexlab::Maze as HexMaze;
+use hexlab::Maze;
 use hexx::{Hex, HexLayout, HexOrientation};
 use rand::{rngs::StdRng, thread_rng, Rng, SeedableRng};
 
 #[derive(Debug, Reflect, Component)]
 #[reflect(Component)]
-#[require(MazeConfig, Floor)]
-pub struct Maze(pub HexMaze);
+#[require(MazeConfig, Floor, Maze)]
+pub struct HexMaze;
 
 #[derive(Debug, Reflect, Component)]
 #[reflect(Component)]

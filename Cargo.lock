@@ -2679,6 +2679,7 @@ version = "0.5.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7bd7c21f4e2c11d40473d1ae673905f4deae3b12104fa6d70eeef9ef385aceb6"
 dependencies = [
+ "bevy",
  "bevy_reflect",
  "bevy_utils",
  "glam",

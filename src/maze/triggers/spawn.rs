@@ -3,14 +3,14 @@ use crate::{
     floor::components::{CurrentFloor, Floor, NextFloor},
     maze::{
         assets::MazeAssets,
-        components::{Maze, MazeConfig, Tile, Wall},
+        components::{HexMaze, MazeConfig, Tile, Wall},
         events::SpawnMaze,
         resources::GlobalMazeConfig,
     },
     theme::palette::rose_pine::RosePine,
 };
 use bevy::prelude::*;
-use hexlab::prelude::{Maze as HexMaze, Tile as HexTile, *};
+use hexlab::prelude::{Tile as HexTile, *};
 use hexx::HexOrientation;
 use std::f32::consts::{FRAC_PI_2, FRAC_PI_3, FRAC_PI_6};
 
@@ -49,7 +49,8 @@ pub(super) fn spawn_maze(
     let entity = commands
         .spawn((
             Name::new(format!("Floor {}", floor)),
-            Maze(maze.clone()),
+            HexMaze,
+            maze.clone(),
             Floor(*floor),
             config.clone(),
             Transform::from_translation(Vec3::ZERO.with_y(y_offset)),
@@ -73,7 +74,7 @@ pub(super) fn spawn_maze(
 pub fn spawn_maze_tiles(
     commands: &mut Commands,
     parent_entity: Entity,
-    maze: &HexMaze,
+    maze: &Maze,
     assets: &MazeAssets,
     maze_config: &MazeConfig,
     global_config: &GlobalMazeConfig,

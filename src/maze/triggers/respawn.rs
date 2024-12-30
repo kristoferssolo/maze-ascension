@@ -1,12 +1,10 @@
 use super::{common::generate_maze, spawn::spawn_maze_tiles};
 use crate::{
     floor::components::Floor,
-    maze::{
-        assets::MazeAssets, components::Maze, errors::MazeError, events::RespawnMaze,
-        GlobalMazeConfig,
-    },
+    maze::{assets::MazeAssets, errors::MazeError, events::RespawnMaze, GlobalMazeConfig},
 };
 use bevy::prelude::*;
+use hexlab::Maze;
 
 pub(super) fn respawn_maze(
     trigger: Trigger<RespawnMaze>,
@@ -30,7 +28,7 @@ pub(super) fn respawn_maze(
         }
     };
 
-    maze.0 = match generate_maze(config) {
+    *maze = match generate_maze(config) {
         Ok(generated_maze) => generated_maze,
         Err(e) => {
             warn!("Failed to update floor ({floor}). {e}");
@@ -43,7 +41,7 @@ pub(super) fn respawn_maze(
     spawn_maze_tiles(
         &mut commands,
         entity,
-        &maze.0,
+        &maze,
         &assets,
         config,
         &global_config,

@@ -3,7 +3,7 @@ use crate::{
         components::{CurrentFloor, MovementState, NextFloor},
         events::TransitionFloor,
     },
-    maze::components::Maze,
+    maze::components::HexMaze,
     player::components::{MovementSpeed, Player},
 };
 use bevy::prelude::*;
@@ -12,7 +12,7 @@ const MOVEMENT_THRESHOLD: f32 = 0.001;
 
 pub(super) fn move_floors(
     mut commands: Commands,
-    mut maze_query: Query<(Entity, &mut Transform, Option<&mut MovementState>), With<Maze>>,
+    mut maze_query: Query<(Entity, &mut Transform, Option<&mut MovementState>), With<HexMaze>>,
     player_query: Query<&MovementSpeed, With<Player>>,
     time: Res<Time>,
 ) {
@@ -34,7 +34,7 @@ pub(super) fn move_floors(
 
 pub(super) fn handle_floor_transition_events(
     mut commands: Commands,
-    mut maze_query: Query<(Entity, &mut Transform, Option<&mut MovementState>), With<Maze>>,
+    mut maze_query: Query<(Entity, &mut Transform, Option<&mut MovementState>), With<HexMaze>>,
     current_query: Query<Entity, With<CurrentFloor>>,
     next_query: Query<Entity, With<NextFloor>>,
     mut event_reader: EventReader<TransitionFloor>,
@@ -82,7 +82,7 @@ fn update_current_next_floor(commands: &mut Commands, current_entity: Entity, ne
 }
 
 fn get_floor_info(
-    maze_query: &Query<(Entity, &mut Transform, Option<&mut MovementState>), With<Maze>>,
+    maze_query: &Query<(Entity, &mut Transform, Option<&mut MovementState>), With<HexMaze>>,
     query: &Query<Entity, With<impl Component>>,
 ) -> Option<(Entity, f32)> {
     query.get_single().ok().and_then(|entity| {
