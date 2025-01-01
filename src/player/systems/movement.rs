@@ -1,12 +1,11 @@
 use crate::{
+    constants::MOVEMENT_THRESHOLD,
     floor::components::CurrentFloor,
     maze::components::MazeConfig,
     player::components::{CurrentPosition, MovementSpeed, MovementTarget, Player},
 };
 use bevy::prelude::*;
 use hexx::Hex;
-
-const MOVEMENT_THRESHOLD: f32 = 0.1;
 
 pub(super) fn player_movement(
     time: Res<Time>,

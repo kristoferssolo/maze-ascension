@@ -1,5 +1,6 @@
 use super::common::generate_maze;
 use crate::{
+    constants::FLOOR_Y_OFFSET,
     floor::components::{CurrentFloor, Floor, NextFloor},
     maze::{
         assets::MazeAssets,
@@ -13,8 +14,6 @@ use bevy::prelude::*;
 use hexlab::prelude::{Tile as HexTile, *};
 use hexx::HexOrientation;
 use std::f32::consts::{FRAC_PI_2, FRAC_PI_3, FRAC_PI_6};
-
-pub const FLOOR_Y_OFFSET: u8 = 100;
 
 pub(super) fn spawn_maze(
     trigger: Trigger<SpawnMaze>,

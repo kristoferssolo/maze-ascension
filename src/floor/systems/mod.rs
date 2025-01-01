@@ -16,9 +16,8 @@ pub(super) fn plugin(app: &mut App) {
             spawn_floor,
             despawn_floor,
             handle_floor_transition_events,
-            move_floors,
+            move_floors.after(handle_floor_transition_events),
         )
-            .chain()
             .run_if(resource_exists::<MazePluginLoaded>),
     );
 }

@@ -1,10 +1,12 @@
 use super::resources::GlobalMazeConfig;
-use crate::theme::{palette::rose_pine::RosePine, prelude::ColorScheme};
+use crate::{
+    constants::WALL_OVERLAP_MODIFIER,
+    theme::{palette::rose_pine::RosePine, prelude::ColorScheme},
+};
 use bevy::{prelude::*, utils::HashMap};
 use std::f32::consts::FRAC_PI_2;
 use strum::IntoEnumIterator;
 
-const WALL_OVERLAP_MODIFIER: f32 = 1.25;
 const HEX_SIDES: u32 = 6;
 const WHITE_EMISSION_INTENSITY: f32 = 10.;
 

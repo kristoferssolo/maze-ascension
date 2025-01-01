@@ -1,5 +1,6 @@
 pub mod asset_tracking;
 pub mod audio;
+pub mod constants;
 #[cfg(feature = "dev")]
 pub mod dev_tools;
 pub mod floor;
