@@ -2,9 +2,9 @@ use crate::maze::{
     components::MazeConfig,
     errors::{MazeError, MazeResult},
 };
-use hexlab::{GeneratorType, HexMaze, MazeBuilder};
+use hexlab::prelude::*;
 
-pub(crate) fn generate_maze(config: &MazeConfig) -> MazeResult<HexMaze> {
+pub fn generate_maze(config: &MazeConfig) -> MazeResult<Maze> {
     MazeBuilder::new()
         .with_radius(config.radius)
         .with_seed(config.seed)

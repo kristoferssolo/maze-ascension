@@ -1,9 +1,10 @@
 use crate::{
     floor::components::CurrentFloor,
-    maze::components::{Maze, MazeConfig},
+    maze::components::MazeConfig,
     player::components::{CurrentPosition, MovementTarget, Player},
 };
 use bevy::prelude::*;
+use hexlab::prelude::*;
 use hexx::{EdgeDirection, HexOrientation};
 
 pub(super) fn player_input(
@@ -24,7 +25,7 @@ pub(super) fn player_input(
             continue;
         };
 
-        let Some(tile) = maze.0.get_tile(current_pos) else {
+        let Some(tile) = maze.get(current_pos) else {
             continue;
         };
 

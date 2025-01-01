@@ -12,7 +12,7 @@ use hexx::{Hex, HexOrientation};
 use rand::{thread_rng, Rng};
 use std::ops::RangeInclusive;
 
-pub(crate) fn maze_controls_ui(world: &mut World) {
+pub fn maze_controls_ui(world: &mut World) {
     if world.get_resource::<MazePluginLoaded>().is_none() {
         return;
     }

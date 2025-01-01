@@ -1,18 +1,19 @@
+use super::common::generate_maze;
 use crate::{
-    floor::components::{CurrentFloor, Floor},
+    constants::FLOOR_Y_OFFSET,
+    floor::components::{CurrentFloor, Floor, NextFloor},
     maze::{
         assets::MazeAssets,
-        components::{Maze, MazeConfig, Tile, Wall},
+        components::{HexMaze, MazeConfig, Tile, Wall},
         events::SpawnMaze,
         resources::GlobalMazeConfig,
     },
+    theme::palette::rose_pine::RosePine,
 };
 use bevy::prelude::*;
-use hexlab::prelude::*;
+use hexlab::prelude::{Tile as HexTile, *};
 use hexx::HexOrientation;
 use std::f32::consts::{FRAC_PI_2, FRAC_PI_3, FRAC_PI_6};
-
-use super::common::generate_maze;
 
 pub(super) fn spawn_maze(
     trigger: Trigger<SpawnMaze>,
@@ -23,23 +24,39 @@ pub(super) fn spawn_maze(
     global_config: Res<GlobalMazeConfig>,
 ) {
     let SpawnMaze { floor, config } = trigger.event();
+
     if maze_query.iter().any(|(_, f, _)| f.0 == *floor) {
         warn!("Floor {} already exists, skipping creation", floor);
         return;
     }
 
-    let maze = generate_maze(config).expect("Failed to generate maze during spawn");
+    let maze = match generate_maze(config) {
+        Ok(m) => m,
+        Err(e) => {
+            error!("Failed to generate maze for floor {floor}: {:?}", e);
+            return;
+        }
+    };
+
+    let y_offset = match *floor {
+        1 => 0,
+        _ => FLOOR_Y_OFFSET,
+    } as f32;
+
+    // (floor - 1) * FLOOR_Y_OFFSET
 
     let entity = commands
         .spawn((
             Name::new(format!("Floor {}", floor)),
-            Maze(maze.clone()),
+            HexMaze,
+            maze.clone(),
             Floor(*floor),
-            CurrentFloor, // TODO: remove
             config.clone(),
-            Transform::from_translation(Vec3::ZERO),
+            Transform::from_translation(Vec3::ZERO.with_y(y_offset)),
             Visibility::Visible,
         ))
+        .insert_if(CurrentFloor, || *floor == 1)
+        .insert_if(NextFloor, || *floor != 1)
         .id();
 
     let assets = MazeAssets::new(&mut meshes, &mut materials, &global_config);
@@ -53,10 +70,10 @@ pub(super) fn spawn_maze(
     );
 }
 
-pub(super) fn spawn_maze_tiles(
+pub fn spawn_maze_tiles(
     commands: &mut Commands,
     parent_entity: Entity,
-    maze: &HexMaze,
+    maze: &Maze,
     assets: &MazeAssets,
     maze_config: &MazeConfig,
     global_config: &GlobalMazeConfig,
@@ -81,12 +98,26 @@ pub(super) fn spawn_single_hex_tile(
         HexOrientation::Flat => Quat::from_rotation_y(FRAC_PI_6), // 30 degrees rotation
     };
 
+    let material = match tile.pos() {
+        pos if pos == maze_config.start_pos => assets
+            .custom_materials
+            .get(&RosePine::Pine)
+            .cloned()
+            .unwrap_or_default(),
+        pos if pos == maze_config.end_pos => assets
+            .custom_materials
+            .get(&RosePine::Love)
+            .cloned()
+            .unwrap_or_default(),
+        _ => assets.hex_material.clone(),
+    };
+
     parent
         .spawn((
             Name::new(format!("Hex {}", tile)),
             Tile,
             Mesh3d(assets.hex_mesh.clone()),
-            MeshMaterial3d(assets.hex_material.clone()),
+            MeshMaterial3d(material),
             Transform::from_translation(world_pos).with_rotation(rotation),
         ))
         .with_children(|parent| spawn_walls(parent, assets, tile.walls(), global_config));

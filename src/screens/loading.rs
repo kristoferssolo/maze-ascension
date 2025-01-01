@@ -33,7 +33,7 @@ fn continue_to_title_screen(mut next_screen: ResMut<NextState<Screen>>) {
     next_screen.set(Screen::Title);
 }
 
-fn all_assets_loaded(
+const fn all_assets_loaded(
     interaction_assets: Option<Res<InteractionAssets>>,
     credits_music: Option<Res<CreditsMusic>>,
     gameplay_music: Option<Res<GameplayMusic>>,
