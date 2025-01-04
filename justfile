@@ -4,7 +4,7 @@ default:
 
 # Run native dev
 native-dev:
-    RUST_BACKTRACE=full cargo run
+    RUSTC_WRAPPER=sccache RUST_BACKTRACE=full cargo run
 
 # Run native release
 native-release:
