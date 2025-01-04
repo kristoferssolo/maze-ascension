@@ -8,8 +8,9 @@ use crate::{
         events::SpawnMaze,
         resources::GlobalMazeConfig,
     },
-    theme::palette::rose_pine::RosePine,
+    theme::palette::rose_pine::RosePineDawn,
 };
+
 use bevy::prelude::*;
 use hexlab::prelude::{Tile as HexTile, *};
 use hexx::HexOrientation;
@@ -100,12 +101,12 @@ pub(super) fn spawn_single_hex_tile(
     let material = match tile.pos() {
         pos if pos == maze_config.start_pos => assets
             .custom_materials
-            .get(&RosePine::Pine)
+            .get(&RosePineDawn::Pine)
             .cloned()
             .unwrap_or_default(),
         pos if pos == maze_config.end_pos => assets
             .custom_materials
-            .get(&RosePine::Love)
+            .get(&RosePineDawn::Love)
             .cloned()
             .unwrap_or_default(),
         _ => assets.hex_material.clone(),

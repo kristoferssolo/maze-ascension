@@ -14,6 +14,7 @@ use bevy::{
     audio::{AudioPlugin, Volume},
     prelude::*,
 };
+use theme::{palette::rose_pine, prelude::ColorScheme};
 
 pub struct AppPlugin;
 
@@ -26,7 +27,7 @@ impl Plugin for AppPlugin {
         );
 
         // Spawn the main camera.
-        app.add_systems(Startup, spawn_camera);
+        app.add_systems(Startup, (spawn_camera, load_background));
 
         // Add Bevy plugins.
         app.add_plugins(
@@ -99,4 +100,12 @@ fn spawn_camera(mut commands: Commands) {
         // for debugging. So it's good to have this here for future-proofing.
         IsDefaultUiCamera,
     ));
+}
+
+fn load_background(mut commands: Commands) {
+    #[cfg(feature = "dev")]
+    let colorcheme = rose_pine::RosePine::Base;
+    #[cfg(not(feature = "dev"))]
+    let colorcheme = rose_pine::RosePineDawn::Base;
+    commands.insert_resource(ClearColor(colorcheme.to_color()));
 }
