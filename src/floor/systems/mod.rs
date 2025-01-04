@@ -1,4 +1,3 @@
-mod clear_events;
 mod despawn;
 mod movement;
 mod spawn;

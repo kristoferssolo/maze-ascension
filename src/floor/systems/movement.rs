@@ -1,7 +1,7 @@
 use crate::{
     constants::{FLOOR_Y_OFFSET, MOVEMENT_THRESHOLD},
     floor::{
-        components::{CurrentFloor, FloorYTarget, NextFloor},
+        components::{CurrentFloor, Floor, FloorYTarget},
         events::TransitionFloor,
     },
     maze::components::HexMaze,
@@ -35,45 +35,52 @@ pub fn move_floors(
 
 pub fn handle_floor_transition_events(
     mut commands: Commands,
-    mut maze_query: Query<(Entity, &Transform, Option<&FloorYTarget>), With<HexMaze>>,
-    current_query: Query<Entity, With<CurrentFloor>>,
-    next_query: Query<Entity, With<NextFloor>>,
+    mut maze_query: Query<(Entity, &Transform, &Floor, Option<&FloorYTarget>), With<HexMaze>>,
+    current_query: Query<(Entity, &Floor), With<CurrentFloor>>,
     mut event_reader: EventReader<TransitionFloor>,
 ) {
     let is_moving = maze_query
         .iter()
-        .any(|(_, _, movement_state)| movement_state.is_some());
+        .any(|(_, _, _, movement_state)| movement_state.is_some());
 
     if is_moving {
         return;
     }
 
     for event in event_reader.read() {
+        dbg!(&event);
+        let Some((current_entity, current_floor)) = current_query.get_single().ok() else {
+            continue;
+        };
+
+        let target_floor_num = event.next_floor_num(current_floor);
+
+        let target_entity = maze_query
+            .iter()
+            .find(|(_, _, floor, _)| floor.0 == target_floor_num)
+            .map(|(entity, ..)| entity);
+
+        let Some(target_entity) = target_entity else {
+            continue;
+        };
+
         let direction = event.into();
 
-        let Some(current_entity) = current_query.get_single().ok() else {
-            continue;
-        };
-        let Some(next_entity) = next_query.get_single().ok() else {
-            continue;
-        };
-
-        for (entity, transforms, movement_state) in maze_query.iter_mut() {
+        for (entity, transforms, _, movement_state) in maze_query.iter_mut() {
             let target_y = (FLOOR_Y_OFFSET as f32).mul_add(direction, transforms.translation.y);
+            dbg!(movement_state, target_y);
             if movement_state.is_none() {
                 commands.entity(entity).insert(FloorYTarget(target_y));
             }
         }
 
-        update_current_next_floor(&mut commands, current_entity, next_entity);
+        update_current_next_floor(&mut commands, current_entity, target_entity);
         break;
     }
+    event_reader.clear();
 }
 
-fn update_current_next_floor(commands: &mut Commands, current_entity: Entity, next_entity: Entity) {
-    commands.entity(current_entity).remove::<CurrentFloor>();
-    commands
-        .entity(next_entity)
-        .remove::<NextFloor>()
-        .insert(CurrentFloor);
+fn update_current_next_floor(commands: &mut Commands, current: Entity, target: Entity) {
+    commands.entity(current).remove::<CurrentFloor>();
+    commands.entity(target).insert(CurrentFloor);
 }
