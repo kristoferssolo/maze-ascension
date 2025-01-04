@@ -17,3 +17,7 @@ web-dev:
 # Run web release
 web-release:
     trunk serve --release --no-default-features
+
+# Run tests
+test:
+    RUSTC_WRAPPER=sccache RUST_BACKTRACE=full cargo nextest run --no-default-features --all-targets
