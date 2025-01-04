@@ -38,8 +38,8 @@ impl From<TransitionFloor> for f32 {
 impl From<&TransitionFloor> for f32 {
     fn from(value: &TransitionFloor) -> Self {
         match value {
-            TransitionFloor::Ascend => -1.,
-            TransitionFloor::Descend => 1.,
+            TransitionFloor::Ascend => -1., // When ascending, floors move down
+            TransitionFloor::Descend => 1., // When descending, floors move up
         }
     }
 }

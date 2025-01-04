@@ -14,22 +14,24 @@ pub(super) fn spawn_floor(
     mut event_reader: EventReader<TransitionFloor>,
     mut highest_floor: ResMut<HighestFloor>,
 ) {
-    let Ok(floor) = query.get_single() else {
+    let Ok(current_floor) = query.get_single() else {
         return;
     };
 
     for event in event_reader.read() {
-        let floor = event.next_floor_num(floor);
-
-        if floor == 1 && *event == TransitionFloor::Descend {
+        if current_floor.0 == 0 && *event == TransitionFloor::Descend {
             warn!("Cannot descend below floor 1");
             return;
         }
 
-        highest_floor.0 = highest_floor.0.max(floor);
+        let next_floor = event.next_floor_num(current_floor);
+        highest_floor.0 = highest_floor.0.max(next_floor);
 
-        info!("Creating level for floor {}", floor);
+        info!("Creating level for floor {}", next_floor);
 
-        commands.trigger(SpawnMaze { floor, ..default() });
+        commands.trigger(SpawnMaze {
+            floor: next_floor,
+            ..default()
+        });
     }
 }

@@ -40,6 +40,16 @@ pub fn maze_controls_ui(world: &mut World) {
         if let Some(mut global_config) = world.get_resource_mut::<GlobalMazeConfig>() {
             ui.heading("Maze Configuration");
 
+            // Display current floor as non-editable text
+            ui.horizontal(|ui| {
+                ui.label("Current floor:");
+                let mut floor_text = floor_value.to_string();
+                ui.add_enabled(
+                    false,
+                    TextEdit::singleline(&mut floor_text).desired_width(10.),
+                );
+            });
+
             changed |= add_seed_control(ui, &mut maze_config.seed);
             changed |= add_drag_value_control(ui, "Radius:", &mut maze_config.radius, 1.0, 1..=100);
             changed |=

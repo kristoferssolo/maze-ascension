@@ -22,16 +22,14 @@ pub fn handle_floor_transition(
     for current_hex in player_query.iter() {
         // Check for ascending
         if current_hex.0 == config.end_pos {
-            dbg!("Ascending");
+            info!("Ascending");
             event_writer.send(TransitionFloor::Ascend);
-            return;
         }
 
         // Check for descending
         if current_hex.0 == config.start_pos && floor.0 != 1 {
-            dbg!("Descending");
+            info!("Descending");
             event_writer.send(TransitionFloor::Descend);
-            return;
         }
     }
 }

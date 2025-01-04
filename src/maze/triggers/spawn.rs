@@ -1,7 +1,7 @@
 use super::common::generate_maze;
 use crate::{
     constants::FLOOR_Y_OFFSET,
-    floor::components::{CurrentFloor, Floor, NextFloor},
+    floor::components::{CurrentFloor, Floor},
     maze::{
         assets::MazeAssets,
         components::{HexMaze, MazeConfig, Tile, Wall},
@@ -56,7 +56,6 @@ pub(super) fn spawn_maze(
             Visibility::Visible,
         ))
         .insert_if(CurrentFloor, || *floor == 1)
-        .insert_if(NextFloor, || *floor != 1)
         .id();
 
     let assets = MazeAssets::new(&mut meshes, &mut materials, &global_config);

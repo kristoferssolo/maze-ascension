@@ -8,10 +8,6 @@ pub struct Floor(pub u8);
 #[reflect(Component)]
 pub struct CurrentFloor;
 
-#[derive(Debug, Reflect, Component)]
-#[reflect(Component)]
-pub struct NextFloor;
-
 #[derive(Debug, Reflect, Component, Deref, DerefMut)]
 #[reflect(Component)]
 pub struct FloorYTarget(pub f32);
