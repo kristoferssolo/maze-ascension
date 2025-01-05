@@ -1,7 +1,7 @@
 pub mod common;
 mod despawn;
 mod respawn;
-pub mod spawn;
+mod spawn;
 
 use bevy::prelude::*;
 use despawn::despawn_maze;

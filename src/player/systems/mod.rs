@@ -12,11 +12,8 @@ use vertical_transition::handle_floor_transition;
 pub(super) fn plugin(app: &mut App) {
     app.add_systems(
         Update,
-        (
-            player_input,
-            player_movement.after(player_input),
-            handle_floor_transition,
-        )
+        (player_input, player_movement, handle_floor_transition)
+            .chain()
             .run_if(in_state(Screen::Gameplay)),
     );
 }

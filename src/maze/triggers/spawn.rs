@@ -1,7 +1,10 @@
 use super::common::generate_maze;
 use crate::{
     constants::FLOOR_Y_OFFSET,
-    floor::components::{CurrentFloor, Floor},
+    floor::{
+        components::{CurrentFloor, Floor},
+        events::TransitionFloor,
+    },
     maze::{
         assets::MazeAssets,
         components::{HexMaze, MazeConfig, Tile, Wall},
@@ -17,13 +20,14 @@ use hexlab::prelude::{Tile as HexTile, *};
 use hexx::HexOrientation;
 use std::f32::consts::{FRAC_PI_2, FRAC_PI_3, FRAC_PI_6};
 
-pub(crate) fn spawn_maze(
+pub fn spawn_maze(
     trigger: Trigger<SpawnMaze>,
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
     maze_query: Query<(Entity, &Floor, &Maze)>,
     global_config: Res<GlobalMazeConfig>,
+    mut event_writer: EventWriter<TransitionFloor>,
 ) {
     let SpawnMaze { floor, config } = trigger.event();
 
@@ -68,6 +72,11 @@ pub(crate) fn spawn_maze(
         config,
         &global_config,
     );
+
+    // TODO: find a better way to handle double event indirection
+    if *floor != 1 {
+        event_writer.send(TransitionFloor::Ascend);
+    }
 }
 
 pub fn spawn_maze_tiles(
