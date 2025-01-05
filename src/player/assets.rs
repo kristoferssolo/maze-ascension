@@ -1,6 +1,6 @@
-use bevy::prelude::*;
-
 use crate::theme::{palette::rose_pine::RosePineDawn, prelude::ColorScheme};
+
+use bevy::prelude::*;
 
 pub(super) fn generate_pill_mesh(radius: f32, half_length: f32) -> Mesh {
     Mesh::from(Capsule3d {
