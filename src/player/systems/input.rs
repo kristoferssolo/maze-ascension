@@ -75,24 +75,24 @@ enum KeyDirection {
 
 impl KeyDirection {
     /// Converts key direction to exact logical direction based on hex orientation
-    fn exact_direction(&self, orientation: &HexOrientation) -> Option<LogicalDirection> {
+    const fn exact_direction(&self, orientation: &HexOrientation) -> Option<LogicalDirection> {
         match orientation {
             HexOrientation::Pointy => match self {
-                KeyDirection::Up => Some(LogicalDirection::PointyNorth),
-                KeyDirection::Down => Some(LogicalDirection::PointySouth),
-                KeyDirection::UpRight => Some(LogicalDirection::PointyNorthEast),
-                KeyDirection::UpLeft => Some(LogicalDirection::PointyNorthWest),
-                KeyDirection::DownRight => Some(LogicalDirection::PointySouthEast),
-                KeyDirection::DownLeft => Some(LogicalDirection::PointySouthWest),
+                Self::Up => Some(LogicalDirection::PointyNorth),
+                Self::Down => Some(LogicalDirection::PointySouth),
+                Self::UpRight => Some(LogicalDirection::PointyNorthEast),
+                Self::UpLeft => Some(LogicalDirection::PointyNorthWest),
+                Self::DownRight => Some(LogicalDirection::PointySouthEast),
+                Self::DownLeft => Some(LogicalDirection::PointySouthWest),
                 _ => None,
             },
             HexOrientation::Flat => match self {
-                KeyDirection::Right => Some(LogicalDirection::FlatEast),
-                KeyDirection::Left => Some(LogicalDirection::FlatWest),
-                KeyDirection::UpRight => Some(LogicalDirection::FlatNorthEast),
-                KeyDirection::UpLeft => Some(LogicalDirection::FlatNorthWest),
-                KeyDirection::DownRight => Some(LogicalDirection::FlatSouthEast),
-                KeyDirection::DownLeft => Some(LogicalDirection::FlatSouthWest),
+                Self::Right => Some(LogicalDirection::FlatEast),
+                Self::Left => Some(LogicalDirection::FlatWest),
+                Self::UpRight => Some(LogicalDirection::FlatNorthEast),
+                Self::UpLeft => Some(LogicalDirection::FlatNorthWest),
+                Self::DownRight => Some(LogicalDirection::FlatSouthEast),
+                Self::DownLeft => Some(LogicalDirection::FlatSouthWest),
                 _ => None,
             },
         }
@@ -103,54 +103,54 @@ impl KeyDirection {
         match orientation {
             HexOrientation::Pointy => match self {
                 // Single key presses check multiple directions
-                KeyDirection::Up => vec![
+                Self::Up => vec![
                     LogicalDirection::PointyNorth,
                     LogicalDirection::PointyNorthEast,
                     LogicalDirection::PointyNorthWest,
                 ],
-                KeyDirection::Right => vec![
+                Self::Right => vec![
                     LogicalDirection::PointyNorthEast,
                     LogicalDirection::PointySouthEast,
                 ],
-                KeyDirection::Down => vec![
+                Self::Down => vec![
                     LogicalDirection::PointySouth,
                     LogicalDirection::PointySouthEast,
                     LogicalDirection::PointySouthWest,
                 ],
-                KeyDirection::Left => vec![
+                Self::Left => vec![
                     LogicalDirection::PointyNorthWest,
                     LogicalDirection::PointySouthWest,
                 ],
                 // Diagonal combinations check specific directions
-                KeyDirection::UpRight => vec![LogicalDirection::PointyNorthEast],
-                KeyDirection::UpLeft => vec![LogicalDirection::PointyNorthWest],
-                KeyDirection::DownRight => vec![LogicalDirection::PointySouthEast],
-                KeyDirection::DownLeft => vec![LogicalDirection::PointySouthWest],
+                Self::UpRight => vec![LogicalDirection::PointyNorthEast],
+                Self::UpLeft => vec![LogicalDirection::PointyNorthWest],
+                Self::DownRight => vec![LogicalDirection::PointySouthEast],
+                Self::DownLeft => vec![LogicalDirection::PointySouthWest],
             },
             HexOrientation::Flat => match self {
-                KeyDirection::Up => vec![
+                Self::Up => vec![
                     LogicalDirection::FlatNorthEast,
                     LogicalDirection::FlatNorthWest,
                 ],
-                KeyDirection::Right => vec![
+                Self::Right => vec![
                     LogicalDirection::FlatEast,
                     LogicalDirection::FlatNorthEast,
                     LogicalDirection::FlatSouthEast,
                 ],
-                KeyDirection::Down => vec![
+                Self::Down => vec![
                     LogicalDirection::FlatSouthEast,
                     LogicalDirection::FlatSouthWest,
                 ],
-                KeyDirection::Left => vec![
+                Self::Left => vec![
                     LogicalDirection::FlatWest,
                     LogicalDirection::FlatNorthWest,
                     LogicalDirection::FlatSouthWest,
                 ],
                 // Diagonal combinations check specific directions
-                KeyDirection::UpRight => vec![LogicalDirection::FlatNorthEast],
-                KeyDirection::UpLeft => vec![LogicalDirection::FlatNorthWest],
-                KeyDirection::DownRight => vec![LogicalDirection::FlatSouthEast],
-                KeyDirection::DownLeft => vec![LogicalDirection::FlatSouthWest],
+                Self::UpRight => vec![LogicalDirection::FlatNorthEast],
+                Self::UpLeft => vec![LogicalDirection::FlatNorthWest],
+                Self::DownRight => vec![LogicalDirection::FlatSouthEast],
+                Self::DownLeft => vec![LogicalDirection::FlatSouthWest],
             },
         }
     }
