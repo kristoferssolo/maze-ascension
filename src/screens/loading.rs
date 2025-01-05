@@ -4,11 +4,11 @@
 use bevy::prelude::*;
 
 use crate::{
-    screens::{gameplay::GameplayMusic, Screen},
+    screens::Screen,
     theme::{interaction::InteractionAssets, prelude::*},
 };
 
-pub(super) fn plugin(app: &mut App) {
+pub fn plugin(app: &mut App) {
     app.add_systems(OnEnter(Screen::Loading), spawn_loading_screen);
 
     app.add_systems(
@@ -33,9 +33,6 @@ fn continue_to_title_screen(mut next_screen: ResMut<NextState<Screen>>) {
     next_screen.set(Screen::Title);
 }
 
-const fn all_assets_loaded(
-    interaction_assets: Option<Res<InteractionAssets>>,
-    gameplay_music: Option<Res<GameplayMusic>>,
-) -> bool {
-    interaction_assets.is_some() && gameplay_music.is_some()
+const fn all_assets_loaded(interaction_assets: Option<Res<InteractionAssets>>) -> bool {
+    interaction_assets.is_some()
 }
