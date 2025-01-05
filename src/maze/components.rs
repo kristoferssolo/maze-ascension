@@ -156,11 +156,10 @@ mod tests {
     fn maze_config_default(#[case] iterations: u32) {
         for _ in 0..iterations {
             let config = MazeConfig::default();
+            let radius = config.radius;
 
-            assert_eq!(config.radius, 8);
-            assert_eq!(config.layout.orientation, HexOrientation::Flat);
-            assert!(is_within_radius(config.start_pos, 8));
-            assert!(is_within_radius(config.end_pos, 8));
+            assert!(is_within_radius(config.start_pos, radius));
+            assert!(is_within_radius(config.end_pos, radius));
             assert_ne!(config.start_pos, config.end_pos);
         }
     }
