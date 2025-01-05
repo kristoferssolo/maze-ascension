@@ -2,7 +2,7 @@ mod despawn;
 mod movement;
 mod spawn;
 
-use crate::maze::MazePluginLoaded;
+use crate::screens::Screen;
 use bevy::prelude::*;
 use despawn::despawn_floor;
 use movement::{handle_floor_transition_events, move_floors};
@@ -18,6 +18,6 @@ pub(super) fn plugin(app: &mut App) {
             move_floors,
         )
             .chain()
-            .run_if(resource_exists::<MazePluginLoaded>),
+            .run_if(in_state(Screen::Gameplay)),
     );
 }

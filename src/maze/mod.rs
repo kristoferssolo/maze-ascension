@@ -9,7 +9,7 @@ pub mod triggers;
 use bevy::{ecs::system::RunSystemOnce, prelude::*};
 use components::HexMaze;
 use events::{DespawnMaze, RespawnMaze, SpawnMaze};
-pub use resources::{GlobalMazeConfig, MazePluginLoaded};
+pub use resources::GlobalMazeConfig;
 
 pub(super) fn plugin(app: &mut App) {
     app.init_resource::<GlobalMazeConfig>()
@@ -22,5 +22,4 @@ pub(super) fn plugin(app: &mut App) {
 
 pub fn spawn_level_command(world: &mut World) {
     let _ = world.run_system_once(systems::setup::setup);
-    world.insert_resource(MazePluginLoaded);
 }

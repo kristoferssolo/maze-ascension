@@ -1,9 +1,5 @@
 use bevy::prelude::*;
 
-#[derive(Debug, Default, Reflect, Resource)]
-#[reflect(Resource)]
-pub struct MazePluginLoaded;
-
 #[derive(Debug, Reflect, Resource, Clone)]
 #[reflect(Resource)]
 pub struct GlobalMazeConfig {
