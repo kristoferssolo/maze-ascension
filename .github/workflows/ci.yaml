@@ -21,13 +21,17 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
       - name: Install dependencies
         run: sudo apt-get update; sudo apt-get install --no-install-recommends libasound2-dev libudev-dev libwayland-dev libxkbcommon-dev
+      - name: Install cargo-nextest
+        run: cargo install cargo-nextest
       - name: Populate target directory from cache
         uses: Leafwing-Studios/cargo-cache@v2
         with:
           sweep-cache: true
       - name: Run tests
         run: |
-          cargo test --locked --workspace --no-default-features
+          cargo nextest run --locked --workspace --no-default-features --all-targets
+          # Run doctests separately since nextest doesn't support them
+          cargo test --doc --locked --workspace --no-default-features
   # Run clippy lints.
   clippy:
     name: Clippy

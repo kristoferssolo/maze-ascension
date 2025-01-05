@@ -20,6 +20,7 @@ web-release:
 
 # Run tests
 test:
+    RUSTC_WRAPPER=sccache RUST_BACKTRACE=full cargo test --doc --locked --workspace --no-default-features
     RUSTC_WRAPPER=sccache RUST_BACKTRACE=full cargo nextest run --no-default-features --all-targets
 
 # Run CI localy
@@ -29,4 +30,4 @@ ci:
     cargo fmt --all -- --check
     cargo clippy --workspace --all-targets --all-features -- --deny warnings
     cargo doc --workspace --all-features --document-private-items --no-deps
-    cargo test --workspace --no-default-features
+    just test
