@@ -23,7 +23,7 @@ test:
     RUSTC_WRAPPER=sccache RUST_BACKTRACE=full cargo nextest run --no-default-features --all-targets
 
 # Run CI localy
-CI:
+ci:
     #!/bin/bash
     set -e
     cargo fmt --all -- --check
