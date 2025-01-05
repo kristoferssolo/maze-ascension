@@ -4,6 +4,7 @@ pub mod constants;
 #[cfg(feature = "dev")]
 pub mod dev_tools;
 pub mod floor;
+pub mod hint;
 pub mod maze;
 pub mod player;
 pub mod screens;
@@ -67,6 +68,7 @@ impl Plugin for AppPlugin {
             maze::plugin,
             floor::plugin,
             player::plugin,
+            hint::plugin,
         ));
 
         // Enable dev tools for dev builds.

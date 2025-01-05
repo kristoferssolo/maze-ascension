@@ -1,15 +1,20 @@
 //! The screen state for the main gameplay.
 
-use crate::maze::spawn_level_command;
 use crate::player::spawn_player_command;
 use crate::screens::Screen;
+use crate::{hint::spawn_hint_command, maze::spawn_level_command};
 
 use bevy::{input::common_conditions::input_just_pressed, prelude::*};
 
 pub(super) fn plugin(app: &mut App) {
     app.add_systems(
         OnEnter(Screen::Gameplay),
-        (spawn_level_command, spawn_player_command).chain(),
+        (
+            spawn_level_command,
+            spawn_player_command,
+            spawn_hint_command,
+        )
+            .chain(),
     );
 
     app.add_systems(
