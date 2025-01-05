@@ -44,8 +44,6 @@ pub(super) fn spawn_maze(
         _ => FLOOR_Y_OFFSET,
     } as f32;
 
-    // (floor - 1) * FLOOR_Y_OFFSET
-
     let entity = commands
         .spawn((
             Name::new(format!("Floor {}", floor)),
