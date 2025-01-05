@@ -12,10 +12,7 @@ use bevy::prelude::*;
 
 pub fn move_floors(
     mut commands: Commands,
-    mut maze_query: Query<
-        (Entity, &mut Transform, &FloorYTarget),
-        (With<HexMaze>, With<FloorYTarget>),
-    >,
+    mut maze_query: Query<(Entity, &mut Transform, &FloorYTarget), With<FloorYTarget>>,
     player_query: Query<&MovementSpeed, With<Player>>,
     time: Res<Time>,
 ) {
