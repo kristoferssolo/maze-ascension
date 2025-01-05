@@ -35,18 +35,17 @@ impl MazeConfig {
         orientation: HexOrientation,
         seed: Option<u64>,
         global_conig: &GlobalMazeConfig,
+        start_pos: Option<Hex>,
     ) -> Self {
         let seed = seed.unwrap_or_else(|| thread_rng().gen());
         let mut rng = StdRng::seed_from_u64(seed);
 
-        // Generate start and end positions ensuring they're different
-        let mut start_pos;
+        let start_pos = start_pos.unwrap_or_else(|| generate_pos(radius, &mut rng));
+
+        // Generate end position ensuring start and end are different
         let mut end_pos;
-
         loop {
-            start_pos = generate_pos(radius, &mut rng);
             end_pos = generate_pos(radius, &mut rng);
-
             if start_pos != end_pos {
                 break;
             }
@@ -79,7 +78,13 @@ impl MazeConfig {
 
 impl Default for MazeConfig {
     fn default() -> Self {
-        Self::new(8, HexOrientation::Flat, None, &GlobalMazeConfig::default())
+        Self::new(
+            8,
+            HexOrientation::Flat,
+            None,
+            &GlobalMazeConfig::default(),
+            None,
+        )
     }
 }
 
@@ -126,7 +131,7 @@ mod tests {
         let seed = Some(12345);
         let global_config = GlobalMazeConfig::default();
 
-        let config = MazeConfig::new(radius, orientation, seed, &global_config);
+        let config = MazeConfig::new(radius, orientation, seed, &global_config, None);
 
         assert_eq!(config.radius, radius);
         assert_eq!(config.seed, 12345);
@@ -173,8 +178,13 @@ mod tests {
         ];
 
         for seed in test_seeds {
-            let config =
-                MazeConfig::new(8, HexOrientation::Flat, seed, &GlobalMazeConfig::default());
+            let config = MazeConfig::new(
+                8,
+                HexOrientation::Flat,
+                seed,
+                &GlobalMazeConfig::default(),
+                None,
+            );
 
             assert_eq!(config.radius, 8);
             assert_eq!(config.layout.orientation, HexOrientation::Flat);
@@ -226,12 +236,14 @@ mod tests {
             HexOrientation::Flat,
             Some(1),
             &GlobalMazeConfig::default(),
+            None,
         );
         let config2 = MazeConfig::new(
             8,
             HexOrientation::Flat,
             Some(2),
             &GlobalMazeConfig::default(),
+            None,
         );
 
         assert_ne!(config1.start_pos, config2.start_pos);
@@ -241,8 +253,20 @@ mod tests {
     #[test]
     fn same_seed_same_positions() {
         let seed = Some(12345);
-        let config1 = MazeConfig::new(8, HexOrientation::Flat, seed, &GlobalMazeConfig::default());
-        let config2 = MazeConfig::new(8, HexOrientation::Flat, seed, &GlobalMazeConfig::default());
+        let config1 = MazeConfig::new(
+            8,
+            HexOrientation::Flat,
+            seed,
+            &GlobalMazeConfig::default(),
+            None,
+        );
+        let config2 = MazeConfig::new(
+            8,
+            HexOrientation::Flat,
+            seed,
+            &GlobalMazeConfig::default(),
+            None,
+        );
 
         assert_eq!(config1.start_pos, config2.start_pos);
         assert_eq!(config1.end_pos, config2.end_pos);
@@ -255,6 +279,7 @@ mod tests {
             HexOrientation::Pointy,
             None,
             &GlobalMazeConfig::default(),
+            None,
         );
         assert_eq!(config.layout.orientation, HexOrientation::Pointy);
     }
@@ -269,6 +294,7 @@ mod tests {
                 hex_size: 0.0,
                 ..default()
             },
+            None,
         );
         assert_eq!(config.layout.hex_size.x, 0.0);
         assert_eq!(config.layout.hex_size.y, 0.0);
