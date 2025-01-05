@@ -53,7 +53,7 @@ impl Plugin for AppPlugin {
                 })
                 .set(AudioPlugin {
                     global_volume: GlobalVolume {
-                        volume: Volume::new(0.),
+                        volume: Volume::new(0.2),
                     },
                     ..default()
                 }),
@@ -84,7 +84,7 @@ enum AppSet {
     TickTimers,
     /// Record player input.
     RecordInput,
-    /// Do everything else (consider splitting this into further variants).
+    /// Do everything else.
     Update,
 }
 

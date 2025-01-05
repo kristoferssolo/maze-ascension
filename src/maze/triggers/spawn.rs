@@ -1,7 +1,14 @@
+//! Maze spawning and rendering functionality.
+//!
+//! Module handles the creation and visualization of hexagonal mazes.
+
 use super::common::generate_maze;
 use crate::{
     constants::FLOOR_Y_OFFSET,
-    floor::components::{CurrentFloor, Floor},
+    floor::{
+        components::{CurrentFloor, Floor},
+        events::TransitionFloor,
+    },
     maze::{
         assets::MazeAssets,
         components::{HexMaze, MazeConfig, Tile, Wall},
@@ -17,13 +24,15 @@ use hexlab::prelude::{Tile as HexTile, *};
 use hexx::HexOrientation;
 use std::f32::consts::{FRAC_PI_2, FRAC_PI_3, FRAC_PI_6};
 
-pub(crate) fn spawn_maze(
+/// Spawns a new maze for the specified floor on [`SpawnMaze`] event.
+pub fn spawn_maze(
     trigger: Trigger<SpawnMaze>,
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
     maze_query: Query<(Entity, &Floor, &Maze)>,
     global_config: Res<GlobalMazeConfig>,
+    mut event_writer: EventWriter<TransitionFloor>,
 ) {
     let SpawnMaze { floor, config } = trigger.event();
 
@@ -40,9 +49,10 @@ pub(crate) fn spawn_maze(
         }
     };
 
+    // Calculate vertical offset based on floor number
     let y_offset = match *floor {
-        1 => 0,
-        _ => FLOOR_Y_OFFSET,
+        1 => 0,              // Ground/Initial floor (floor 1) is at y=0
+        _ => FLOOR_Y_OFFSET, // Other floors are offset vertically
     } as f32;
 
     let entity = commands
@@ -56,7 +66,7 @@ pub(crate) fn spawn_maze(
             Visibility::Visible,
             StateScoped(Screen::Gameplay),
         ))
-        .insert_if(CurrentFloor, || *floor == 1)
+        .insert_if(CurrentFloor, || *floor == 1) // Only floor 1 gets CurrentFloor
         .id();
 
     let assets = MazeAssets::new(&mut meshes, &mut materials, &global_config);
@@ -68,8 +78,14 @@ pub(crate) fn spawn_maze(
         config,
         &global_config,
     );
+
+    // TODO: find a better way to handle double event indirection
+    if *floor != 1 {
+        event_writer.send(TransitionFloor::Ascend);
+    }
 }
 
+/// Spawns all tiles for a maze as children of the parent maze entity
 pub fn spawn_maze_tiles(
     commands: &mut Commands,
     parent_entity: Entity,
@@ -85,6 +101,7 @@ pub fn spawn_maze_tiles(
     });
 }
 
+/// Spawns a single hexagonal tile with appropriate transforms and materials
 pub(super) fn spawn_single_hex_tile(
     parent: &mut ChildBuilder,
     assets: &MazeAssets,
@@ -98,6 +115,7 @@ pub(super) fn spawn_single_hex_tile(
         HexOrientation::Flat => Quat::from_rotation_y(FRAC_PI_6), // 30 degrees rotation
     };
 
+    // Select material based on tile position: start, end, or default
     let material = match tile.pos() {
         pos if pos == maze_config.start_pos => assets
             .custom_materials
@@ -123,12 +141,14 @@ pub(super) fn spawn_single_hex_tile(
         .with_children(|parent| spawn_walls(parent, assets, tile.walls(), global_config));
 }
 
+/// Spawns walls around a hexagonal tile based on the walls configuration
 fn spawn_walls(
     parent: &mut ChildBuilder,
     assets: &MazeAssets,
     walls: &Walls,
     global_config: &GlobalMazeConfig,
 ) {
+    // Base rotation for wall alignment (90 degrees counter-clockwise)
     let z_rotation = Quat::from_rotation_z(-FRAC_PI_2);
     let y_offset = global_config.height / 2.;
 
@@ -137,12 +157,25 @@ fn spawn_walls(
             continue;
         }
 
+        // Calculate the angle for this wall
+        // FRAC_PI_3 = 60 deg
+        // Negative because going clockwise
+        // i * 60 produces: 0, 60, 120, 180, 240, 300
         let wall_angle = -FRAC_PI_3 * i as f32;
 
+        // cos(angle) gives x coordinate on unit circle
+        // sin(angle) gives z coordinate on unit circle
+        // Multiply by wall_offset to get actual distance from center
         let x_offset = global_config.wall_offset() * f32::cos(wall_angle);
         let z_offset = global_config.wall_offset() * f32::sin(wall_angle);
+
+        // x: distance along x-axis from center
+        // y: vertical offset from center
+        // z: distance along z-axis from center
         let pos = Vec3::new(x_offset, y_offset, z_offset);
 
+        // 1. Rotate around x-axis to align wall with angle
+        // 2. Add FRAC_PI_2 (90) to make wall perpendicular to angle
         let x_rotation = Quat::from_rotation_x(wall_angle + FRAC_PI_2);
         let final_rotation = z_rotation * x_rotation;
 
@@ -150,6 +183,7 @@ fn spawn_walls(
     }
 }
 
+/// Spawns a single wall segment with the specified rotation and position
 fn spawn_single_wall(parent: &mut ChildBuilder, assets: &MazeAssets, rotation: Quat, offset: Vec3) {
     parent.spawn((
         Name::new("Wall"),

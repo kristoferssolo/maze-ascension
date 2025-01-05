@@ -1,6 +1,11 @@
+//! Maze components and configuration.
+//!
+//! Module defines the core components and configuration structures used
+//! for maze generation and rendering, including hexagonal maze layouts,
+//! tiles, walls, and maze configuration.
+use super::GlobalMazeConfig;
 use crate::floor::components::Floor;
 
-use super::GlobalMazeConfig;
 use bevy::prelude::*;
 use hexlab::Maze;
 use hexx::{Hex, HexLayout, HexOrientation};
@@ -19,17 +24,27 @@ pub struct Tile;
 #[reflect(Component)]
 pub struct Wall;
 
+/// Configuration for a single maze instance.
+///
+/// Contains all necessary parameters to generate and position a maze,
+/// including its size, start/end positions, random seed, and layout.
 #[derive(Debug, Reflect, Component, Clone)]
 #[reflect(Component)]
 pub struct MazeConfig {
+    /// Radius of the hexagonal maze
     pub radius: u16,
+    /// Starting position in hex coordinates
     pub start_pos: Hex,
+    /// Ending position in hex coordinates
     pub end_pos: Hex,
+    /// Random seed for maze generation
     pub seed: u64,
+    /// Layout configuration for hex-to-world space conversion
     pub layout: HexLayout,
 }
 
 impl MazeConfig {
+    /// Creates a new maze configuration with the specified parameters.
     fn new(
         radius: u16,
         orientation: HexOrientation,
@@ -71,6 +86,7 @@ impl MazeConfig {
         }
     }
 
+    /// Updates the maze configuration with new global settings.
     pub fn update(&mut self, global_conig: &GlobalMazeConfig) {
         self.layout.hex_size = Vec2::splat(global_conig.hex_size);
     }
@@ -88,6 +104,10 @@ impl Default for MazeConfig {
     }
 }
 
+/// Generates a random position within a hexagonal radius.
+///
+/// # Returns
+/// A valid Hex coordinate within the specified radius
 fn generate_pos<R: Rng>(radius: u16, rng: &mut R) -> Hex {
     let radius = radius as i32;
     loop {

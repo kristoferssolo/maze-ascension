@@ -1,4 +1,8 @@
-use bevy::prelude::*;
+//! Floor transition handling system.
+//!
+//! This module manages player transitions between different maze floors,
+//! handling both ascending and descending movements based on player position
+//! and input.
 
 use crate::{
     floor::{
@@ -9,6 +13,12 @@ use crate::{
     player::components::{CurrentPosition, Player},
 };
 
+use bevy::prelude::*;
+
+/// Handles floor transitions when a player reaches start/end positions.
+///
+/// System checks if the player is at a valid transition point (start or end position)
+/// and triggers floor transitions when the appropriate input is received.
 pub fn handle_floor_transition(
     mut player_query: Query<&CurrentPosition, With<Player>>,
     maze_query: Query<(&MazeConfig, &Floor), With<CurrentFloor>>,
@@ -25,13 +35,13 @@ pub fn handle_floor_transition(
     };
 
     for current_hex in player_query.iter_mut() {
-        // Check for ascending
+        // Check for ascending (at end position)
         if current_hex.0 == config.end_pos {
             info!("Ascending");
             event_writer.send(TransitionFloor::Ascend);
         }
 
-        // Check for descending
+        // Check for descending (at start position, not on first floor)
         if current_hex.0 == config.start_pos && floor.0 != 1 {
             info!("Descending");
             event_writer.send(TransitionFloor::Descend);

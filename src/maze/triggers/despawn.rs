@@ -1,7 +1,13 @@
+//! Maze despawning functionality.
+//!
+//! Module handles the cleanup of maze entities when they need to be removed,
+//! ensuring proper cleanup of both the maze and all its child entities.
 use crate::{floor::components::Floor, maze::events::DespawnMaze};
+
 use bevy::prelude::*;
 
-pub(super) fn despawn_maze(
+/// Despawns a maze and all its associated entities for a given floor.
+pub fn despawn_maze(
     trigger: Trigger<DespawnMaze>,
     mut commands: Commands,
     query: Query<(Entity, &Floor)>,

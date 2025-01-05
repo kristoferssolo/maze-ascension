@@ -1,3 +1,5 @@
+use bevy::prelude::*;
+
 use crate::{
     floor::{
         components::{CurrentFloor, Floor, FloorYTarget},
@@ -6,7 +8,6 @@ use crate::{
     },
     maze::{components::MazeConfig, events::SpawnMaze},
 };
-use bevy::prelude::*;
 
 pub(super) fn spawn_floor(
     mut commands: Commands,
@@ -19,7 +20,7 @@ pub(super) fn spawn_floor(
     };
 
     for event in event_reader.read() {
-        if current_floor.0 == 0 && *event == TransitionFloor::Descend {
+        if current_floor.0 == 1 && *event == TransitionFloor::Descend {
             warn!("Cannot descend below floor 1");
             return;
         }
