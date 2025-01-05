@@ -14,6 +14,7 @@ use bevy::{
     audio::{AudioPlugin, Volume},
     prelude::*,
 };
+use constants::TITLE;
 use theme::{palette::rose_pine, prelude::ColorScheme};
 
 pub struct AppPlugin;
@@ -41,7 +42,7 @@ impl Plugin for AppPlugin {
                 })
                 .set(WindowPlugin {
                     primary_window: Window {
-                        title: "Maze Ascension: The Labyrinth of Echoes".to_string(),
+                        title: TITLE.to_string(),
                         canvas: Some("#bevy".to_string()),
                         fit_canvas_to_parent: true,
                         prevent_default_event_handling: true,
