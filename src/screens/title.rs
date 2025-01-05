@@ -13,7 +13,14 @@ fn spawn_title_screen(mut commands: Commands) {
         .ui_root()
         .insert(StateScoped(Screen::Title))
         .with_children(|parent| {
-            parent.header("Maze Ascension");
+            parent
+                .spawn(Node {
+                    bottom: Val::Px(70.),
+                    ..default()
+                })
+                .with_children(|parent| {
+                    parent.header("Maze Ascension");
+                });
             parent.button("Play").observe(enter_gameplay_screen);
 
             #[cfg(not(target_family = "wasm"))]

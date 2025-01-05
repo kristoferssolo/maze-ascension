@@ -3,9 +3,8 @@
 use bevy::{ecs::system::EntityCommands, prelude::*, ui::Val::*};
 use rose_pine::RosePineDawn;
 
-use crate::theme::{interaction::InteractionPalette, palette::*};
-
 use super::prelude::ColorScheme;
+use crate::theme::{interaction::InteractionPalette, palette::*};
 
 /// An extension trait for spawning UI widgets.
 pub trait Widgets {
@@ -123,7 +122,7 @@ impl Containers for Commands<'_, '_> {
                 justify_content: JustifyContent::Center,
                 align_items: AlignItems::Center,
                 flex_direction: FlexDirection::Column,
-                row_gap: Px(10.0),
+                row_gap: Px(32.0),
                 position_type: PositionType::Absolute,
                 ..default()
             },
