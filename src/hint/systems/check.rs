@@ -2,7 +2,7 @@ use bevy::prelude::*;
 use hexx::Hex;
 
 use crate::{
-    floor::components::CurrentFloor,
+    floor::components::{CurrentFloor, Floor, FloorYTarget},
     hint::components::{Hint, IdleTimer},
     maze::components::MazeConfig,
     player::components::{CurrentPosition, MovementTarget, Player},
@@ -11,7 +11,8 @@ use crate::{
 pub fn check_player_hints(
     mut idle_query: Query<&mut IdleTimer>,
     player_query: Query<(&CurrentPosition, &MovementTarget), With<Player>>,
-    maze_query: Query<&MazeConfig, With<CurrentFloor>>,
+    tranitioning: Query<Has<FloorYTarget>>,
+    maze_query: Query<(&MazeConfig, &Floor), With<CurrentFloor>>,
     mut hint_query: Query<(&mut Visibility, &Hint)>,
     time: Res<Time>,
 ) {
@@ -19,7 +20,7 @@ pub fn check_player_hints(
         return;
     };
 
-    let Ok(maze_config) = maze_query.get_single() else {
+    let Ok((maze_config, floor)) = maze_query.get_single() else {
         return;
     };
 
@@ -27,7 +28,7 @@ pub fn check_player_hints(
         return;
     };
 
-    let is_moving = movement_target.is_some();
+    let is_moving = movement_target.is_some() || tranitioning.iter().any(|x| x);
 
     if is_moving {
         // Reset timer and hide hints when player moves
@@ -40,12 +41,13 @@ pub fn check_player_hints(
     idle_timer.timer.tick(time.delta());
 
     if idle_timer.timer.finished() {
-        let on_special_tile = is_on_special_tile(player_pos, maze_config);
+        let on_special_tile = is_on_special_tile(player_pos, maze_config, floor.0);
 
         if !idle_timer.movement_hint_visible {
             set_hint_visibility(&mut hint_query, Hint::Movement, true);
             idle_timer.movement_hint_visible = true;
         }
+
         if on_special_tile && !idle_timer.interaction_hint_visible {
             set_hint_visibility(&mut hint_query, Hint::Interaction, true);
             idle_timer.interaction_hint_visible = true;
@@ -79,6 +81,6 @@ fn set_hint_visibility(
     }
 }
 
-fn is_on_special_tile(player_pos: &Hex, maze_config: &MazeConfig) -> bool {
-    *player_pos == maze_config.start_pos || *player_pos == maze_config.end_pos
+fn is_on_special_tile(player_pos: &Hex, maze_config: &MazeConfig, floor: u8) -> bool {
+    (*player_pos == maze_config.start_pos && floor != 1) || *player_pos == maze_config.end_pos
 }
