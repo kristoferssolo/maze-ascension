@@ -4,7 +4,7 @@ pub mod errors;
 pub mod events;
 pub mod resources;
 mod systems;
-mod triggers;
+pub mod triggers;
 
 use bevy::{ecs::system::RunSystemOnce, prelude::*};
 use components::HexMaze;

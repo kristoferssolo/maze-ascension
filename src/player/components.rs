@@ -3,7 +3,7 @@ use hexx::Hex;
 
 #[derive(Debug, Reflect, Component)]
 #[reflect(Component)]
-#[require(CurrentPosition, MovementSpeed, MovementTarget, TranstitionState)]
+#[require(CurrentPosition, MovementSpeed, MovementTarget)]
 pub struct Player;
 
 #[derive(Debug, Reflect, Component, Deref, DerefMut, Default)]
@@ -13,13 +13,6 @@ pub struct CurrentPosition(pub Hex);
 #[derive(Debug, Reflect, Component, Deref, DerefMut)]
 #[reflect(Component)]
 pub struct MovementSpeed(pub f32);
-
-#[derive(Debug, Reflect, Component, Default)]
-#[reflect(Component)]
-pub struct TranstitionState {
-    pub just_transitioned: bool,
-    pub last_position: Hex,
-}
 
 impl Default for MovementSpeed {
     fn default() -> Self {

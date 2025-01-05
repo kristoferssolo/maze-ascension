@@ -16,7 +16,7 @@ use hexlab::prelude::{Tile as HexTile, *};
 use hexx::HexOrientation;
 use std::f32::consts::{FRAC_PI_2, FRAC_PI_3, FRAC_PI_6};
 
-pub(super) fn spawn_maze(
+pub(crate) fn spawn_maze(
     trigger: Trigger<SpawnMaze>,
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
