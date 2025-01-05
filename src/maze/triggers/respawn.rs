@@ -1,3 +1,8 @@
+//! Maze respawning functionality.
+//!
+//! Module provides the ability to regenerate mazes for existing floors,
+//! maintaining the same floor entity but replacing its internal maze structure.
+
 use super::{common::generate_maze, spawn::spawn_maze_tiles};
 use crate::{
     floor::components::Floor,
@@ -6,7 +11,15 @@ use crate::{
 use bevy::prelude::*;
 use hexlab::Maze;
 
-pub(super) fn respawn_maze(
+/// Respawns a maze for an existing floor with a new configuration.
+///
+/// # Behavior:
+/// - Finds the target floor
+/// - Generates a new maze configuration
+/// - Cleans up existing maze tiles
+/// - Spawns new maze tiles
+/// - Updates the floor's configuration
+pub fn respawn_maze(
     trigger: Trigger<RespawnMaze>,
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,

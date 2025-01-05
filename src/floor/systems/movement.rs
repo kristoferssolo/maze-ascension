@@ -10,6 +10,12 @@ use crate::{
 
 use bevy::prelude::*;
 
+/// Move floor entities to their target Y positions based on movement speed
+///
+/// # Behavior
+/// - Calculates movement distance based on player speed and delta time
+/// - Moves floors towards their target Y position
+/// - Removes FloorYTarget component when floor reaches destination
 pub fn move_floors(
     mut commands: Commands,
     mut maze_query: Query<(Entity, &mut Transform, &FloorYTarget), With<FloorYTarget>>,
@@ -30,6 +36,13 @@ pub fn move_floors(
     }
 }
 
+/// Handle floor transition events by setting up floor movement targets
+///
+/// # Behavior
+/// - Checks if any floors are currently moving
+/// - Processes floor transition events
+/// - Sets target Y positions for all maze entities
+/// - Updates current and next floor designations
 pub fn handle_floor_transition_events(
     mut commands: Commands,
     mut maze_query: Query<(Entity, &Transform, &Floor, Option<&FloorYTarget>), With<HexMaze>>,

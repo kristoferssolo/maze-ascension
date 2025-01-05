@@ -1,13 +1,22 @@
+//! Player movement system and related utilities.
+//!
+//! This module handles smooth player movement between hexagonal tiles,
+//! including position interpolation and movement completion detection.
 use crate::{
     constants::MOVEMENT_THRESHOLD,
     floor::components::CurrentFloor,
     maze::components::MazeConfig,
     player::components::{CurrentPosition, MovementSpeed, MovementTarget, Player},
 };
+
 use bevy::prelude::*;
 use hexx::Hex;
 
-pub(super) fn player_movement(
+/// System handles player movement between hexagonal tiles.
+///
+/// Smoothly interpolates player position between hexagonal tiles,
+/// handling movement target acquisition, position updates, and movement completion.
+pub fn player_movement(
     time: Res<Time>,
     mut query: Query<
         (
@@ -48,10 +57,12 @@ pub(super) fn player_movement(
     }
 }
 
+/// Determines if the movement should be completed based on proximity to target.
 fn should_complete_movement(current_pos: Vec3, target_pos: Vec3) -> bool {
     (target_pos - current_pos).length() < MOVEMENT_THRESHOLD
 }
 
+/// Updates the player's position based on movement parameters.
 fn update_position(
     transform: &mut Transform,
     current_pos: Vec3,
@@ -69,6 +80,7 @@ fn update_position(
     transform.translation += movement;
 }
 
+/// Calculates the world position for a given hex coordinate.
 fn calculate_target_position(maze_config: &MazeConfig, target_hex: Hex, y: f32) -> Vec3 {
     let world_pos = maze_config.layout.hex_to_world_pos(target_hex);
     Vec3::new(world_pos.x, y, world_pos.y)
