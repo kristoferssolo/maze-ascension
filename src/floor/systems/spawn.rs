@@ -33,7 +33,7 @@ pub(super) fn spawn_floor(
             floor: target_floor,
             config: MazeConfig {
                 start_pos: config.end_pos,
-                radius: config.radius + 2,
+                radius: config.radius + 1,
                 ..default()
             },
         });

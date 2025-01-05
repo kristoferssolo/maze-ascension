@@ -222,6 +222,7 @@ impl From<LogicalDirection> for EdgeDirection {
         direction.rotate_cw(0)
     }
 }
+
 #[cfg(test)]
 mod tests {
     use super::*;

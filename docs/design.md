@@ -309,7 +309,6 @@ pub enum Screen {
     Splash,
     Loading,
     Title,
-    Credits,
     Gameplay,
     Victory,
     Leaderboard,

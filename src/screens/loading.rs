@@ -4,7 +4,7 @@
 use bevy::prelude::*;
 
 use crate::{
-    screens::{credits::CreditsMusic, gameplay::GameplayMusic, Screen},
+    screens::{gameplay::GameplayMusic, Screen},
     theme::{interaction::InteractionAssets, prelude::*},
 };
 
@@ -21,8 +21,8 @@ fn spawn_loading_screen(mut commands: Commands) {
     commands
         .ui_root()
         .insert(StateScoped(Screen::Loading))
-        .with_children(|children| {
-            children.label("Loading...").insert(Node {
+        .with_children(|parent| {
+            parent.label("Loading...").insert(Node {
                 justify_content: JustifyContent::Center,
                 ..default()
             });
@@ -35,8 +35,7 @@ fn continue_to_title_screen(mut next_screen: ResMut<NextState<Screen>>) {
 
 const fn all_assets_loaded(
     interaction_assets: Option<Res<InteractionAssets>>,
-    credits_music: Option<Res<CreditsMusic>>,
     gameplay_music: Option<Res<GameplayMusic>>,
 ) -> bool {
-    interaction_assets.is_some() && credits_music.is_some() && gameplay_music.is_some()
+    interaction_assets.is_some() && gameplay_music.is_some()
 }

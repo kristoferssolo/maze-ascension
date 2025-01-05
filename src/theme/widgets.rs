@@ -1,7 +1,9 @@
 //! Helper traits for creating common widgets.
 
 use bevy::{ecs::system::EntityCommands, prelude::*, ui::Val::*};
+use rose_pine::RosePineDawn;
 
+use super::prelude::ColorScheme;
 use crate::theme::{interaction::InteractionPalette, palette::*};
 
 /// An extension trait for spawning UI widgets.
@@ -22,7 +24,7 @@ impl<T: SpawnUi> Widgets for T {
             Name::new("Button"),
             Button,
             ImageNode {
-                color: NODE_BACKGROUND,
+                color: RosePineDawn::Surface.to_color(),
                 ..default()
             },
             Node {
@@ -30,23 +32,26 @@ impl<T: SpawnUi> Widgets for T {
                 height: Px(65.0),
                 justify_content: JustifyContent::Center,
                 align_items: AlignItems::Center,
+                border: UiRect::all(Px(4.)),
                 ..default()
             },
+            BorderRadius::all(Px(8.)),
+            BorderColor(RosePineDawn::Text.to_color()),
             InteractionPalette {
-                none: NODE_BACKGROUND,
-                hovered: BUTTON_HOVERED_BACKGROUND,
-                pressed: BUTTON_PRESSED_BACKGROUND,
+                none: RosePineDawn::HighlightLow.to_color(),
+                hovered: RosePineDawn::HighlightMed.to_color(),
+                pressed: RosePineDawn::HighlightHigh.to_color(),
             },
         ));
-        entity.with_children(|children| {
-            children.spawn_ui((
+        entity.with_children(|parent| {
+            parent.spawn_ui((
                 Name::new("Button Text"),
                 Text(text.into()),
                 TextFont {
                     font_size: 40.0,
                     ..default()
                 },
-                TextColor(BUTTON_TEXT),
+                TextColor(RosePineDawn::Text.to_color()),
             ));
         });
 
@@ -63,38 +68,38 @@ impl<T: SpawnUi> Widgets for T {
                 align_items: AlignItems::Center,
                 ..default()
             },
-            BackgroundColor(NODE_BACKGROUND),
         ));
-        entity.with_children(|children| {
-            children.spawn_ui((
+        entity.with_children(|parent| {
+            parent.spawn_ui((
                 Name::new("Header Text"),
                 Text(text.into()),
                 TextFont {
-                    font_size: 40.0,
+                    font_size: 60.0,
                     ..default()
                 },
-                TextColor(HEADER_TEXT),
+                TextLayout {
+                    justify: JustifyText::Center,
+                    ..default()
+                },
+                TextColor(RosePineDawn::Text.to_color()),
             ));
         });
         entity
     }
 
-    fn label(&mut self, _text: impl Into<String>) -> EntityCommands {
+    fn label(&mut self, text: impl Into<String>) -> EntityCommands {
         let entity = self.spawn_ui((
             Name::new("Label"),
-            Text::default(),
-            // TextBundle::from_section(
-            //     text,
-            //     TextStyle {
-            //         font_size: 24.0,
-            //         color: LABEL_TEXT,
-            //         ..default()
-            //     },
-            // )
-            // .with_style(Style {
-            //     width: Px(500.0),
-            //     ..default()
-            // }),
+            Text(text.into()),
+            TextFont {
+                font_size: 24.0,
+                ..default()
+            },
+            TextColor(RosePineDawn::Text.to_color()),
+            Node {
+                width: Px(500.),
+                ..default()
+            },
         ));
         entity
     }
@@ -117,7 +122,7 @@ impl Containers for Commands<'_, '_> {
                 justify_content: JustifyContent::Center,
                 align_items: AlignItems::Center,
                 flex_direction: FlexDirection::Column,
-                row_gap: Px(10.0),
+                row_gap: Px(32.0),
                 position_type: PositionType::Absolute,
                 ..default()
             },

@@ -12,21 +12,24 @@ fn spawn_title_screen(mut commands: Commands) {
     commands
         .ui_root()
         .insert(StateScoped(Screen::Title))
-        .with_children(|children| {
-            children.button("Play").observe(enter_gameplay_screen);
-            children.button("Credits").observe(enter_credits_screen);
+        .with_children(|parent| {
+            parent
+                .spawn(Node {
+                    bottom: Val::Px(70.),
+                    ..default()
+                })
+                .with_children(|parent| {
+                    parent.header("Maze Ascension");
+                });
+            parent.button("Play").observe(enter_gameplay_screen);
 
             #[cfg(not(target_family = "wasm"))]
-            children.button("Exit").observe(exit_app);
+            parent.button("Quit").observe(exit_app);
         });
 }
 
 fn enter_gameplay_screen(_trigger: Trigger<OnPress>, mut next_screen: ResMut<NextState<Screen>>) {
     next_screen.set(Screen::Gameplay);
-}
-
-fn enter_credits_screen(_trigger: Trigger<OnPress>, mut next_screen: ResMut<NextState<Screen>>) {
-    next_screen.set(Screen::Credits);
 }
 
 #[cfg(not(target_family = "wasm"))]

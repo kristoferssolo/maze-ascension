@@ -3,7 +3,7 @@ mod movement;
 pub mod setup;
 mod vertical_transition;
 
-use crate::maze::MazePluginLoaded;
+use crate::screens::Screen;
 use bevy::prelude::*;
 use input::player_input;
 use movement::player_movement;
@@ -17,6 +17,6 @@ pub(super) fn plugin(app: &mut App) {
             player_movement.after(player_input),
             handle_floor_transition,
         )
-            .run_if(resource_exists::<MazePluginLoaded>),
+            .run_if(in_state(Screen::Gameplay)),
     );
 }

@@ -1,7 +1,8 @@
 use crate::{
     floor::components::{CurrentFloor, Floor},
-    maze::{components::MazeConfig, events::RespawnMaze, GlobalMazeConfig, MazePluginLoaded},
+    maze::{components::MazeConfig, events::RespawnMaze, GlobalMazeConfig},
     player::events::RespawnPlayer,
+    screens::Screen,
 };
 use bevy::{prelude::*, window::PrimaryWindow};
 use bevy_egui::{
@@ -13,8 +14,11 @@ use rand::{thread_rng, Rng};
 use std::ops::RangeInclusive;
 
 pub fn maze_controls_ui(world: &mut World) {
-    if world.get_resource::<MazePluginLoaded>().is_none() {
-        return;
+    if let Some(state) = world.get_resource::<State<Screen>>() {
+        // Check if the current state is NOT Gameplay
+        if *state.get() != Screen::Gameplay {
+            return;
+        }
     }
 
     let Ok(egui_context) = world

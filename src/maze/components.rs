@@ -79,7 +79,7 @@ impl MazeConfig {
 impl Default for MazeConfig {
     fn default() -> Self {
         Self::new(
-            8,
+            4,
             HexOrientation::Flat,
             None,
             &GlobalMazeConfig::default(),
@@ -93,7 +93,6 @@ fn generate_pos<R: Rng>(radius: u16, rng: &mut R) -> Hex {
     loop {
         let q = rng.gen_range(-radius..=radius);
         let r = rng.gen_range(-radius..=radius);
-
         let s = -q - r; // Calculate third coordinate (axial coordinates: q + r + s = 0)
 
         // Check if the position is within the hexagonal radius

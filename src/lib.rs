@@ -14,6 +14,7 @@ use bevy::{
     audio::{AudioPlugin, Volume},
     prelude::*,
 };
+use constants::TITLE;
 use theme::{palette::rose_pine, prelude::ColorScheme};
 
 pub struct AppPlugin;
@@ -41,7 +42,7 @@ impl Plugin for AppPlugin {
                 })
                 .set(WindowPlugin {
                     primary_window: Window {
-                        title: "Maze Ascension: The Labyrinth of Echoes".to_string(),
+                        title: TITLE.to_string(),
                         canvas: Some("#bevy".to_string()),
                         fit_canvas_to_parent: true,
                         prevent_default_event_handling: true,
@@ -103,9 +104,6 @@ fn spawn_camera(mut commands: Commands) {
 }
 
 fn load_background(mut commands: Commands) {
-    #[cfg(feature = "dev")]
-    let colorcheme = rose_pine::RosePine::Base;
-    #[cfg(not(feature = "dev"))]
     let colorcheme = rose_pine::RosePineDawn::Base;
     commands.insert_resource(ClearColor(colorcheme.to_color()));
 }
