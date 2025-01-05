@@ -12,10 +12,7 @@ use bevy::prelude::*;
 
 pub fn move_floors(
     mut commands: Commands,
-    mut maze_query: Query<
-        (Entity, &mut Transform, &FloorYTarget),
-        (With<HexMaze>, With<FloorYTarget>),
-    >,
+    mut maze_query: Query<(Entity, &mut Transform, &FloorYTarget), With<FloorYTarget>>,
     player_query: Query<&MovementSpeed, With<Player>>,
     time: Res<Time>,
 ) {
@@ -48,7 +45,6 @@ pub fn handle_floor_transition_events(
     }
 
     for event in event_reader.read() {
-        dbg!(&event);
         let Some((current_entity, current_floor)) = current_query.get_single().ok() else {
             continue;
         };
@@ -68,7 +64,6 @@ pub fn handle_floor_transition_events(
 
         for (entity, transforms, _, movement_state) in maze_query.iter_mut() {
             let target_y = (FLOOR_Y_OFFSET as f32).mul_add(direction, transforms.translation.y);
-            dbg!(movement_state, target_y);
             if movement_state.is_none() {
                 commands.entity(entity).insert(FloorYTarget(target_y));
             }
@@ -77,7 +72,6 @@ pub fn handle_floor_transition_events(
         update_current_next_floor(&mut commands, current_entity, target_entity);
         break;
     }
-    event_reader.clear();
 }
 
 fn update_current_next_floor(commands: &mut Commands, current: Entity, target: Entity) {

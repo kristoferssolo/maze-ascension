@@ -6,10 +6,12 @@ pub struct Floor(pub u8);
 
 #[derive(Debug, Reflect, Component)]
 #[reflect(Component)]
+#[require(Floor)]
 pub struct CurrentFloor;
 
 #[derive(Debug, Reflect, Component, Deref, DerefMut)]
 #[reflect(Component)]
+#[require(Floor)]
 pub struct FloorYTarget(pub f32);
 
 impl Default for Floor {

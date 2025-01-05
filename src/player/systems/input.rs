@@ -1,5 +1,5 @@
 use crate::{
-    floor::components::CurrentFloor,
+    floor::components::{CurrentFloor, FloorYTarget},
     maze::components::MazeConfig,
     player::components::{CurrentPosition, MovementTarget, Player},
 };
@@ -10,11 +10,15 @@ use hexx::{EdgeDirection, HexOrientation};
 pub(super) fn player_input(
     input: Res<ButtonInput<KeyCode>>,
     mut player_query: Query<(&mut MovementTarget, &CurrentPosition), With<Player>>,
-    maze_query: Query<(&Maze, &MazeConfig), With<CurrentFloor>>,
+    maze_query: Query<(&Maze, &MazeConfig, Has<FloorYTarget>), With<CurrentFloor>>,
 ) {
-    let Ok((maze, maze_config)) = maze_query.get_single() else {
+    let Ok((maze, maze_config, has_y_target)) = maze_query.get_single() else {
         return;
     };
+
+    if has_y_target {
+        return;
+    }
 
     for (mut target_pos, current_pos) in player_query.iter_mut() {
         if target_pos.is_some() {

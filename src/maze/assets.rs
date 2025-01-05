@@ -1,7 +1,7 @@
 use super::resources::GlobalMazeConfig;
 use crate::{
     constants::WALL_OVERLAP_MODIFIER,
-    theme::{palette::rose_pine::RosePine, prelude::ColorScheme},
+    theme::{palette::rose_pine::RosePineDawn, prelude::ColorScheme},
 };
 use bevy::{prelude::*, utils::HashMap};
 use std::f32::consts::FRAC_PI_2;
@@ -15,7 +15,7 @@ pub struct MazeAssets {
     pub wall_mesh: Handle<Mesh>,
     pub hex_material: Handle<StandardMaterial>,
     pub wall_material: Handle<StandardMaterial>,
-    pub custom_materials: HashMap<RosePine, Handle<StandardMaterial>>,
+    pub custom_materials: HashMap<RosePineDawn, Handle<StandardMaterial>>,
 }
 
 impl MazeAssets {
@@ -24,7 +24,7 @@ impl MazeAssets {
         materials: &mut ResMut<Assets<StandardMaterial>>,
         global_config: &GlobalMazeConfig,
     ) -> Self {
-        let custom_materials = RosePine::iter()
+        let custom_materials = RosePineDawn::iter()
             .map(|color| (color, materials.add(color.to_standart_material())))
             .collect();
         Self {

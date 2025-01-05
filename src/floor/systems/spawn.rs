@@ -4,17 +4,17 @@ use crate::{
         events::TransitionFloor,
         resources::HighestFloor,
     },
-    maze::events::SpawnMaze,
+    maze::{components::MazeConfig, events::SpawnMaze},
 };
 use bevy::prelude::*;
 
 pub(super) fn spawn_floor(
     mut commands: Commands,
-    query: Query<&mut Floor, (With<CurrentFloor>, Without<FloorYTarget>)>,
+    query: Query<(&mut Floor, &MazeConfig), (With<CurrentFloor>, Without<FloorYTarget>)>,
     mut event_reader: EventReader<TransitionFloor>,
     mut highest_floor: ResMut<HighestFloor>,
 ) {
-    let Ok(current_floor) = query.get_single() else {
+    let Ok((current_floor, config)) = query.get_single() else {
         return;
     };
 
@@ -24,14 +24,17 @@ pub(super) fn spawn_floor(
             return;
         }
 
-        let next_floor = event.next_floor_num(current_floor);
-        highest_floor.0 = highest_floor.0.max(next_floor);
+        let target_floor = event.next_floor_num(current_floor);
+        highest_floor.0 = highest_floor.0.max(target_floor);
 
-        info!("Creating level for floor {}", next_floor);
+        info!("Creating level for floor {}", target_floor);
 
         commands.trigger(SpawnMaze {
-            floor: next_floor,
-            ..default()
+            floor: target_floor,
+            config: MazeConfig {
+                start_pos: config.end_pos,
+                ..default()
+            },
         });
     }
 }
