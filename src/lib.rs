@@ -103,9 +103,6 @@ fn spawn_camera(mut commands: Commands) {
 }
 
 fn load_background(mut commands: Commands) {
-    #[cfg(feature = "dev")]
-    let colorcheme = rose_pine::RosePine::Base;
-    #[cfg(not(feature = "dev"))]
     let colorcheme = rose_pine::RosePineDawn::Base;
     commands.insert_resource(ClearColor(colorcheme.to_color()));
 }
