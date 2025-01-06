@@ -1,6 +1,6 @@
 use crate::{
     floor::components::{CurrentFloor, Floor},
-    maze::{components::MazeConfig, events::RespawnMaze, GlobalMazeConfig},
+    maze::{commands::RespawnMaze, components::MazeConfig, GlobalMazeConfig},
     player::events::RespawnPlayer,
     screens::Screen,
 };
@@ -72,10 +72,11 @@ pub fn maze_controls_ui(world: &mut World) {
             // Handle updates
             if changed {
                 maze_config.update(&global_config);
-                world.trigger(RespawnMaze {
+                RespawnMaze {
                     floor: floor_value,
                     config: maze_config,
-                });
+                }
+                .apply(world);
                 world.trigger(RespawnPlayer);
             }
         }

@@ -11,8 +11,8 @@ use crate::{
     },
     maze::{
         assets::MazeAssets,
+        commands::SpawnMaze,
         components::{HexMaze, MazeConfig, Tile, Wall},
-        events::SpawnMaze,
         resources::GlobalMazeConfig,
     },
     screens::Screen,
@@ -26,7 +26,7 @@ use std::f32::consts::{FRAC_PI_2, FRAC_PI_3, FRAC_PI_6};
 
 /// Spawns a new maze for the specified floor on [`SpawnMaze`] event.
 pub fn spawn_maze(
-    trigger: Trigger<SpawnMaze>,
+    In(SpawnMaze { floor, config }): In<SpawnMaze>,
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
@@ -34,14 +34,12 @@ pub fn spawn_maze(
     global_config: Res<GlobalMazeConfig>,
     mut event_writer: EventWriter<TransitionFloor>,
 ) {
-    let SpawnMaze { floor, config } = trigger.event();
-
-    if maze_query.iter().any(|(_, f, _)| f.0 == *floor) {
-        warn!("Floor {} already exists, skipping creation", floor);
+    if maze_query.iter().any(|(_, f, _)| f.0 == floor) {
+        info!("Floor {} already exists, skipping creation", floor);
         return;
     }
 
-    let maze = match generate_maze(config) {
+    let maze = match generate_maze(&config) {
         Ok(m) => m,
         Err(e) => {
             error!("Failed to generate maze for floor {floor}: {:?}", e);
@@ -50,7 +48,7 @@ pub fn spawn_maze(
     };
 
     // Calculate vertical offset based on floor number
-    let y_offset = match *floor {
+    let y_offset = match floor {
         1 => 0,              // Ground/Initial floor (floor 1) is at y=0
         _ => FLOOR_Y_OFFSET, // Other floors are offset vertically
     } as f32;
@@ -60,13 +58,13 @@ pub fn spawn_maze(
             Name::new(format!("Floor {}", floor)),
             HexMaze,
             maze.clone(),
-            Floor(*floor),
+            Floor(floor),
             config.clone(),
             Transform::from_translation(Vec3::ZERO.with_y(y_offset)),
             Visibility::Visible,
             StateScoped(Screen::Gameplay),
         ))
-        .insert_if(CurrentFloor, || *floor == 1) // Only floor 1 gets CurrentFloor
+        .insert_if(CurrentFloor, || floor == 1) // Only floor 1 gets CurrentFloor
         .id();
 
     let assets = MazeAssets::new(&mut meshes, &mut materials, &global_config);
@@ -75,12 +73,12 @@ pub fn spawn_maze(
         entity,
         &maze,
         &assets,
-        config,
+        &config,
         &global_config,
     );
 
     // TODO: find a better way to handle double event indirection
-    if *floor != 1 {
+    if floor != 1 {
         event_writer.send(TransitionFloor::Ascend);
     }
 }
