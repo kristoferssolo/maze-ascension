@@ -1,4 +1,4 @@
-mod assets;
+pub mod assets;
 pub mod commands;
 pub mod components;
 mod systems;
