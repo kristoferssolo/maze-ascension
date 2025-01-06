@@ -4,6 +4,8 @@
 use bevy::prelude::*;
 
 use crate::{
+    hint::assets::HintAssets,
+    player::assets::PlayerAssets,
     screens::Screen,
     theme::{interaction::InteractionAssets, prelude::*},
 };
@@ -33,6 +35,10 @@ fn continue_to_title_screen(mut next_screen: ResMut<NextState<Screen>>) {
     next_screen.set(Screen::Title);
 }
 
-const fn all_assets_loaded(interaction_assets: Option<Res<InteractionAssets>>) -> bool {
-    interaction_assets.is_some()
+const fn all_assets_loaded(
+    player_assets: Option<Res<PlayerAssets>>,
+    interaction_assets: Option<Res<InteractionAssets>>,
+    hints_assets: Option<Res<HintAssets>>,
+) -> bool {
+    player_assets.is_some() && interaction_assets.is_some() && hints_assets.is_some()
 }

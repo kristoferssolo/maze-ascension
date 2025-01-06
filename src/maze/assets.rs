@@ -37,8 +37,8 @@ pub struct MazeAssets {
 impl MazeAssets {
     /// Creates a new instance of MazeAssets with all necessary meshes and materials.
     pub fn new(
-        meshes: &mut ResMut<Assets<Mesh>>,
-        materials: &mut ResMut<Assets<StandardMaterial>>,
+        meshes: &mut Assets<Mesh>,
+        materials: &mut Assets<StandardMaterial>,
         global_config: &GlobalMazeConfig,
     ) -> Self {
         let custom_materials = RosePineDawn::iter()
