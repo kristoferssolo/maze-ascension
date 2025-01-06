@@ -4,14 +4,12 @@ use crate::{
     player::{
         assets::{blue_material, generate_pill_mesh},
         components::{CurrentPosition, Player},
-        events::SpawnPlayer,
     },
     screens::Screen,
 };
 use bevy::prelude::*;
 
-pub(super) fn spawn_player(
-    _trigger: Trigger<SpawnPlayer>,
+pub fn spawn_player(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,

@@ -9,7 +9,7 @@ use crate::{
     maze::{commands::SpawnMaze, components::MazeConfig},
 };
 
-pub(super) fn spawn_floor(
+pub fn spawn_floor(
     mut commands: Commands,
     query: Query<(&mut Floor, &MazeConfig), (With<CurrentFloor>, Without<FloorYTarget>)>,
     mut event_reader: EventReader<TransitionFloor>,

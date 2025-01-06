@@ -1,5 +1,5 @@
 mod check;
-pub mod setup;
+pub mod spawn;
 
 use bevy::prelude::*;
 use check::check_player_hints;

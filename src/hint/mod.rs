@@ -9,5 +9,5 @@ pub(super) fn plugin(app: &mut App) {
 }
 
 pub fn spawn_hint_command(world: &mut World) {
-    let _ = world.run_system_once(systems::setup::setup);
+    let _ = world.run_system_once(systems::spawn::spawn_hints);
 }
