@@ -5,7 +5,7 @@ use crate::hint::{
     components::{Hint, IdleTimer},
 };
 
-pub fn setup(mut commands: Commands, hint_assets: Res<HintAssets>) {
+pub fn spawn_hints(mut commands: Commands, hint_assets: Res<HintAssets>) {
     commands.spawn((
         Name::new("Movement hint"),
         Hint::Movement,

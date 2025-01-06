@@ -1,7 +1,9 @@
+pub mod despawn;
 mod input;
 mod movement;
-pub mod setup;
+pub mod respawn;
 mod sound_effect;
+pub mod spawn;
 mod vertical_transition;
 
 use crate::{screens::Screen, AppSet};

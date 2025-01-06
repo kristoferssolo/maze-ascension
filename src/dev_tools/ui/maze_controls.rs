@@ -1,7 +1,7 @@
 use crate::{
     floor::components::{CurrentFloor, Floor},
-    maze::{components::MazeConfig, events::RespawnMaze, GlobalMazeConfig},
-    player::events::RespawnPlayer,
+    maze::{commands::RespawnMaze, components::MazeConfig, GlobalMazeConfig},
+    player::commands::RespawnPlayer,
     screens::Screen,
 };
 use bevy::{prelude::*, window::PrimaryWindow};
@@ -72,11 +72,12 @@ pub fn maze_controls_ui(world: &mut World) {
             // Handle updates
             if changed {
                 maze_config.update(&global_config);
-                world.trigger(RespawnMaze {
+                RespawnMaze {
                     floor: floor_value,
                     config: maze_config,
-                });
-                world.trigger(RespawnPlayer);
+                }
+                .apply(world);
+                RespawnPlayer.apply(world);
             }
         }
     });

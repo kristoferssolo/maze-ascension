@@ -6,10 +6,10 @@ use crate::{
         events::TransitionFloor,
         resources::HighestFloor,
     },
-    maze::{components::MazeConfig, events::SpawnMaze},
+    maze::{commands::SpawnMaze, components::MazeConfig},
 };
 
-pub(super) fn spawn_floor(
+pub fn spawn_floor(
     mut commands: Commands,
     query: Query<(&mut Floor, &MazeConfig), (With<CurrentFloor>, Without<FloorYTarget>)>,
     mut event_reader: EventReader<TransitionFloor>,
@@ -21,7 +21,7 @@ pub(super) fn spawn_floor(
 
     for event in event_reader.read() {
         if current_floor.0 == 1 && *event == TransitionFloor::Descend {
-            warn!("Cannot descend below floor 1");
+            info!("Cannot descend below floor 1");
             return;
         }
 
@@ -30,7 +30,7 @@ pub(super) fn spawn_floor(
 
         info!("Creating level for floor {}", target_floor);
 
-        commands.trigger(SpawnMaze {
+        commands.queue(SpawnMaze {
             floor: target_floor,
             config: MazeConfig {
                 start_pos: config.end_pos,
