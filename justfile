@@ -12,7 +12,7 @@ native-release:
 
 # Run web dev
 web-dev:
-    RUST_BACKTRACE=full trunk serve
+    RUSTC_WRAPPER=sccache RUST_BACKTRACE=full trunk serve
 
 # Run web release
 web-release:
