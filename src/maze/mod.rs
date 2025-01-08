@@ -1,6 +1,7 @@
 mod assets;
 pub mod commands;
 pub mod components;
+pub mod coordinates;
 pub mod errors;
 pub mod resources;
 mod systems;
