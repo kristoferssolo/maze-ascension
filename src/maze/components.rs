@@ -49,7 +49,7 @@ impl MazeConfig {
         radius: u16,
         orientation: HexOrientation,
         seed: Option<u64>,
-        global_conig: &GlobalMazeConfig,
+        global_config: &GlobalMazeConfig,
         start_pos: Option<Hex>,
     ) -> Self {
         let seed = seed.unwrap_or_else(|| thread_rng().gen());
@@ -65,15 +65,11 @@ impl MazeConfig {
                 break;
             }
         }
-
-        info!(
-            "Start pos: (q={}, r={}). End pos: (q={}, r={})",
-            start_pos.x, start_pos.y, end_pos.x, end_pos.y
-        );
+        dbg!(seed, start_pos, end_pos);
 
         let layout = HexLayout {
             orientation,
-            hex_size: Vec2::splat(global_conig.hex_size),
+            hex_size: Vec2::splat(global_config.hex_size),
             ..default()
         };
 

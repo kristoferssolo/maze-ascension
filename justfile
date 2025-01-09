@@ -20,8 +20,8 @@ web-release:
 
 # Run tests
 test:
-    RUSTC_WRAPPER=sccache RUST_BACKTRACE=full cargo test --doc --locked --workspace --no-default-features
-    RUSTC_WRAPPER=sccache RUST_BACKTRACE=full cargo nextest run --no-default-features --all-targets
+    RUSTC_WRAPPER=sccache cargo test --doc --locked --workspace --no-default-features
+    RUSTC_WRAPPER=sccache cargo nextest run --no-default-features --all-targets
 
 # Run CI localy
 ci:

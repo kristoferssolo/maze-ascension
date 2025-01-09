@@ -3146,6 +3146,7 @@ dependencies = [
  "hexx",
  "log",
  "rand",
+ "rayon",
  "rstest",
  "rstest_reuse",
  "strum",

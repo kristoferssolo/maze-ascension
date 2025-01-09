@@ -27,6 +27,7 @@ strum = { version = "0.26", features = ["derive"] }
 
 [dev-dependencies]
 claims = "0.8.0"
+rayon = "1.10.0"
 rstest = "0.24"
 rstest_reuse = "0.7"
 test-log = { version = "0.2.16", default-features = false, features = [

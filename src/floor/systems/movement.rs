@@ -4,7 +4,7 @@ use crate::{
         components::{CurrentFloor, Floor, FloorYTarget},
         events::TransitionFloor,
     },
-    maze::components::HexMaze,
+    maze::components::{HexMaze, MazeConfig},
     player::components::{MovementSpeed, Player},
 };
 
@@ -18,13 +18,22 @@ use bevy::prelude::*;
 /// - Removes FloorYTarget component when floor reaches destination
 pub fn move_floors(
     mut commands: Commands,
-    mut maze_query: Query<(Entity, &mut Transform, &FloorYTarget), With<FloorYTarget>>,
+    mut maze_query: Query<
+        (
+            Entity,
+            &mut Transform,
+            &FloorYTarget,
+            &MazeConfig,
+            Has<CurrentFloor>,
+        ),
+        With<FloorYTarget>,
+    >,
     player_query: Query<&MovementSpeed, With<Player>>,
     time: Res<Time>,
 ) {
     let speed = player_query.get_single().map_or(100., |s| s.0);
     let movement_distance = speed * time.delta_secs();
-    for (entity, mut transform, movement_state) in maze_query.iter_mut() {
+    for (entity, mut transform, movement_state, config, is_current_floor) in maze_query.iter_mut() {
         let delta = movement_state.0 - transform.translation.y;
         if delta.abs() > MOVEMENT_THRESHOLD {
             let movement = delta.signum() * movement_distance.min(delta.abs());
@@ -32,6 +41,13 @@ pub fn move_floors(
         } else {
             transform.translation.y = movement_state.0;
             commands.entity(entity).remove::<FloorYTarget>();
+            if is_current_floor {
+                info!("Current floor seed: {}", config.seed);
+                info!(
+                    "Start pos: (q={}, r={}). End pos: (q={}, r={})",
+                    config.start_pos.x, config.start_pos.y, config.end_pos.x, config.end_pos.y,
+                );
+            }
         }
     }
 }
