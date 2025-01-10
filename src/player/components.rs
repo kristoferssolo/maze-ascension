@@ -16,7 +16,7 @@ pub struct MovementSpeed(pub f32);
 
 impl Default for MovementSpeed {
     fn default() -> Self {
-        Self(200.)
+        Self(100.)
     }
 }
 
