@@ -25,7 +25,11 @@ pub enum MazeError {
     Other(#[from] anyhow::Error),
 }
 
-pub type MazeResult<T> = Result<T, MazeError>;
+#[derive(Debug, Error)]
+pub enum RadiusError {
+    #[error("Radius cannot be negative: {0}")]
+    NegativeRadius(i32),
+}
 
 impl MazeError {
     pub fn config_error(msg: impl Into<String>) -> Self {

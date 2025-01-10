@@ -3,7 +3,7 @@
 //! Module defines the core components and configuration structures used
 //! for maze generation and rendering, including hexagonal maze layouts,
 //! tiles, walls, and maze configuration.
-use super::GlobalMazeConfig;
+use super::{coordinates::is_within_radius, GlobalMazeConfig};
 use crate::floor::components::Floor;
 
 use bevy::prelude::*;
@@ -49,31 +49,19 @@ impl MazeConfig {
         radius: u16,
         orientation: HexOrientation,
         seed: Option<u64>,
-        global_conig: &GlobalMazeConfig,
+        global_config: &GlobalMazeConfig,
         start_pos: Option<Hex>,
     ) -> Self {
-        let seed = seed.unwrap_or_else(|| thread_rng().gen());
-        let mut rng = StdRng::seed_from_u64(seed);
+        let (seed, mut rng) = setup_rng(seed);
 
         let start_pos = start_pos.unwrap_or_else(|| generate_pos(radius, &mut rng));
 
         // Generate end position ensuring start and end are different
-        let mut end_pos;
-        loop {
-            end_pos = generate_pos(radius, &mut rng);
-            if start_pos != end_pos {
-                break;
-            }
-        }
-
-        info!(
-            "Start pos: (q={}, r={}). End pos: (q={}, r={})",
-            start_pos.x, start_pos.y, end_pos.x, end_pos.y
-        );
+        let end_pos = generate_end_pos(radius, start_pos, &mut rng);
 
         let layout = HexLayout {
             orientation,
-            hex_size: Vec2::splat(global_conig.hex_size),
+            hex_size: Vec2::splat(global_config.hex_size),
             ..default()
         };
 
@@ -86,11 +74,34 @@ impl MazeConfig {
         }
     }
 
+    pub fn from_self(config: &Self) -> Self {
+        let start_pos = config.end_pos;
+        let (seed, mut rng) = setup_rng(None);
+
+        let end_pos = generate_end_pos(config.radius, start_pos, &mut rng);
+
+        Self {
+            radius: config.radius + 1,
+            start_pos,
+            end_pos,
+            seed,
+            layout: config.layout.clone(),
+        }
+    }
+
     /// Updates the maze configuration with new global settings.
     pub fn update(&mut self, global_conig: &GlobalMazeConfig) {
         self.layout.hex_size = Vec2::splat(global_conig.hex_size);
     }
 }
+
+// TO
+// 3928551514041614914
+// (4, 0)
+
+// FROM
+// 7365371276044996661
+// ()
 
 impl Default for MazeConfig {
     fn default() -> Self {
@@ -104,21 +115,38 @@ impl Default for MazeConfig {
     }
 }
 
+fn setup_rng(seed: Option<u64>) -> (u64, StdRng) {
+    let seed = seed.unwrap_or_else(|| thread_rng().gen());
+    let rng = StdRng::seed_from_u64(seed);
+    (seed, rng)
+}
+
+fn generate_end_pos<R: Rng>(radius: u16, start_pos: Hex, rng: &mut R) -> Hex {
+    let mut end_pos;
+    loop {
+        end_pos = generate_pos(radius, rng);
+        if start_pos != end_pos {
+            return end_pos;
+        }
+    }
+}
+
 /// Generates a random position within a hexagonal radius.
 ///
 /// # Returns
 /// A valid Hex coordinate within the specified radius
 fn generate_pos<R: Rng>(radius: u16, rng: &mut R) -> Hex {
     let radius = radius as i32;
-    loop {
-        let q = rng.gen_range(-radius..=radius);
-        let r = rng.gen_range(-radius..=radius);
-        let s = -q - r; // Calculate third coordinate (axial coordinates: q + r + s = 0)
 
-        // Check if the position is within the hexagonal radius
-        // Using the formula: max(abs(q), abs(r), abs(s)) <= radius
-        if q.abs().max(r.abs()).max(s.abs()) <= radius {
-            return Hex::new(q, r);
+    loop {
+        // Generate coordinates using cube coordinate bounds
+        let q = rng.gen_range(-radius..=radius);
+        let r = rng.gen_range((-radius).max(-q - radius)..=radius.min(-q + radius));
+
+        if let Ok(is_valid) = is_within_radius(radius, &(q, r)) {
+            if is_valid {
+                return Hex::new(q, r);
+            }
         }
     }
 }
@@ -126,19 +154,8 @@ fn generate_pos<R: Rng>(radius: u16, rng: &mut R) -> Hex {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use claims::*;
     use rstest::*;
-
-    fn is_within_radius(hex: Hex, radius: u16) -> bool {
-        let q = hex.x;
-        let r = hex.y;
-        let s = -q - r;
-        q.abs().max(r.abs()).max(s.abs()) <= radius as i32
-    }
-
-    #[fixture]
-    fn test_radius() -> Vec<u16> {
-        vec![1, 2, 5, 8]
-    }
 
     #[rstest]
     #[case(1)]
@@ -156,18 +173,8 @@ mod tests {
         assert_eq!(config.seed, 12345);
         assert_eq!(config.layout.orientation, orientation);
 
-        assert!(
-            is_within_radius(config.start_pos, radius),
-            "Start pos {:?} outside radius {}",
-            config.start_pos,
-            radius
-        );
-        assert!(
-            is_within_radius(config.end_pos, radius),
-            "End pos {:?} outside radius {}",
-            config.end_pos,
-            radius
-        );
+        assert_ok!(is_within_radius(radius, &config.start_pos),);
+        assert_ok!(is_within_radius(radius, &config.end_pos));
         assert_ne!(config.start_pos, config.end_pos);
     }
 
@@ -178,13 +185,13 @@ mod tests {
             let config = MazeConfig::default();
             let radius = config.radius;
 
-            assert!(is_within_radius(config.start_pos, radius));
-            assert!(is_within_radius(config.end_pos, radius));
+            assert_ok!(is_within_radius(radius, &config.start_pos));
+            assert_ok!(is_within_radius(radius, &config.end_pos));
             assert_ne!(config.start_pos, config.end_pos);
         }
     }
 
-    #[rstest]
+    #[test]
     fn maze_config_default_with_seeds() {
         let test_seeds = [
             None,
@@ -206,8 +213,8 @@ mod tests {
 
             assert_eq!(config.radius, 8);
             assert_eq!(config.layout.orientation, HexOrientation::Flat);
-            assert!(is_within_radius(config.start_pos, 8));
-            assert!(is_within_radius(config.end_pos, 8));
+            assert_ok!(is_within_radius(8, &config.start_pos));
+            assert_ok!(is_within_radius(8, &config.end_pos));
             assert_ne!(config.start_pos, config.end_pos);
         }
     }
@@ -238,12 +245,7 @@ mod tests {
 
         for _ in 0..10 {
             let pos = generate_pos(radius, &mut rng);
-            assert!(
-                is_within_radius(pos, radius),
-                "Position {:?} outside radius {}",
-                pos,
-                radius
-            );
+            assert_ok!(is_within_radius(radius, &pos),);
         }
     }
 
@@ -316,5 +318,52 @@ mod tests {
         );
         assert_eq!(config.layout.hex_size.x, 0.0);
         assert_eq!(config.layout.hex_size.y, 0.0);
+    }
+
+    #[test]
+    fn basic_generation() {
+        let mut rng = thread_rng();
+        let radius = 2;
+        let hex = generate_pos(radius, &mut rng);
+
+        // Test that generated position is within radius
+        assert_ok!(is_within_radius(radius as i32, &(hex.x, hex.y)));
+    }
+
+    #[rstest]
+    #[case(1)]
+    #[case(2)]
+    #[case(3)]
+    #[case(6)]
+    fn multiple_radii(#[case] radius: u16) {
+        let mut rng = thread_rng();
+
+        // Generate multiple points for each radius
+        for _ in 0..100 {
+            let hex = generate_pos(radius, &mut rng);
+            assert_ok!(is_within_radius(radius, &hex));
+        }
+    }
+
+    #[test]
+    fn zero_radius() {
+        let mut rng = thread_rng();
+        let hex = generate_pos(0, &mut rng);
+
+        // With radius 0, only (0,0) should be possible
+        assert_eq!(hex.x, 0);
+        assert_eq!(hex.y, 0);
+    }
+
+    #[test]
+    fn large_radius() {
+        let mut rng = thread_rng();
+        let radius = 100;
+        let iterations = 100;
+
+        for _ in 0..iterations {
+            let hex = generate_pos(radius, &mut rng);
+            assert_ok!(is_within_radius(radius, &hex));
+        }
     }
 }

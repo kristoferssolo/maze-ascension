@@ -1,10 +1,13 @@
 //! Helper traits for creating common widgets.
 
-use bevy::{ecs::system::EntityCommands, prelude::*, ui::Val::*};
+use bevy::{
+    ecs::system::EntityCommands, prelude::*, ui::Val::*, window::SystemCursorIcon,
+    winit::cursor::CursorIcon,
+};
 use rose_pine::RosePineDawn;
 
-use super::prelude::ColorScheme;
-use crate::theme::{interaction::InteractionPalette, palette::*};
+use super::prelude::{ColorScheme, InteractionPalette};
+use crate::theme::palette::*;
 
 /// An extension trait for spawning UI widgets.
 pub trait Widgets {
@@ -35,6 +38,7 @@ impl<T: SpawnUi> Widgets for T {
                 border: UiRect::all(Px(4.)),
                 ..default()
             },
+            CursorIcon::System(SystemCursorIcon::Pointer),
             BorderRadius::all(Px(8.)),
             BorderColor(RosePineDawn::Text.to_color()),
             InteractionPalette {

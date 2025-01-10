@@ -7,7 +7,7 @@ use crate::{
     hint::assets::HintAssets,
     player::assets::PlayerAssets,
     screens::Screen,
-    theme::{interaction::InteractionAssets, prelude::*},
+    theme::{assets::InteractionAssets, prelude::*},
 };
 
 pub fn plugin(app: &mut App) {
