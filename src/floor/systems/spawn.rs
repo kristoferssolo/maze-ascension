@@ -32,11 +32,7 @@ pub fn spawn_floor(
 
         commands.queue(SpawnMaze {
             floor: target_floor,
-            config: MazeConfig {
-                start_pos: config.end_pos,
-                radius: config.radius + 1,
-                ..default()
-            },
+            config: MazeConfig::from_self(config),
         });
     }
 }

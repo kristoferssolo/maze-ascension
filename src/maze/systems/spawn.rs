@@ -68,6 +68,7 @@ pub fn spawn_maze(
         .id();
 
     let assets = MazeAssets::new(&mut meshes, &mut materials, &global_config);
+
     spawn_maze_tiles(
         &mut commands,
         entity,

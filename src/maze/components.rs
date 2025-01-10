@@ -52,20 +52,12 @@ impl MazeConfig {
         global_config: &GlobalMazeConfig,
         start_pos: Option<Hex>,
     ) -> Self {
-        let seed = seed.unwrap_or_else(|| thread_rng().gen());
-        let mut rng = StdRng::seed_from_u64(seed);
+        let (seed, mut rng) = setup_rng(seed);
 
         let start_pos = start_pos.unwrap_or_else(|| generate_pos(radius, &mut rng));
 
         // Generate end position ensuring start and end are different
-        let mut end_pos;
-        loop {
-            end_pos = generate_pos(radius, &mut rng);
-            if start_pos != end_pos {
-                break;
-            }
-        }
-        dbg!(seed, start_pos, end_pos);
+        let end_pos = generate_end_pos(radius, start_pos, &mut rng);
 
         let layout = HexLayout {
             orientation,
@@ -82,11 +74,34 @@ impl MazeConfig {
         }
     }
 
+    pub fn from_self(config: &Self) -> Self {
+        let start_pos = config.end_pos;
+        let (seed, mut rng) = setup_rng(None);
+
+        let end_pos = generate_end_pos(config.radius, start_pos, &mut rng);
+
+        Self {
+            radius: config.radius + 1,
+            start_pos,
+            end_pos,
+            seed,
+            layout: config.layout.clone(),
+        }
+    }
+
     /// Updates the maze configuration with new global settings.
     pub fn update(&mut self, global_conig: &GlobalMazeConfig) {
         self.layout.hex_size = Vec2::splat(global_conig.hex_size);
     }
 }
+
+// TO
+// 3928551514041614914
+// (4, 0)
+
+// FROM
+// 7365371276044996661
+// ()
 
 impl Default for MazeConfig {
     fn default() -> Self {
@@ -97,6 +112,22 @@ impl Default for MazeConfig {
             &GlobalMazeConfig::default(),
             None,
         )
+    }
+}
+
+fn setup_rng(seed: Option<u64>) -> (u64, StdRng) {
+    let seed = seed.unwrap_or_else(|| thread_rng().gen());
+    let rng = StdRng::seed_from_u64(seed);
+    (seed, rng)
+}
+
+fn generate_end_pos<R: Rng>(radius: u16, start_pos: Hex, rng: &mut R) -> Hex {
+    let mut end_pos;
+    loop {
+        end_pos = generate_pos(radius, rng);
+        if start_pos != end_pos {
+            return end_pos;
+        }
     }
 }
 
