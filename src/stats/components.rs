@@ -1,9 +1,5 @@
 use bevy::prelude::*;
 
-#[derive(Debug, Reflect, Component, Deref, DerefMut)]
-#[reflect(Component)]
-pub struct Score(pub usize);
-
 #[derive(Debug, Clone, Reflect, Component)]
 #[reflect(Component)]
 pub struct FloorDisplay;

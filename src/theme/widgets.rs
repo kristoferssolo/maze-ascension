@@ -120,7 +120,7 @@ impl<T: SpawnUi> Widgets for T {
                 ..default()
             },
             bundle,
-            TextColor(RosePineDawn::Foam.to_color()),
+            TextColor(RosePineDawn::Text.to_color()),
         ));
         entity
     }

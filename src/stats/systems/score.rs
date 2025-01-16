@@ -6,13 +6,13 @@ use crate::{
     },
     floor::resources::HighestFloor,
     stats::{
-        components::{Score, ScoreDisplay},
-        resources::FloorTimer,
+        components::ScoreDisplay,
+        resources::{FloorTimer, Score},
     },
 };
 
 pub fn update_score(
-    mut score_query: Query<&mut Score>,
+    mut score: ResMut<Score>,
     hightes_floor: Res<HighestFloor>,
     floor_timer: Res<FloorTimer>,
 ) {
@@ -20,21 +20,13 @@ pub fn update_score(
         return;
     }
 
-    let Ok(mut score) = score_query.get_single_mut() else {
-        return;
-    };
-
     score.0 = calculate_score(hightes_floor.0, floor_timer.elapsed_secs());
 }
 
 pub fn update_score_display(
-    score_query: Query<&Score>,
     mut text_query: Query<&mut Text, With<ScoreDisplay>>,
+    score: Res<Score>,
 ) {
-    let Ok(score) = score_query.get_single() else {
-        return;
-    };
-
     let Ok(mut text) = text_query.get_single_mut() else {
         return;
     };
