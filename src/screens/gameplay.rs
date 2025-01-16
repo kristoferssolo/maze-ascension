@@ -1,8 +1,9 @@
 //! The screen state for the main gameplay.
 
-use crate::player::spawn_player_command;
-use crate::screens::Screen;
-use crate::{hint::spawn_hint_command, maze::spawn_level_command};
+use crate::{
+    hint::spawn_hint_command, maze::spawn_level_command, player::spawn_player_command,
+    screens::Screen, stats::spawn_stats_command,
+};
 
 use bevy::{input::common_conditions::input_just_pressed, prelude::*};
 
@@ -13,6 +14,7 @@ pub(super) fn plugin(app: &mut App) {
             spawn_level_command,
             spawn_player_command,
             spawn_hint_command,
+            spawn_stats_command,
         )
             .chain(),
     );

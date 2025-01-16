@@ -8,7 +8,7 @@ native-dev:
 
 # Run native release
 native-release:
-   RUSTC_WRAPPER=sccache cargo run --release --no-default-features
+    RUSTC_WRAPPER=sccache cargo run --release --no-default-features
 
 # Run web dev
 web-dev:
