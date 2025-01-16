@@ -3,3 +3,6 @@ pub const WALL_OVERLAP_MODIFIER: f32 = 1.25;
 pub const FLOOR_Y_OFFSET: u8 = 200;
 pub const MOVEMENT_COOLDOWN: f32 = 1.0; // one second cooldown
 pub const TITLE: &str = "Maze Ascension: The Labyrinth of Echoes";
+
+pub const FLOOR_SCORE_MULTIPLIER: f32 = 100.;
+pub const TIME_SCORE_MULTIPLIER: f32 = 10.0;

@@ -8,7 +8,7 @@ pub mod components;
 pub mod events;
 pub mod palette;
 mod systems;
-mod widgets;
+pub mod widgets;
 
 #[allow(unused_imports)]
 pub mod prelude {

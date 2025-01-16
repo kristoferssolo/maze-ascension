@@ -8,6 +8,7 @@ pub mod hint;
 pub mod maze;
 pub mod player;
 pub mod screens;
+pub mod stats;
 pub mod theme;
 
 use bevy::{
@@ -69,6 +70,7 @@ impl Plugin for AppPlugin {
             floor::plugin,
             player::plugin,
             hint::plugin,
+            stats::plugin,
         ));
 
         // Enable dev tools for dev builds.

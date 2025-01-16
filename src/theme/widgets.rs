@@ -19,6 +19,8 @@ pub trait Widgets {
 
     /// Spawn a simple text label.
     fn label(&mut self, text: impl Into<String>) -> EntityCommands;
+
+    fn stats(&mut self, text: impl Into<String>, value: impl Into<String>) -> EntityCommands;
 }
 
 impl<T: SpawnUi> Widgets for T {
@@ -104,6 +106,20 @@ impl<T: SpawnUi> Widgets for T {
                 width: Px(500.),
                 ..default()
             },
+        ));
+        entity
+    }
+
+    fn stats(&mut self, text: impl Into<String>, value: impl Into<String>) -> EntityCommands {
+        let text = text.into();
+        let entity = self.spawn_ui((
+            Name::new(text.clone()),
+            Text(format!("{text}: {}", value.into())),
+            TextFont {
+                font_size: 24.0,
+                ..default()
+            },
+            TextColor(RosePineDawn::Foam.to_color()),
         ));
         entity
     }
