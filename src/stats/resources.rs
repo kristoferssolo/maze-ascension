@@ -1,21 +1,27 @@
+use std::time::Duration;
+
 use bevy::prelude::*;
 
 #[derive(Debug, Reflect, Resource, Deref, DerefMut)]
 #[reflect(Resource)]
-pub struct GameTimer(pub Timer);
+pub struct TotalTimer(pub Timer);
 
 #[derive(Debug, Reflect, Resource, Deref, DerefMut)]
 #[reflect(Resource)]
 pub struct FloorTimer(pub Timer);
 
-impl Default for GameTimer {
+impl Default for TotalTimer {
     fn default() -> Self {
-        Self(Timer::from_seconds(0.0, TimerMode::Once))
+        Self(init_timer())
     }
 }
 
 impl Default for FloorTimer {
     fn default() -> Self {
-        Self(Timer::from_seconds(0.0, TimerMode::Once))
+        Self(init_timer())
     }
+}
+
+fn init_timer() -> Timer {
+    Timer::new(Duration::MAX, TimerMode::Once)
 }

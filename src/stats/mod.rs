@@ -1,17 +1,16 @@
 pub mod components;
+pub mod container;
 pub mod resources;
-pub mod stats;
 mod systems;
 
 use bevy::{ecs::system::RunSystemOnce, prelude::*};
 use components::Score;
-use resources::{FloorTimer, GameTimer};
+use resources::{FloorTimer, TotalTimer};
 
 pub(super) fn plugin(app: &mut App) {
     app.register_type::<Score>()
-        .init_resource::<GameTimer>()
+        .init_resource::<TotalTimer>()
         .init_resource::<FloorTimer>()
-        .insert_resource(FloorTimer(Timer::from_seconds(0.0, TimerMode::Once)))
         .add_plugins(systems::plugin);
 }
 

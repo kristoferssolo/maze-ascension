@@ -20,7 +20,7 @@ pub trait Widgets {
     /// Spawn a simple text label.
     fn label(&mut self, text: impl Into<String>) -> EntityCommands;
 
-    fn stats(&mut self, text: impl Into<String>, value: impl Into<String>) -> EntityCommands;
+    fn stats(&mut self, text: impl Into<String>, bundle: impl Bundle) -> EntityCommands;
 }
 
 impl<T: SpawnUi> Widgets for T {
@@ -110,15 +110,16 @@ impl<T: SpawnUi> Widgets for T {
         entity
     }
 
-    fn stats(&mut self, text: impl Into<String>, value: impl Into<String>) -> EntityCommands {
+    fn stats(&mut self, text: impl Into<String>, bundle: impl Bundle) -> EntityCommands {
         let text = text.into();
         let entity = self.spawn_ui((
             Name::new(text.clone()),
-            Text(format!("{text}: {}", value.into())),
+            Text(text),
             TextFont {
                 font_size: 24.0,
                 ..default()
             },
+            bundle,
             TextColor(RosePineDawn::Foam.to_color()),
         ));
         entity
