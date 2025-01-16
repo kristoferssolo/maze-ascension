@@ -95,14 +95,6 @@ impl MazeConfig {
     }
 }
 
-// TO
-// 3928551514041614914
-// (4, 0)
-
-// FROM
-// 7365371276044996661
-// ()
-
 impl Default for MazeConfig {
     fn default() -> Self {
         Self::new(
