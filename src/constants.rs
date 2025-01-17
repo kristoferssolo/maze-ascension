@@ -17,4 +17,3 @@ pub const TIME_REFERENCE_SECONDS: f32 = 60.0; // Reference time for score calcul
 pub const BASE_ZOOM_SPEED: f32 = 10.0;
 pub const MIN_ZOOM: f32 = 50.0;
 pub const MAX_ZOOM: f32 = 2500.0;
-pub const DISTANCE_SCALE_FACTOR: f32 = 0.5; // Adjust this to control how much distance affects zoom speed
