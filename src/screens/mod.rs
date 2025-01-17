@@ -2,6 +2,7 @@
 
 mod gameplay;
 mod loading;
+mod pause;
 mod splash;
 mod title;
 
@@ -16,6 +17,7 @@ pub(super) fn plugin(app: &mut App) {
         loading::plugin,
         splash::plugin,
         title::plugin,
+        pause::plugin,
     ));
 }
 
@@ -28,4 +30,5 @@ pub enum Screen {
     Loading,
     Title,
     Gameplay,
+    Pause,
 }
