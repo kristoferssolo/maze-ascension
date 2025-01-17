@@ -14,6 +14,11 @@ pub const MIN_TIME_MULTIPLIER: f32 = 0.1; // Minimum score multiplier for time
 pub const TIME_REFERENCE_SECONDS: f32 = 60.0; // Reference time for score calculation
 
 // Constants for camera control
+
 pub const BASE_ZOOM_SPEED: f32 = 10.0;
+#[cfg(not(target_family = "wasm"))]
+pub const SCROLL_MODIFIER: f32 = 1.;
+#[cfg(target_family = "wasm")]
+pub const SCROLL_MODIFIER: f32 = 0.01;
 pub const MIN_ZOOM: f32 = 50.0;
 pub const MAX_ZOOM: f32 = 2500.0;
