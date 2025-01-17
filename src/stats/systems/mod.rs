@@ -20,7 +20,11 @@ pub(super) fn plugin(app: &mut App) {
         .add_systems(
             Update,
             (
-                (update_score, update_score_display).chain(),
+                (
+                    update_score.before(update_floor_timer),
+                    update_score_display,
+                )
+                    .chain(),
                 (update_floor_timer, update_floor_timer_display).chain(),
                 (update_total_timer, update_total_timer_display).chain(),
                 update_floor_display,

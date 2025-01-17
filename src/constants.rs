@@ -5,13 +5,15 @@ pub const MOVEMENT_COOLDOWN: f32 = 1.0; // one second cooldown
 pub const TITLE: &str = "Maze Ascension: The Labyrinth of Echoes";
 
 // Base score constants
-pub const BASE_FLOOR_SCORE: usize = 1000;
-pub const BASE_TIME_SCORE: usize = 100;
+pub const BASE_FLOOR_SCORE: usize = 100;
 
 // Floor progression constants
-pub const FLOOR_DIFFICULTY_MULTIPLIER: f32 = 1.2; // Higher floors are exponentially harder
-pub const MIN_TIME_MULTIPLIER: f32 = 0.1; // Minimum score multiplier for time
-pub const TIME_REFERENCE_SECONDS: f32 = 60.0; // Reference time for score calculation
+pub const FLOOR_PROGRESSION_MULTIPLIER: f32 = 1.2;
+pub const MIN_TIME_MULTIPLIER: f32 = 0.2; // Minimum score multiplier for time
+pub const TIME_BONUS_MULTIPLIER: f32 = 1.5;
+// Time scaling constants
+pub const BASE_PERFECT_TIME: f32 = 10.0; // Base time for floor 1
+pub const TIME_INCREASE_FACTOR: f32 = 0.15; // Each floor adds 15% more time
 
 // Constants for camera control
 
