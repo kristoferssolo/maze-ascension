@@ -1,6 +1,6 @@
 use bevy::{input::mouse::MouseWheel, prelude::*};
 
-use crate::constants::{BASE_ZOOM_SPEED, MAX_ZOOM, MIN_ZOOM};
+use crate::constants::{BASE_ZOOM_SPEED, MAX_ZOOM, MIN_ZOOM, SCROLL_MODIFIER};
 
 pub(super) fn plugin(app: &mut App) {
     app.add_systems(Update, camera_zoom);
@@ -53,7 +53,7 @@ fn camera_zoom(
     }
 
     for ev in scrool_evr.read() {
-        zoom_delta += ev.y * adjusted_zoom_speed;
+        zoom_delta += ev.y * adjusted_zoom_speed * SCROLL_MODIFIER;
     }
 
     if zoom_delta != 0.0 {
