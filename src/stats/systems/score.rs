@@ -20,7 +20,10 @@ pub fn update_score(
         return;
     }
 
-    score.0 = calculate_score(hightes_floor.0, floor_timer.elapsed_secs());
+    score.0 = calculate_score(
+        hightes_floor.0.saturating_sub(1),
+        floor_timer.elapsed_secs(),
+    );
 }
 
 pub fn update_score_display(

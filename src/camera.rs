@@ -1,6 +1,6 @@
 use bevy::{input::mouse::MouseWheel, prelude::*};
 
-use crate::constants::{BASE_ZOOM_SPEED, DISTANCE_SCALE_FACTOR, MAX_ZOOM, MIN_ZOOM};
+use crate::constants::{BASE_ZOOM_SPEED, MAX_ZOOM, MIN_ZOOM};
 
 pub(super) fn plugin(app: &mut App) {
     app.add_systems(Update, camera_zoom);
@@ -39,7 +39,7 @@ fn camera_zoom(
     let current_distance = transform.translation.length();
 
     // Calculate zoom speed based on distance
-    let distance_multiplier = (current_distance / MIN_ZOOM).powf(DISTANCE_SCALE_FACTOR);
+    let distance_multiplier = (current_distance / MIN_ZOOM).sqrt();
     let adjusted_zoom_speed = BASE_ZOOM_SPEED * distance_multiplier;
 
     let mut zoom_delta = 0.0;
