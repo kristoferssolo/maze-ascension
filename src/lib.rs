@@ -1,5 +1,6 @@
 pub mod asset_tracking;
 pub mod audio;
+pub mod camera;
 pub mod constants;
 #[cfg(feature = "dev")]
 pub mod dev_tools;
@@ -16,6 +17,7 @@ use bevy::{
     audio::{AudioPlugin, Volume},
     prelude::*,
 };
+use camera::spawn_camera;
 use constants::TITLE;
 use theme::{palette::rose_pine, prelude::ColorScheme};
 
@@ -71,6 +73,7 @@ impl Plugin for AppPlugin {
             player::plugin,
             hint::plugin,
             stats::plugin,
+            camera::plugin,
         ));
 
         // Enable dev tools for dev builds.
@@ -90,21 +93,6 @@ enum AppSet {
     RecordInput,
     /// Do everything else.
     Update,
-}
-
-fn spawn_camera(mut commands: Commands) {
-    commands.spawn((
-        Name::new("Camera"),
-        Camera3d::default(),
-        Transform::from_xyz(200., 200., 0.).looking_at(Vec3::ZERO, Vec3::Y),
-        // Render all UI to this camera.
-        // Not strictly necessary since we only use one camera,
-        // but if we don't use this component, our UI will disappear as soon
-        // as we add another camera. This includes indirect ways of adding cameras like using
-        // [ui node outlines](https://bevyengine.org/news/bevy-0-14/#ui-node-outline-gizmos)
-        // for debugging. So it's good to have this here for future-proofing.
-        IsDefaultUiCamera,
-    ));
 }
 
 fn load_background(mut commands: Commands) {
