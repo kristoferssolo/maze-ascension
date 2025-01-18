@@ -74,7 +74,7 @@ pub fn handle_floor_transition_events(
     }
 
     for event in event_reader.read() {
-        let Some((current_entity, current_floor)) = current_query.get_single().ok() else {
+        let Ok((current_entity, current_floor)) = current_query.get_single() else {
             continue;
         };
 

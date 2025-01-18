@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-#[derive(Debug, Reflect, Component, Deref, DerefMut)]
+#[derive(Debug, Reflect, Component, Deref, DerefMut, PartialEq, Eq, PartialOrd, Ord)]
 #[reflect(Component)]
 pub struct Floor(pub u8);
 
