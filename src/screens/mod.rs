@@ -7,7 +7,7 @@ mod splash;
 mod title;
 
 use bevy::prelude::*;
-pub use gameplay::GameplayInitialized;
+pub use gameplay::{GameplayElement, GameplayInitialized};
 
 pub(super) fn plugin(app: &mut App) {
     app.init_state::<Screen>();

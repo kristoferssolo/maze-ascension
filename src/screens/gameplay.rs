@@ -23,6 +23,7 @@ pub(super) fn plugin(app: &mut App) {
     app.add_systems(OnEnter(Screen::Gameplay), |mut commands: Commands| {
         commands.insert_resource(GameplayInitialized(true));
     });
+    app.add_systems(Update, cleanup_game.run_if(state_changed::<Screen>));
 
     app.add_systems(OnEnter(Screen::Title), reset_gameplay_state);
 
@@ -43,3 +44,19 @@ fn reset_gameplay_state(mut commands: Commands) {
 #[derive(Debug, Default, Reflect, Resource, DerefMut, Deref)]
 #[reflect(Resource)]
 pub struct GameplayInitialized(bool);
+
+#[derive(Debug, Reflect, Component)]
+#[reflect(Component)]
+pub struct GameplayElement;
+
+fn cleanup_game(
+    mut commands: Commands,
+    query: Query<Entity, With<GameplayElement>>,
+    state: Res<State<Screen>>,
+) {
+    if !matches!(*state.get(), Screen::Gameplay | Screen::Pause) {
+        for entity in query.iter() {
+            commands.entity(entity).despawn_recursive();
+        }
+    }
+}

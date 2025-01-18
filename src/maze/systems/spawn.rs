@@ -15,6 +15,7 @@ use crate::{
         components::{HexMaze, MazeConfig, Tile, Wall},
         resources::GlobalMazeConfig,
     },
+    screens::GameplayElement,
     theme::palette::rose_pine::RosePineDawn,
 };
 
@@ -61,6 +62,7 @@ pub fn spawn_maze(
             config.clone(),
             Transform::from_translation(Vec3::ZERO.with_y(y_offset)),
             Visibility::Visible,
+            GameplayElement,
         ))
         .insert_if(CurrentFloor, || floor == 1) // Only floor 1 gets CurrentFloor
         .id();
