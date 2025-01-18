@@ -2,10 +2,12 @@
 
 mod gameplay;
 mod loading;
+mod pause;
 mod splash;
 mod title;
 
 use bevy::prelude::*;
+pub use gameplay::{GameplayElement, GameplayInitialized};
 
 pub(super) fn plugin(app: &mut App) {
     app.init_state::<Screen>();
@@ -16,6 +18,7 @@ pub(super) fn plugin(app: &mut App) {
         loading::plugin,
         splash::plugin,
         title::plugin,
+        pause::plugin,
     ));
 }
 
@@ -28,4 +31,5 @@ pub enum Screen {
     Loading,
     Title,
     Gameplay,
+    Pause,
 }

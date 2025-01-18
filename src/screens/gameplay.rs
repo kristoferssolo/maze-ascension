@@ -8,6 +8,7 @@ use crate::{
 use bevy::{input::common_conditions::input_just_pressed, prelude::*};
 
 pub(super) fn plugin(app: &mut App) {
+    app.init_resource::<GameplayInitialized>();
     app.add_systems(
         OnEnter(Screen::Gameplay),
         (
@@ -16,16 +17,46 @@ pub(super) fn plugin(app: &mut App) {
             spawn_hint_command,
             spawn_stats_command,
         )
-            .chain(),
+            .chain()
+            .run_if(not(resource_exists::<GameplayInitialized>)),
     );
+    app.add_systems(OnEnter(Screen::Gameplay), |mut commands: Commands| {
+        commands.insert_resource(GameplayInitialized(true));
+    });
+    app.add_systems(Update, cleanup_game.run_if(state_changed::<Screen>));
+
+    app.add_systems(OnEnter(Screen::Title), reset_gameplay_state);
 
     app.add_systems(
         Update,
-        return_to_title_screen
-            .run_if(in_state(Screen::Gameplay).and(input_just_pressed(KeyCode::Escape))),
+        pause_game.run_if(in_state(Screen::Gameplay).and(input_just_pressed(KeyCode::Escape))),
     );
 }
 
-fn return_to_title_screen(mut next_screen: ResMut<NextState<Screen>>) {
-    next_screen.set(Screen::Title);
+fn pause_game(mut next_screen: ResMut<NextState<Screen>>) {
+    next_screen.set(Screen::Pause);
+}
+
+fn reset_gameplay_state(mut commands: Commands) {
+    commands.remove_resource::<GameplayInitialized>();
+}
+
+#[derive(Debug, Default, Reflect, Resource, DerefMut, Deref)]
+#[reflect(Resource)]
+pub struct GameplayInitialized(bool);
+
+#[derive(Debug, Reflect, Component)]
+#[reflect(Component)]
+pub struct GameplayElement;
+
+fn cleanup_game(
+    mut commands: Commands,
+    query: Query<Entity, With<GameplayElement>>,
+    state: Res<State<Screen>>,
+) {
+    if !matches!(*state.get(), Screen::Gameplay | Screen::Pause) {
+        for entity in query.iter() {
+            commands.entity(entity).despawn_recursive();
+        }
+    }
 }

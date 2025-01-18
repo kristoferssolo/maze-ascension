@@ -59,8 +59,6 @@ fn calculate_score(floor_number: u8, completion_time: f32) -> usize {
         time_factor.max(MIN_TIME_MULTIPLIER) * TIME_BONUS_MULTIPLIER
     };
 
-    dbg!(base_score * time_multiplier);
-
     (base_score * time_multiplier) as usize
 }
 

@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 
 use crate::{
-    screens::Screen,
+    screens::GameplayElement,
     stats::{
         components::{
             FloorDisplay, FloorTimerDisplay, HighestFloorDisplay, ScoreDisplay, TotalTimerDisplay,
@@ -14,7 +14,7 @@ use crate::{
 pub fn spawn_stats(mut commands: Commands) {
     commands
         .ui_stats()
-        .insert(StateScoped(Screen::Gameplay))
+        .insert(GameplayElement)
         .with_children(|parent| {
             parent.stats("Floor: 1", FloorDisplay);
             parent.stats("Highest Floor: 1", HighestFloorDisplay);
