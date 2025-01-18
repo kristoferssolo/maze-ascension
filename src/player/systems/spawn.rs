@@ -5,7 +5,6 @@ use crate::{
         assets::{blue_material, generate_pill_mesh},
         components::{CurrentPosition, Player},
     },
-    screens::Screen,
 };
 use bevy::prelude::*;
 
@@ -33,6 +32,5 @@ pub fn spawn_player(
         Mesh3d(meshes.add(generate_pill_mesh(player_radius, player_height / 2.))),
         MeshMaterial3d(materials.add(blue_material())),
         Transform::from_xyz(start_pos.x, y_offset, start_pos.y),
-        StateScoped(Screen::Gameplay),
     ));
 }
