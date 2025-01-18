@@ -4,7 +4,7 @@ mod movement;
 pub mod respawn;
 mod sound_effect;
 pub mod spawn;
-mod toogle_pause;
+mod toggle_pause;
 mod vertical_transition;
 
 use crate::{screens::Screen, AppSet};
@@ -12,7 +12,7 @@ use bevy::prelude::*;
 use input::player_input;
 use movement::player_movement;
 use sound_effect::play_movement_sound;
-use toogle_pause::toggle_player;
+use toggle_pause::toggle_player;
 use vertical_transition::handle_floor_transition;
 
 use super::assets::PlayerAssets;
