@@ -4,6 +4,7 @@ mod movement;
 pub mod respawn;
 mod sound_effect;
 pub mod spawn;
+mod toogle_pause;
 mod vertical_transition;
 
 use crate::{screens::Screen, AppSet};
@@ -11,6 +12,7 @@ use bevy::prelude::*;
 use input::player_input;
 use movement::player_movement;
 use sound_effect::play_movement_sound;
+use toogle_pause::toggle_player;
 use vertical_transition::handle_floor_transition;
 
 use super::assets::PlayerAssets;
@@ -30,4 +32,5 @@ pub(super) fn plugin(app: &mut App) {
             .chain()
             .run_if(in_state(Screen::Gameplay)),
     );
+    app.add_systems(Update, toggle_player.run_if(state_changed::<Screen>));
 }
