@@ -2,10 +2,10 @@ pub mod common;
 pub mod despawn;
 pub mod respawn;
 pub mod spawn;
-mod toogle_pause;
+mod toggle_pause;
 
 use bevy::prelude::*;
-use toogle_pause::toggle_walls;
+use toggle_pause::toggle_walls;
 
 use crate::screens::Screen;
 
