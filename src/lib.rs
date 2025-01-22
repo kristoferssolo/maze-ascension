@@ -8,6 +8,7 @@ pub mod floor;
 pub mod hint;
 pub mod maze;
 pub mod player;
+pub mod powerups;
 pub mod screens;
 pub mod stats;
 pub mod theme;
@@ -79,6 +80,7 @@ impl Plugin for AppPlugin {
             hint::plugin,
             stats::plugin,
             camera::plugin,
+            powerups::plugin,
         ));
 
         // Enable dev tools for dev builds.

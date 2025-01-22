@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use hexx::Hex;
 
-#[derive(Debug, Reflect, Component)]
+#[derive(Debug, Reflect, Component, Default)]
 #[reflect(Component)]
 #[require(CurrentPosition, MovementSpeed, MovementTarget)]
 pub struct Player;
