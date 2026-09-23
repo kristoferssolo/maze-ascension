@@ -33,7 +33,7 @@ fn spawn_hud(mut commands: Commands, existing: Query<Entity, With<PowerupHud>>) 
                 position_type: PositionType::Absolute,
                 left: Val::Px(16.0),
                 bottom: Val::Px(16.0),
-                width: Val::Px(420.0),
+                width: Val::Px(400.0),
                 padding: UiRect::all(Val::Px(10.0)),
                 flex_direction: FlexDirection::Column,
                 row_gap: Val::Px(6.0),
@@ -42,13 +42,8 @@ fn spawn_hud(mut commands: Commands, existing: Query<Entity, With<PowerupHud>>) 
             BackgroundColor(RosePineDawn::Surface.to_color().with_alpha(0.9)),
         ))
         .with_children(|parent| {
-            spawn_row(
-                parent,
-                "Space + move",
-                "Cross wall · green",
-                AbilityStatus::WallJump,
-            );
-            spawn_row(parent, "F", "Show route · gold", AbilityStatus::Route);
+            spawn_row(parent, "Space + move", "Wall jump", AbilityStatus::WallJump);
+            spawn_row(parent, "F", "PathFinder", AbilityStatus::Route);
         });
 }
 
@@ -58,6 +53,10 @@ fn spawn_row(
     action: &'static str,
     status: AbilityStatus,
 ) {
+    let ability_color = match status {
+        AbilityStatus::WallJump => RosePineDawn::Pine.to_color(),
+        AbilityStatus::Route => RosePineDawn::Gold.to_color(),
+    };
     parent
         .spawn(Node {
             width: Val::Percent(100.0),
@@ -69,6 +68,7 @@ fn spawn_row(
         .with_children(|row| {
             row.spawn((
                 Text::new(key),
+                TextLayout::no_wrap(),
                 TextFont {
                     font_size: FontSize::Px(18.0),
                     ..default()
@@ -77,14 +77,16 @@ fn spawn_row(
             ));
             row.spawn((
                 Text::new(action),
+                TextLayout::no_wrap(),
                 TextFont {
                     font_size: FontSize::Px(18.0),
                     ..default()
                 },
-                TextColor(RosePineDawn::Text.to_color()),
+                TextColor(ability_color),
             ));
             row.spawn((
                 Text::new("0 charges"),
+                TextLayout::no_wrap(),
                 TextFont {
                     font_size: FontSize::Px(18.0),
                     ..default()
@@ -109,7 +111,7 @@ fn update_hud(
             ("0 charges".to_owned(), RosePineDawn::Muted.to_color())
         } else if let Some(seconds) = remaining {
             (
-                format!("{charges} · {}s", seconds.ceil() as u32),
+                format!("{charges} / {}s", seconds.ceil() as u32),
                 RosePineDawn::Muted.to_color(),
             )
         } else {
@@ -161,7 +163,7 @@ mod tests {
                 AbilityStatus::Route => ("route", text.0.as_str()),
             })
             .collect::<Vec<_>>();
-        assert!(labels.contains(&("wall", "1 · 10s")));
+        assert!(labels.contains(&("wall", "1 / 10s")));
         assert!(labels.contains(&("route", "1 ready")));
     }
 

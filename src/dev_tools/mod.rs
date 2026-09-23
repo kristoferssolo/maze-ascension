@@ -6,13 +6,13 @@ use bevy::{
 };
 use bevy_egui::EguiPlugin;
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
-use ui::maze_controls_ui;
+use ui::custom_debug_ui;
 
 pub(super) fn plugin(app: &mut App) {
     app.add_systems(Update, log_transitions::<Screen>)
         .add_plugins(EguiPlugin::default())
         .add_plugins(WorldInspectorPlugin::new())
-        .add_systems(Update, maze_controls_ui)
+        .add_systems(Update, custom_debug_ui)
         .add_systems(
             Update,
             toggle_debug_ui.run_if(input_just_pressed(TOGGLE_KEY)),

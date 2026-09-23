@@ -1,3 +1,3 @@
-mod maze_controls;
+mod custom_debug;
 
-pub use maze_controls::maze_controls_ui;
+pub use custom_debug::custom_debug_ui;
