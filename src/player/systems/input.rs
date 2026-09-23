@@ -41,7 +41,12 @@ pub fn player_input(
         let mut available_directions = possible_directions
             .into_iter()
             .map(EdgeDirection::from)
-            .filter(|dir| !tile.walls().contains(*dir))
+            .filter(|dir| {
+                !tile.walls().contains(*dir)
+                    && maze
+                        .get(&current_pos.0.neighbor(*dir))
+                        .is_some_and(|neighbor| !neighbor.walls().contains(-*dir))
+            })
             .collect::<Vec<_>>();
 
         if let Some(logical_dir) = key_direction.exact_direction(&maze_config.layout.orientation) {
@@ -202,30 +207,212 @@ enum LogicalDirection {
 
 impl From<LogicalDirection> for EdgeDirection {
     fn from(value: LogicalDirection) -> Self {
-        let direction = match value {
+        // The camera looks along -X, so screen right is -Z and screen up is -X.
+        match value {
             // Pointy orientation mappings
             LogicalDirection::PointyNorth => Self::POINTY_WEST,
             LogicalDirection::PointySouth => Self::POINTY_EAST,
-            LogicalDirection::PointyNorthEast => Self::POINTY_SOUTH_WEST,
-            LogicalDirection::PointySouthEast => Self::POINTY_SOUTH_EAST,
-            LogicalDirection::PointyNorthWest => Self::POINTY_NORTH_WEST,
-            LogicalDirection::PointySouthWest => Self::POINTY_NORTH_EAST,
+            LogicalDirection::PointyNorthEast => Self::POINTY_NORTH_WEST,
+            LogicalDirection::PointySouthEast => Self::POINTY_NORTH_EAST,
+            LogicalDirection::PointyNorthWest => Self::POINTY_SOUTH_WEST,
+            LogicalDirection::PointySouthWest => Self::POINTY_SOUTH_EAST,
 
             // Flat orientation mappings
-            LogicalDirection::FlatWest => Self::FLAT_NORTH,
-            LogicalDirection::FlatEast => Self::FLAT_SOUTH,
-            LogicalDirection::FlatNorthEast => Self::FLAT_SOUTH_WEST,
-            LogicalDirection::FlatSouthEast => Self::FLAT_SOUTH_EAST,
-            LogicalDirection::FlatNorthWest => Self::FLAT_NORTH_WEST,
-            LogicalDirection::FlatSouthWest => Self::FLAT_NORTH_EAST,
-        };
-        direction.rotate_cw(0)
+            LogicalDirection::FlatWest => Self::FLAT_SOUTH,
+            LogicalDirection::FlatEast => Self::FLAT_NORTH,
+            LogicalDirection::FlatNorthEast => Self::FLAT_NORTH_WEST,
+            LogicalDirection::FlatSouthEast => Self::FLAT_NORTH_EAST,
+            LogicalDirection::FlatNorthWest => Self::FLAT_SOUTH_WEST,
+            LogicalDirection::FlatSouthWest => Self::FLAT_SOUTH_EAST,
+        }
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    fn movement_target_for(
+        keys: &[KeyCode],
+        orientation: HexOrientation,
+        open_direction: EdgeDirection,
+        neighbor_direction: EdgeDirection,
+    ) -> Option<hexx::Hex> {
+        let mut app = App::new();
+        let mut input = ButtonInput::default();
+        for &key in keys {
+            input.press(key);
+        }
+        app.insert_resource(input);
+        app.add_systems(Update, player_input);
+
+        let mut maze = Maze::new();
+        maze.insert(hexx::Hex::ZERO);
+        let neighbor = hexx::Hex::ZERO.neighbor(neighbor_direction);
+        maze.insert(neighbor);
+        assert!(maze
+            .remove_tile_wall(&hexx::Hex::ZERO, open_direction)
+            .is_ok());
+        assert!(maze
+            .remove_tile_wall(&neighbor, open_direction.const_neg())
+            .is_ok());
+        let mut config = MazeConfig::default();
+        config.layout.orientation = orientation;
+        app.world_mut().spawn((CurrentFloor, config, maze));
+        let player = app
+            .world_mut()
+            .spawn((Player, CurrentPosition::default()))
+            .id();
+
+        app.update();
+        app.world()
+            .get::<MovementTarget>(player)
+            .and_then(|target| target.0)
+    }
+
+    #[test]
+    fn flat_up_right_uses_screen_north_east_edge() {
+        assert_eq!(
+            movement_target_for(
+                &[KeyCode::KeyW, KeyCode::KeyD],
+                HexOrientation::Flat,
+                EdgeDirection::FLAT_NORTH_WEST,
+                EdgeDirection::FLAT_NORTH_WEST,
+            ),
+            Some(hexx::Hex::ZERO.neighbor(EdgeDirection::FLAT_NORTH_WEST)),
+        );
+    }
+
+    #[test]
+    fn flat_up_right_does_not_take_open_south_west_edge() {
+        assert_eq!(
+            movement_target_for(
+                &[KeyCode::KeyW, KeyCode::KeyD],
+                HexOrientation::Flat,
+                EdgeDirection::FLAT_SOUTH_WEST,
+                EdgeDirection::FLAT_SOUTH_WEST,
+            ),
+            None,
+        );
+    }
+
+    #[test]
+    fn keys_follow_screen_directions_for_both_layouts() {
+        let cases: &[(HexOrientation, &[KeyCode], EdgeDirection)] = &[
+            (
+                HexOrientation::Flat,
+                &[KeyCode::KeyA],
+                EdgeDirection::FLAT_SOUTH,
+            ),
+            (
+                HexOrientation::Flat,
+                &[KeyCode::KeyD],
+                EdgeDirection::FLAT_NORTH,
+            ),
+            (
+                HexOrientation::Flat,
+                &[KeyCode::KeyW, KeyCode::KeyA],
+                EdgeDirection::FLAT_SOUTH_WEST,
+            ),
+            (
+                HexOrientation::Flat,
+                &[KeyCode::KeyW, KeyCode::KeyD],
+                EdgeDirection::FLAT_NORTH_WEST,
+            ),
+            (
+                HexOrientation::Flat,
+                &[KeyCode::KeyS, KeyCode::KeyA],
+                EdgeDirection::FLAT_SOUTH_EAST,
+            ),
+            (
+                HexOrientation::Flat,
+                &[KeyCode::KeyS, KeyCode::KeyD],
+                EdgeDirection::FLAT_NORTH_EAST,
+            ),
+            (
+                HexOrientation::Pointy,
+                &[KeyCode::KeyW],
+                EdgeDirection::POINTY_WEST,
+            ),
+            (
+                HexOrientation::Pointy,
+                &[KeyCode::KeyS],
+                EdgeDirection::POINTY_EAST,
+            ),
+            (
+                HexOrientation::Pointy,
+                &[KeyCode::KeyW, KeyCode::KeyA],
+                EdgeDirection::POINTY_SOUTH_WEST,
+            ),
+            (
+                HexOrientation::Pointy,
+                &[KeyCode::KeyW, KeyCode::KeyD],
+                EdgeDirection::POINTY_NORTH_WEST,
+            ),
+            (
+                HexOrientation::Pointy,
+                &[KeyCode::KeyS, KeyCode::KeyA],
+                EdgeDirection::POINTY_SOUTH_EAST,
+            ),
+            (
+                HexOrientation::Pointy,
+                &[KeyCode::KeyS, KeyCode::KeyD],
+                EdgeDirection::POINTY_NORTH_EAST,
+            ),
+        ];
+
+        for &(orientation, keys, direction) in cases {
+            assert_eq!(
+                movement_target_for(keys, orientation, direction, direction),
+                Some(hexx::Hex::ZERO.neighbor(direction)),
+                "{orientation:?} {keys:?}",
+            );
+        }
+    }
+
+    #[test]
+    fn open_edge_without_a_neighbor_does_not_move_player() {
+        assert_eq!(
+            movement_target_for(
+                &[KeyCode::KeyW, KeyCode::KeyD],
+                HexOrientation::Flat,
+                EdgeDirection::FLAT_NORTH_WEST,
+                EdgeDirection::FLAT_SOUTH,
+            ),
+            None,
+        );
+    }
+
+    #[test]
+    fn destination_wall_blocks_movement() {
+        let mut app = App::new();
+        let mut input = ButtonInput::default();
+        input.press(KeyCode::KeyW);
+        input.press(KeyCode::KeyD);
+        app.insert_resource(input);
+        app.add_systems(Update, player_input);
+
+        let direction = EdgeDirection::FLAT_NORTH_WEST;
+        let mut maze = Maze::new();
+        maze.insert(hexx::Hex::ZERO);
+        maze.insert(hexx::Hex::ZERO.neighbor(direction));
+        assert!(maze.remove_tile_wall(&hexx::Hex::ZERO, direction).is_ok());
+        app.world_mut()
+            .spawn((CurrentFloor, MazeConfig::default(), maze));
+        let player = app
+            .world_mut()
+            .spawn((Player, CurrentPosition::default()))
+            .id();
+
+        app.update();
+
+        assert_eq!(
+            app.world()
+                .get::<MovementTarget>(player)
+                .map(|target| target.0),
+            Some(None)
+        );
+    }
 
     /// Helper function to create a button input with specific key states
     fn create_input(w: bool, a: bool, s: bool, d: bool) -> ButtonInput<KeyCode> {

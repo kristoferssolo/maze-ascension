@@ -21,8 +21,8 @@ use crate::{
 
 use bevy::prelude::*;
 use hexlab::prelude::{Tile as HexTile, *};
-use hexx::HexOrientation;
-use std::f32::consts::{FRAC_PI_2, FRAC_PI_3, FRAC_PI_6};
+use hexx::{EdgeDirection, Hex, HexLayout, HexOrientation};
+use std::f32::consts::{FRAC_PI_2, FRAC_PI_6};
 
 /// Spawns a new maze for the specified floor on [`SpawnMaze`] event.
 pub fn spawn_maze(
@@ -132,7 +132,16 @@ pub(super) fn spawn_single_hex_tile(
             MeshMaterial3d(material),
             Transform::from_translation(world_pos).with_rotation(rotation),
         ))
-        .with_children(|parent| spawn_walls(parent, assets, tile.walls(), global_config));
+        .with_children(|parent| {
+            spawn_walls(
+                parent,
+                assets,
+                tile.walls(),
+                &maze_config.layout,
+                rotation,
+                global_config,
+            );
+        });
 }
 
 /// Spawns walls around a hexagonal tile based on the walls configuration
@@ -140,33 +149,26 @@ fn spawn_walls(
     parent: &mut ChildSpawnerCommands,
     assets: &MazeAssets,
     walls: &Walls,
+    layout: &HexLayout,
+    tile_rotation: Quat,
     global_config: &GlobalMazeConfig,
 ) {
     // Base rotation for wall alignment (90 degrees counter-clockwise)
     let z_rotation = Quat::from_rotation_z(-FRAC_PI_2);
     let y_offset = global_config.height / 2.;
 
-    for i in 0..6 {
-        if !walls.contains(i) {
+    let center = layout.hex_to_world_pos(Hex::ZERO);
+    for direction in EdgeDirection::ALL_DIRECTIONS {
+        if !walls.contains(direction) {
             continue;
         }
 
-        // Calculate the angle for this wall
-        // FRAC_PI_3 = 60 deg
-        // Negative because going clockwise
-        // i * 60 produces: 0, 60, 120, 180, 240, 300
-        let wall_angle = -FRAC_PI_3 * i as f32;
-
-        // cos(angle) gives x coordinate on unit circle
-        // sin(angle) gives z coordinate on unit circle
-        // Multiply by wall_offset to get actual distance from center
-        let x_offset = global_config.wall_offset() * f32::cos(wall_angle);
-        let z_offset = global_config.wall_offset() * f32::sin(wall_angle);
-
-        // x: distance along x-axis from center
-        // y: vertical offset from center
-        // z: distance along z-axis from center
-        let pos = Vec3::new(x_offset, y_offset, z_offset);
+        let neighbor = layout.hex_to_world_pos(Hex::ZERO.neighbor(direction));
+        let offset = (neighbor - center).normalize() * global_config.wall_offset();
+        // Walls are children of the rotated tile, so undo that rotation here.
+        let local_offset = tile_rotation.inverse() * Vec3::new(offset.x, 0.0, offset.y);
+        let wall_angle = local_offset.z.atan2(local_offset.x);
+        let pos = local_offset.with_y(y_offset);
 
         // 1. Rotate around x-axis to align wall with angle
         // 2. Add FRAC_PI_2 (90) to make wall perpendicular to angle
@@ -191,4 +193,63 @@ fn spawn_single_wall(
         MeshMaterial3d(assets.wall_material.clone()),
         Transform::from_translation(offset).with_rotation(rotation),
     ));
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use bevy::ecs::world::CommandQueue;
+    use claims::assert_ok;
+
+    #[test]
+    fn wall_position_faces_its_hex_neighbor() {
+        let assets = MazeAssets {
+            hex_mesh: Handle::default(),
+            wall_mesh: Handle::default(),
+            hex_material: Handle::default(),
+            wall_material: Handle::default(),
+            custom_materials: Default::default(),
+        };
+        for orientation in [HexOrientation::Flat, HexOrientation::Pointy] {
+            for direction in EdgeDirection::ALL_DIRECTIONS {
+                let mut world = World::new();
+                let mut queue = CommandQueue::default();
+                let mut walls = Walls::empty();
+                walls.insert(direction);
+                let mut config = MazeConfig::default();
+                config.layout.orientation = orientation;
+                let tile_rotation = match orientation {
+                    HexOrientation::Pointy => Quat::IDENTITY,
+                    HexOrientation::Flat => Quat::from_rotation_y(FRAC_PI_6),
+                };
+
+                Commands::new(&mut queue, &world)
+                    .spawn_empty()
+                    .with_children(|parent| {
+                        spawn_walls(
+                            parent,
+                            &assets,
+                            &walls,
+                            &config.layout,
+                            tile_rotation,
+                            &GlobalMazeConfig::default(),
+                        );
+                    });
+                queue.apply(&mut world);
+
+                let mut query = world.query_filtered::<&Transform, With<Wall>>();
+                let wall = assert_ok!(query.single(&world));
+                let world_offset = tile_rotation * wall.translation;
+                let center = config.layout.hex_to_world_pos(Hex::ZERO);
+                let neighbor = config
+                    .layout
+                    .hex_to_world_pos(Hex::ZERO.neighbor(direction));
+                let wall_direction = Vec2::new(world_offset.x, world_offset.z).normalize();
+                assert!(
+                    wall_direction.dot((neighbor - center).normalize()) > 0.99,
+                    "{orientation:?} {direction:?}",
+                );
+            }
+        }
+    }
 }
