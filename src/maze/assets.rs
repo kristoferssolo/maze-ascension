@@ -9,7 +9,8 @@ use crate::{
     theme::{palette::rose_pine::RosePineDawn, prelude::ColorScheme},
 };
 
-use bevy::{prelude::*, utils::HashMap};
+use bevy::prelude::*;
+use std::collections::HashMap;
 use std::f32::consts::FRAC_PI_2;
 use strum::IntoEnumIterator;
 

@@ -9,7 +9,7 @@ use crate::floor::components::Floor;
 use bevy::prelude::*;
 use hexlab::Maze;
 use hexx::{Hex, HexLayout, HexOrientation};
-use rand::{rngs::StdRng, thread_rng, Rng, SeedableRng};
+use rand::{rng, rngs::StdRng, Rng, RngExt, SeedableRng};
 
 #[derive(Debug, Reflect, Component)]
 #[reflect(Component)]
@@ -28,8 +28,7 @@ pub struct Wall;
 ///
 /// Contains all necessary parameters to generate and position a maze,
 /// including its size, start/end positions, random seed, and layout.
-#[derive(Debug, Reflect, Component, Clone)]
-#[reflect(Component)]
+#[derive(Debug, Component, Clone)]
 pub struct MazeConfig {
     /// Radius of the hexagonal maze
     pub radius: u16,
@@ -61,7 +60,7 @@ impl MazeConfig {
 
         let layout = HexLayout {
             orientation,
-            hex_size: Vec2::splat(global_config.hex_size),
+            scale: hexx::Vec2::splat(global_config.hex_size),
             ..default()
         };
 
@@ -90,8 +89,8 @@ impl MazeConfig {
     }
 
     /// Updates the maze configuration with new global settings.
-    pub fn update(&mut self, global_conig: &GlobalMazeConfig) {
-        self.layout.hex_size = Vec2::splat(global_conig.hex_size);
+    pub const fn update(&mut self, global_conig: &GlobalMazeConfig) {
+        self.layout.scale = hexx::Vec2::splat(global_conig.hex_size);
     }
 }
 
@@ -108,7 +107,7 @@ impl Default for MazeConfig {
 }
 
 fn setup_rng(seed: Option<u64>) -> (u64, StdRng) {
-    let seed = seed.unwrap_or_else(|| thread_rng().gen());
+    let seed = seed.unwrap_or_else(|| rng().random());
     let rng = StdRng::seed_from_u64(seed);
     (seed, rng)
 }
@@ -132,8 +131,8 @@ fn generate_pos<R: Rng>(radius: u16, rng: &mut R) -> Hex {
 
     loop {
         // Generate coordinates using cube coordinate bounds
-        let q = rng.gen_range(-radius..=radius);
-        let r = rng.gen_range((-radius).max(-q - radius)..=radius.min(-q + radius));
+        let q = rng.random_range(-radius..=radius);
+        let r = rng.random_range((-radius).max(-q - radius)..=radius.min(-q + radius));
 
         if let Ok(is_valid) = is_within_radius(radius, &(q, r)) {
             if is_valid {
@@ -191,7 +190,7 @@ mod tests {
             Some(1),
             Some(12345),
             Some(u64::MAX),
-            Some(thread_rng().gen()),
+            Some(rng().random()),
         ];
 
         for seed in test_seeds {
@@ -224,8 +223,8 @@ mod tests {
 
         config.update(&global_config);
 
-        assert_eq!(config.layout.hex_size.x, new_size);
-        assert_eq!(config.layout.hex_size.y, new_size);
+        assert_eq!(config.layout.scale.x, new_size);
+        assert_eq!(config.layout.scale.y, new_size);
     }
 
     #[rstest]
@@ -308,13 +307,13 @@ mod tests {
             },
             None,
         );
-        assert_eq!(config.layout.hex_size.x, 0.0);
-        assert_eq!(config.layout.hex_size.y, 0.0);
+        assert_eq!(config.layout.scale.x, 0.0);
+        assert_eq!(config.layout.scale.y, 0.0);
     }
 
     #[test]
     fn basic_generation() {
-        let mut rng = thread_rng();
+        let mut rng = rng();
         let radius = 2;
         let hex = generate_pos(radius, &mut rng);
 
@@ -328,7 +327,7 @@ mod tests {
     #[case(3)]
     #[case(6)]
     fn multiple_radii(#[case] radius: u16) {
-        let mut rng = thread_rng();
+        let mut rng = rng();
 
         // Generate multiple points for each radius
         for _ in 0..100 {
@@ -339,7 +338,7 @@ mod tests {
 
     #[test]
     fn zero_radius() {
-        let mut rng = thread_rng();
+        let mut rng = rng();
         let hex = generate_pos(0, &mut rng);
 
         // With radius 0, only (0,0) should be possible
@@ -349,7 +348,7 @@ mod tests {
 
     #[test]
     fn large_radius() {
-        let mut rng = thread_rng();
+        let mut rng = rng();
         let radius = 100;
         let iterations = 100;
 

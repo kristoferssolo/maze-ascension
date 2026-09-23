@@ -35,7 +35,9 @@ impl PlayerAssets {
 
 impl FromWorld for PlayerAssets {
     fn from_world(world: &mut World) -> Self {
-        let assets = world.resource::<AssetServer>();
+        let Some(assets) = world.get_resource::<AssetServer>() else {
+            return Self { steps: default() };
+        };
         Self {
             steps: vec![
                 assets.load(Self::PATH_STEP_1),

@@ -7,7 +7,7 @@ use crate::{
 };
 
 use bevy::prelude::*;
-use rand::seq::SliceRandom;
+use rand::seq::IndexedRandom;
 
 pub fn play_movement_sound(
     mut commands: Commands,
@@ -19,7 +19,7 @@ pub fn play_movement_sound(
             continue;
         }
 
-        let rng = &mut rand::thread_rng();
+        let rng = &mut rand::rng();
         if let Some(random_step) = player_assets.steps.choose(rng) {
             commands.spawn((
                 AudioPlayer(random_step.clone()),

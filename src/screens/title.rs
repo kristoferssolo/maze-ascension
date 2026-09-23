@@ -11,7 +11,7 @@ pub(super) fn plugin(app: &mut App) {
 fn spawn_title_screen(mut commands: Commands) {
     commands
         .ui_root()
-        .insert(StateScoped(Screen::Title))
+        .insert(DespawnOnExit(Screen::Title))
         .with_children(|parent| {
             parent
                 .spawn(Node {
@@ -28,11 +28,11 @@ fn spawn_title_screen(mut commands: Commands) {
         });
 }
 
-fn enter_gameplay_screen(_trigger: Trigger<OnPress>, mut next_screen: ResMut<NextState<Screen>>) {
+fn enter_gameplay_screen(_trigger: On<OnPress>, mut next_screen: ResMut<NextState<Screen>>) {
     next_screen.set(Screen::Gameplay);
 }
 
 #[cfg(not(target_family = "wasm"))]
-fn exit_app(_trigger: Trigger<OnPress>, mut app_exit: EventWriter<AppExit>) {
-    app_exit.send(AppExit::Success);
+fn exit_app(_trigger: On<OnPress>, mut app_exit: MessageWriter<AppExit>) {
+    app_exit.write(AppExit::Success);
 }

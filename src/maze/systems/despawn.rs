@@ -13,7 +13,7 @@ pub fn despawn_maze(
     query: Query<(Entity, &Floor)>,
 ) {
     match query.iter().find(|(_, f)| f.0 == floor) {
-        Some((entity, _)) => commands.entity(entity).despawn_recursive(),
+        Some((entity, _)) => commands.entity(entity).despawn(),
         _ => warn!("Floor {} not found for removal", floor),
     }
 }

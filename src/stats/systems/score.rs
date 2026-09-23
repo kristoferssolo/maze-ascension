@@ -31,7 +31,7 @@ pub fn update_score_display(
     mut text_query: Query<&mut Text, With<ScoreDisplay>>,
     score: Res<Score>,
 ) {
-    let Ok(mut text) = text_query.get_single_mut() else {
+    let Ok(mut text) = text_query.single_mut() else {
         return;
     };
 

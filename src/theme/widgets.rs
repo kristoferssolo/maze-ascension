@@ -1,8 +1,10 @@
 //! Helper traits for creating common widgets.
 
 use bevy::{
-    ecs::system::EntityCommands, prelude::*, ui::Val::*, window::SystemCursorIcon,
-    winit::cursor::CursorIcon,
+    ecs::system::EntityCommands,
+    prelude::*,
+    ui::Val::*,
+    window::{CursorIcon, SystemCursorIcon},
 };
 use rose_pine::RosePineDawn;
 
@@ -12,19 +14,19 @@ use crate::theme::palette::*;
 /// An extension trait for spawning UI widgets.
 pub trait Widgets {
     /// Spawn a simple button with text.
-    fn button(&mut self, text: impl Into<String>) -> EntityCommands;
+    fn button(&mut self, text: impl Into<String>) -> EntityCommands<'_>;
 
     /// Spawn a simple header label. Bigger than [`Widgets::label`].
-    fn header(&mut self, text: impl Into<String>) -> EntityCommands;
+    fn header(&mut self, text: impl Into<String>) -> EntityCommands<'_>;
 
     /// Spawn a simple text label.
-    fn label(&mut self, text: impl Into<String>) -> EntityCommands;
+    fn label(&mut self, text: impl Into<String>) -> EntityCommands<'_>;
 
-    fn stats(&mut self, text: impl Into<String>, bundle: impl Bundle) -> EntityCommands;
+    fn stats(&mut self, text: impl Into<String>, bundle: impl Bundle) -> EntityCommands<'_>;
 }
 
 impl<T: SpawnUi> Widgets for T {
-    fn button(&mut self, text: impl Into<String>) -> EntityCommands {
+    fn button(&mut self, text: impl Into<String>) -> EntityCommands<'_> {
         let mut entity = self.spawn_ui((
             Name::new("Button"),
             Button,
@@ -38,11 +40,11 @@ impl<T: SpawnUi> Widgets for T {
                 justify_content: JustifyContent::Center,
                 align_items: AlignItems::Center,
                 border: UiRect::all(Px(4.)),
+                border_radius: BorderRadius::all(Px(8.)),
                 ..default()
             },
             CursorIcon::System(SystemCursorIcon::Pointer),
-            BorderRadius::all(Px(8.)),
-            BorderColor(RosePineDawn::Text.to_color()),
+            BorderColor::all(RosePineDawn::Text.to_color()),
             InteractionPalette {
                 none: RosePineDawn::HighlightLow.to_color(),
                 hovered: RosePineDawn::HighlightMed.to_color(),
@@ -54,7 +56,7 @@ impl<T: SpawnUi> Widgets for T {
                 Name::new("Button Text"),
                 Text(text.into()),
                 TextFont {
-                    font_size: 40.0,
+                    font_size: FontSize::Px(40.0),
                     ..default()
                 },
                 TextColor(RosePineDawn::Text.to_color()),
@@ -64,7 +66,7 @@ impl<T: SpawnUi> Widgets for T {
         entity
     }
 
-    fn header(&mut self, text: impl Into<String>) -> EntityCommands {
+    fn header(&mut self, text: impl Into<String>) -> EntityCommands<'_> {
         let mut entity = self.spawn_ui((
             Name::new("Header"),
             Node {
@@ -80,11 +82,11 @@ impl<T: SpawnUi> Widgets for T {
                 Name::new("Header Text"),
                 Text(text.into()),
                 TextFont {
-                    font_size: 60.0,
+                    font_size: FontSize::Px(60.0),
                     ..default()
                 },
                 TextLayout {
-                    justify: JustifyText::Center,
+                    justify: Justify::Center,
                     ..default()
                 },
                 TextColor(RosePineDawn::Text.to_color()),
@@ -93,12 +95,12 @@ impl<T: SpawnUi> Widgets for T {
         entity
     }
 
-    fn label(&mut self, text: impl Into<String>) -> EntityCommands {
+    fn label(&mut self, text: impl Into<String>) -> EntityCommands<'_> {
         let entity = self.spawn_ui((
             Name::new("Label"),
             Text(text.into()),
             TextFont {
-                font_size: 24.0,
+                font_size: FontSize::Px(24.0),
                 ..default()
             },
             TextColor(RosePineDawn::Text.to_color()),
@@ -110,13 +112,13 @@ impl<T: SpawnUi> Widgets for T {
         entity
     }
 
-    fn stats(&mut self, text: impl Into<String>, bundle: impl Bundle) -> EntityCommands {
+    fn stats(&mut self, text: impl Into<String>, bundle: impl Bundle) -> EntityCommands<'_> {
         let text = text.into();
         let entity = self.spawn_ui((
             Name::new(text.clone()),
             Text(text),
             TextFont {
-                font_size: 24.0,
+                font_size: FontSize::Px(24.0),
                 ..default()
             },
             bundle,
@@ -130,11 +132,11 @@ impl<T: SpawnUi> Widgets for T {
 pub trait Containers {
     /// Spawns a root node that covers the full screen
     /// and centers its content horizontally and vertically.
-    fn ui_root(&mut self) -> EntityCommands;
+    fn ui_root(&mut self) -> EntityCommands<'_>;
 }
 
 impl Containers for Commands<'_, '_> {
-    fn ui_root(&mut self) -> EntityCommands {
+    fn ui_root(&mut self) -> EntityCommands<'_> {
         self.spawn((
             Name::new("UI Root"),
             Node {
@@ -156,17 +158,17 @@ impl Containers for Commands<'_, '_> {
 /// are able to spawn entities.
 /// Ideally, this trait should be [part of Bevy itself](https://github.com/bevyengine/bevy/issues/14231).
 trait SpawnUi {
-    fn spawn_ui<B: Bundle>(&mut self, bundle: B) -> EntityCommands;
+    fn spawn_ui<B: Bundle>(&mut self, bundle: B) -> EntityCommands<'_>;
 }
 
 impl SpawnUi for Commands<'_, '_> {
-    fn spawn_ui<B: Bundle>(&mut self, bundle: B) -> EntityCommands {
+    fn spawn_ui<B: Bundle>(&mut self, bundle: B) -> EntityCommands<'_> {
         self.spawn(bundle)
     }
 }
 
-impl SpawnUi for ChildBuilder<'_> {
-    fn spawn_ui<B: Bundle>(&mut self, bundle: B) -> EntityCommands {
+impl SpawnUi for ChildSpawnerCommands<'_> {
+    fn spawn_ui<B: Bundle>(&mut self, bundle: B) -> EntityCommands<'_> {
         self.spawn(bundle)
     }
 }

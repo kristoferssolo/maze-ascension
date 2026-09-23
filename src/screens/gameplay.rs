@@ -29,7 +29,7 @@ pub(super) fn plugin(app: &mut App) {
 
     app.add_systems(
         Update,
-        pause_game.run_if(in_state(Screen::Gameplay).and(input_just_pressed(KeyCode::Escape))),
+        pause_game.run_if(in_state(Screen::Gameplay).and_then(input_just_pressed(KeyCode::Escape))),
     );
 }
 
@@ -56,7 +56,7 @@ fn cleanup_game(
 ) {
     if !matches!(*state.get(), Screen::Gameplay | Screen::Pause) {
         for entity in query.iter() {
-            commands.entity(entity).despawn_recursive();
+            commands.entity(entity).despawn();
         }
     }
 }

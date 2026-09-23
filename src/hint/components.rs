@@ -18,7 +18,7 @@ pub struct IdleTimer {
 }
 
 impl IdleTimer {
-    pub fn hide_all(&mut self) {
+    pub const fn hide_all(&mut self) {
         self.movement_hint_visible = false;
         self.interaction_hint_visible = false;
     }

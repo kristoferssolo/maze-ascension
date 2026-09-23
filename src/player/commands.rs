@@ -12,18 +12,24 @@ pub struct RespawnPlayer;
 pub struct DespawnPlayer;
 
 impl Command for SpawnPlayer {
+    type Out = ();
+
     fn apply(self, world: &mut World) {
         let _ = world.run_system_once(spawn_player);
     }
 }
 
 impl Command for RespawnPlayer {
+    type Out = ();
+
     fn apply(self, world: &mut World) {
         let _ = world.run_system_once(respawn_player);
     }
 }
 
 impl Command for DespawnPlayer {
+    type Out = ();
+
     fn apply(self, world: &mut World) {
         let _ = world.run_system_once(despawn_players);
     }

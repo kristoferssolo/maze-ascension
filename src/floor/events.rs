@@ -2,7 +2,7 @@ use bevy::prelude::*;
 
 use super::components::Floor;
 
-#[derive(Debug, Clone, Copy, Reflect, Event, Default, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, Reflect, Message, Default, PartialEq, Eq)]
 pub enum TransitionFloor {
     #[default]
     Ascend,

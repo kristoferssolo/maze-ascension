@@ -32,7 +32,7 @@ pub fn spawn_maze(
     mut materials: ResMut<Assets<StandardMaterial>>,
     maze_query: Query<(Entity, &Floor, &Maze)>,
     global_config: Res<GlobalMazeConfig>,
-    mut event_writer: EventWriter<TransitionFloor>,
+    mut event_writer: MessageWriter<TransitionFloor>,
 ) {
     if maze_query.iter().any(|(_, f, _)| f.0 == floor) {
         info!("Floor {} already exists, skipping creation", floor);
@@ -69,46 +69,41 @@ pub fn spawn_maze(
 
     let assets = MazeAssets::new(&mut meshes, &mut materials, &global_config);
 
-    spawn_maze_tiles(
-        &mut commands,
-        entity,
-        &maze,
-        &assets,
-        &config,
-        &global_config,
-    );
+    spawn_maze_tiles(commands, entity, &maze, &assets, &config, &global_config);
 
     // TODO: find a better way to handle double event indirection
     if floor != 1 {
-        event_writer.send(TransitionFloor::Ascend);
+        event_writer.write(TransitionFloor::Ascend);
     }
 }
 
 /// Spawns all tiles for a maze as children of the parent maze entity
-pub fn spawn_maze_tiles(
-    commands: &mut Commands,
+pub fn spawn_maze_tiles<'world, 'state>(
+    mut commands: Commands<'world, 'state>,
     parent_entity: Entity,
     maze: &Maze,
     assets: &MazeAssets,
     maze_config: &MazeConfig,
     global_config: &GlobalMazeConfig,
-) {
+) -> Commands<'world, 'state> {
     commands.entity(parent_entity).with_children(|parent| {
         for tile in maze.values() {
             spawn_single_hex_tile(parent, assets, tile, maze_config, global_config);
         }
     });
+    commands
 }
 
 /// Spawns a single hexagonal tile with appropriate transforms and materials
 pub(super) fn spawn_single_hex_tile(
-    parent: &mut ChildBuilder,
+    parent: &mut ChildSpawnerCommands,
     assets: &MazeAssets,
     tile: &HexTile,
     maze_config: &MazeConfig,
     global_config: &GlobalMazeConfig,
 ) {
-    let world_pos = tile.to_vec3(&maze_config.layout);
+    let world_pos = maze_config.layout.hex_to_world_pos(tile.pos());
+    let world_pos = Vec3::new(world_pos.x, 0., world_pos.y);
     let rotation = match maze_config.layout.orientation {
         HexOrientation::Pointy => Quat::from_rotation_y(0.0),
         HexOrientation::Flat => Quat::from_rotation_y(FRAC_PI_6), // 30 degrees rotation
@@ -142,7 +137,7 @@ pub(super) fn spawn_single_hex_tile(
 
 /// Spawns walls around a hexagonal tile based on the walls configuration
 fn spawn_walls(
-    parent: &mut ChildBuilder,
+    parent: &mut ChildSpawnerCommands,
     assets: &MazeAssets,
     walls: &Walls,
     global_config: &GlobalMazeConfig,
@@ -183,7 +178,12 @@ fn spawn_walls(
 }
 
 /// Spawns a single wall segment with the specified rotation and position
-fn spawn_single_wall(parent: &mut ChildBuilder, assets: &MazeAssets, rotation: Quat, offset: Vec3) {
+fn spawn_single_wall(
+    parent: &mut ChildSpawnerCommands,
+    assets: &MazeAssets,
+    rotation: Quat,
+    offset: Vec3,
+) {
     parent.spawn((
         Name::new("Wall"),
         Wall,

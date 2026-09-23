@@ -1,0 +1,32 @@
+#:schema https://dystroy.org/bacon/.bacon.schema.json
+
+default_job = "check"
+env.CARGO_TERM_COLOR = "always"
+
+# Fast type-checking with dynamic linking — the job you want running
+# constantly while writing Bevy code
+[jobs.check]
+command = ["cargo", "check", "--all-targets"]
+need_stdout = false
+
+# Bevy-specific lints (bevy_lint)
+[jobs.lint]
+command = ["bevy", "lint", "--all-targets"]
+need_stdout = false
+
+# Run the game. A Bevy app never exits on its own, so treat it like a
+# long-running job: show output immediately and restart on change.
+[jobs.run]
+command = ["cargo", "run", "--features", "bevy/dynamic_linking"]
+need_stdout = true
+allow_warnings = true
+background = false
+on_change_strategy = "kill_then_restart"
+kill = ["pkill", "-TERM", "-P"]
+show_command_error_code = true
+scroll_anchor = "auto"
+
+[keybindings]
+c = "job:clippy"
+l = "job:lint"
+r = "job:run"

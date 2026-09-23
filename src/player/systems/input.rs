@@ -11,14 +11,14 @@ use hexx::{EdgeDirection, HexOrientation};
 pub fn player_input(
     input: Res<ButtonInput<KeyCode>>,
     mut player_query: Query<(&mut MovementTarget, &CurrentPosition), With<Player>>,
-    maze_query: Query<(&Maze, &MazeConfig, Has<FloorYTarget>), With<CurrentFloor>>,
+    maze_query: Query<(&Maze, &MazeConfig, Option<&FloorYTarget>), With<CurrentFloor>>,
 ) {
-    let Ok((maze, maze_config, has_y_target)) = maze_query.get_single() else {
+    let Ok((maze, maze_config, y_target)) = maze_query.single() else {
         return;
     };
 
     // Disable movement while transitioning floors
-    if has_y_target {
+    if y_target.is_some() {
         return;
     }
 

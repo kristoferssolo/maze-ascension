@@ -22,14 +22,14 @@ use bevy::prelude::*;
 pub fn handle_floor_transition(
     mut player_query: Query<&CurrentPosition, With<Player>>,
     maze_query: Query<(&MazeConfig, &Floor), With<CurrentFloor>>,
-    mut event_writer: EventWriter<TransitionFloor>,
+    mut event_writer: MessageWriter<TransitionFloor>,
     input: Res<ButtonInput<KeyCode>>,
 ) {
     if !input.just_pressed(KeyCode::KeyE) {
         return;
     }
 
-    let Ok((config, floor)) = maze_query.get_single() else {
+    let Ok((config, floor)) = maze_query.single() else {
         warn!("Failed to get maze configuration for current floor - cannot ascend/descend player.");
         return;
     };
@@ -38,13 +38,13 @@ pub fn handle_floor_transition(
         // Check for ascending (at end position)
         if current_hex.0 == config.end_pos {
             info!("Ascending");
-            event_writer.send(TransitionFloor::Ascend);
+            event_writer.write(TransitionFloor::Ascend);
         }
 
         // Check for descending (at start position, not on first floor)
         if current_hex.0 == config.start_pos && floor.0 != 1 {
             info!("Descending");
-            event_writer.send(TransitionFloor::Descend);
+            event_writer.write(TransitionFloor::Descend);
         }
     }
 }

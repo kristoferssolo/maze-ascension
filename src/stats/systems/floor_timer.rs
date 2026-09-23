@@ -22,7 +22,7 @@ pub fn update_floor_timer_display(
     mut text_query: Query<&mut Text, With<FloorTimerDisplay>>,
     floor_timer: Res<FloorTimer>,
 ) {
-    let Ok(mut text) = text_query.get_single_mut() else {
+    let Ok(mut text) = text_query.single_mut() else {
         return;
     };
 

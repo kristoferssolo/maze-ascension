@@ -12,7 +12,7 @@ pub fn update_total_timer_display(
     mut text_query: Query<&mut Text, With<TotalTimerDisplay>>,
     total_timer: Res<TotalTimer>,
 ) {
-    let Ok(mut text) = text_query.get_single_mut() else {
+    let Ok(mut text) = text_query.single_mut() else {
         return;
     };
 

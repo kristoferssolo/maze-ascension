@@ -24,14 +24,14 @@ pub fn move_floors(
             &mut Transform,
             &FloorYTarget,
             &MazeConfig,
-            Has<CurrentFloor>,
+            Option<&CurrentFloor>,
         ),
         With<FloorYTarget>,
     >,
     player_query: Query<&MovementSpeed, With<Player>>,
     time: Res<Time>,
 ) {
-    let speed = player_query.get_single().map_or(100., |s| s.0);
+    let speed = player_query.single().map_or(100., |s| s.0);
     let movement_distance = speed * time.delta_secs();
     for (entity, mut transform, movement_state, config, is_current_floor) in maze_query.iter_mut() {
         let delta = movement_state.0 - transform.translation.y;
@@ -41,7 +41,7 @@ pub fn move_floors(
         } else {
             transform.translation.y = movement_state.0;
             commands.entity(entity).remove::<FloorYTarget>();
-            if is_current_floor {
+            if is_current_floor.is_some() {
                 info!("Current floor seed: {}", config.seed);
                 info!(
                     "Start pos: (q={}, r={}). End pos: (q={}, r={})",
@@ -63,7 +63,7 @@ pub fn handle_floor_transition_events(
     mut commands: Commands,
     mut maze_query: Query<(Entity, &Transform, &Floor, Option<&FloorYTarget>), With<HexMaze>>,
     current_query: Query<(Entity, &Floor), With<CurrentFloor>>,
-    mut event_reader: EventReader<TransitionFloor>,
+    mut event_reader: MessageReader<TransitionFloor>,
 ) {
     let is_moving = maze_query
         .iter()
@@ -74,7 +74,7 @@ pub fn handle_floor_transition_events(
     }
 
     for event in event_reader.read() {
-        let Ok((current_entity, current_floor)) = current_query.get_single() else {
+        let Ok((current_entity, current_floor)) = current_query.single() else {
             continue;
         };
 
@@ -98,12 +98,12 @@ pub fn handle_floor_transition_events(
             }
         }
 
-        update_current_next_floor(&mut commands, current_entity, target_entity);
+        update_current_next_floor(commands, current_entity, target_entity);
         break;
     }
 }
 
-fn update_current_next_floor(commands: &mut Commands, current: Entity, target: Entity) {
+fn update_current_next_floor(mut commands: Commands, current: Entity, target: Entity) {
     commands.entity(current).remove::<CurrentFloor>();
     commands.entity(target).insert(CurrentFloor);
 }

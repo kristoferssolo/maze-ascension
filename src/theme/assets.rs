@@ -15,7 +15,12 @@ impl InteractionAssets {
 
 impl FromWorld for InteractionAssets {
     fn from_world(world: &mut World) -> Self {
-        let assets = world.resource::<AssetServer>();
+        let Some(assets) = world.get_resource::<AssetServer>() else {
+            return Self {
+                hover: default(),
+                press: default(),
+            };
+        };
         Self {
             hover: assets.load(Self::PATH_BUTTON_HOVER),
             press: assets.load(Self::PATH_BUTTON_PRESS),

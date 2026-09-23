@@ -10,7 +10,7 @@ use bevy_egui::{
     EguiContext,
 };
 use hexx::{Hex, HexOrientation};
-use rand::{thread_rng, Rng};
+use rand::{rng, RngExt};
 use std::ops::RangeInclusive;
 
 pub fn maze_controls_ui(world: &mut World) {
@@ -23,7 +23,7 @@ pub fn maze_controls_ui(world: &mut World) {
 
     let Ok(egui_context) = world
         .query_filtered::<&mut EguiContext, With<PrimaryWindow>>()
-        .get_single(world)
+        .single(world)
     else {
         return;
     };
@@ -31,7 +31,7 @@ pub fn maze_controls_ui(world: &mut World) {
 
     let Ok((maze_config, floor)) = world
         .query_filtered::<(&MazeConfig, &Floor), With<CurrentFloor>>()
-        .get_single(world)
+        .single(world)
     else {
         return;
     };
@@ -136,13 +136,13 @@ fn add_seed_control(ui: &mut Ui, seed: &mut u64) -> bool {
 
         // New random seed button
         if ui.button("🎲").clicked() {
-            *seed = thread_rng().gen();
+            *seed = rng().random();
             changed = true;
         }
 
         // Copy button
         if ui.button("📋").clicked() {
-            ui.output_mut(|o| o.copied_text = seed.to_string());
+            ui.ctx().copy_text(seed.to_string());
         }
     });
 

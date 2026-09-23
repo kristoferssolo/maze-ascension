@@ -12,10 +12,10 @@ use crate::{
 pub fn spawn_floor(
     mut commands: Commands,
     query: Query<(&mut Floor, &MazeConfig), (With<CurrentFloor>, Without<FloorYTarget>)>,
-    mut event_reader: EventReader<TransitionFloor>,
+    mut event_reader: MessageReader<TransitionFloor>,
     mut highest_floor: ResMut<HighestFloor>,
 ) {
-    let Ok((current_floor, config)) = query.get_single() else {
+    let Ok((current_floor, config)) = query.single() else {
         return;
     };
 

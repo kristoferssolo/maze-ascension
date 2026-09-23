@@ -28,7 +28,12 @@ impl Plugin for AppPlugin {
         // Order new `AppStep` variants by adding them here:
         app.configure_sets(
             Update,
-            (AppSet::TickTimers, AppSet::RecordInput, AppSet::Update).chain(),
+            (
+                AppSystems::TickTimers,
+                AppSystems::RecordInput,
+                AppSystems::Update,
+            )
+                .chain(),
         );
 
         // Spawn the main camera.
@@ -57,7 +62,7 @@ impl Plugin for AppPlugin {
                 })
                 .set(AudioPlugin {
                     global_volume: GlobalVolume {
-                        volume: Volume::new(0.2),
+                        volume: Volume::Linear(0.2),
                     },
                     ..default()
                 }),
@@ -86,7 +91,7 @@ impl Plugin for AppPlugin {
 /// When adding a new variant, make sure to order it in the `configure_sets`
 /// call above.
 #[derive(SystemSet, Debug, Clone, Copy, Eq, PartialEq, Hash, PartialOrd, Ord)]
-enum AppSet {
+enum AppSystems {
     /// Tick timers.
     TickTimers,
     /// Record player input.

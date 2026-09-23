@@ -1,11 +1,11 @@
 use bevy::prelude::*;
 
 pub trait StatsContainer {
-    fn ui_stats(&mut self) -> EntityCommands;
+    fn ui_stats(&mut self) -> EntityCommands<'_>;
 }
 
 impl StatsContainer for Commands<'_, '_> {
-    fn ui_stats(&mut self) -> EntityCommands {
+    fn ui_stats(&mut self) -> EntityCommands<'_> {
         self.spawn((
             Name::new("Stats Root"),
             Node {
