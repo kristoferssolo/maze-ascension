@@ -34,12 +34,10 @@ fn spawn_hud(mut commands: Commands, existing: Query<Entity, With<PowerupHud>>) 
                 left: Val::Px(16.0),
                 bottom: Val::Px(16.0),
                 width: Val::Px(400.0),
-                padding: UiRect::all(Val::Px(10.0)),
                 flex_direction: FlexDirection::Column,
                 row_gap: Val::Px(6.0),
                 ..default()
             },
-            BackgroundColor(RosePineDawn::Surface.to_color().with_alpha(0.9)),
         ))
         .with_children(|parent| {
             spawn_row(parent, "Space + move", "Wall jump", AbilityStatus::WallJump);
@@ -177,6 +175,11 @@ mod tests {
 
         let world = app.world_mut();
         let mut roots = world.query_filtered::<Entity, With<PowerupHud>>();
-        assert_eq!(roots.iter(world).count(), 1);
+        let roots = roots.iter(world).collect::<Vec<_>>();
+        assert_eq!(roots.len(), 1);
+        assert_eq!(
+            world.get::<BackgroundColor>(roots[0]),
+            Some(&BackgroundColor::DEFAULT)
+        );
     }
 }
