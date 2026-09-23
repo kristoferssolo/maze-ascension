@@ -2,6 +2,7 @@ use crate::{
     floor::components::{CurrentFloor, FloorYTarget},
     maze::components::MazeConfig,
     player::components::{CurrentPosition, MovementTarget, Player},
+    powerups::wall_jump::WallJump,
 };
 use bevy::prelude::*;
 use hexlab::prelude::*;
@@ -12,6 +13,7 @@ pub fn player_input(
     input: Res<ButtonInput<KeyCode>>,
     mut player_query: Query<(&mut MovementTarget, &CurrentPosition), With<Player>>,
     maze_query: Query<(&Maze, &MazeConfig, Option<&FloorYTarget>), With<CurrentFloor>>,
+    mut wall_jump: Option<ResMut<WallJump>>,
 ) {
     let Ok((maze, maze_config, y_target)) = maze_query.single() else {
         return;
@@ -35,12 +37,44 @@ pub fn player_input(
             continue;
         };
 
-        let possible_directions = key_direction.related_directions(&maze_config.layout.orientation);
-
-        // Convert to edge directions and filter out walls
-        let mut available_directions = possible_directions
+        let possible_directions = key_direction
+            .related_directions(&maze_config.layout.orientation)
             .into_iter()
             .map(EdgeDirection::from)
+            .collect::<Vec<_>>();
+
+        if input.just_pressed(KeyCode::Space)
+            && wall_jump.as_ref().is_some_and(|powerup| powerup.is_ready())
+        {
+            let jump_directions = possible_directions
+                .iter()
+                .copied()
+                .filter(|direction| {
+                    maze.get(&current_pos.0.neighbor(*direction))
+                        .is_some_and(|neighbor| {
+                            tile.walls().contains(*direction)
+                                || neighbor.walls().contains(-*direction)
+                        })
+                })
+                .collect::<Vec<_>>();
+
+            if let Some(direction) = selected_direction(
+                key_direction,
+                &maze_config.layout.orientation,
+                &jump_directions,
+            ) {
+                target_pos.0 = Some(current_pos.0.neighbor(direction));
+                if let Some(powerup) = &mut wall_jump {
+                    powerup.consume();
+                }
+                continue;
+            }
+        }
+
+        // Convert to edge directions and filter out walls
+        let available_directions = possible_directions
+            .iter()
+            .copied()
             .filter(|dir| {
                 !tile.walls().contains(*dir)
                     && maze
@@ -49,19 +83,32 @@ pub fn player_input(
             })
             .collect::<Vec<_>>();
 
-        if let Some(logical_dir) = key_direction.exact_direction(&maze_config.layout.orientation) {
-            let edge_dir = EdgeDirection::from(logical_dir);
-            if available_directions.contains(&edge_dir) {
-                available_directions = vec![edge_dir];
-            }
+        if let Some(direction) = selected_direction(
+            key_direction,
+            &maze_config.layout.orientation,
+            &available_directions,
+        ) {
+            target_pos.0 = Some(current_pos.0.neighbor(direction));
         }
+    }
+}
 
-        if available_directions.len() == 1 {
-            if let Some(&next_tile) = available_directions.first() {
-                let next_hex = current_pos.0.neighbor(next_tile);
-                target_pos.0 = Some(next_hex);
-            }
+fn selected_direction(
+    key_direction: KeyDirection,
+    orientation: &HexOrientation,
+    candidates: &[EdgeDirection],
+) -> Option<EdgeDirection> {
+    if let Some(exact) = key_direction
+        .exact_direction(orientation)
+        .map(EdgeDirection::from)
+    {
+        if candidates.contains(&exact) {
+            return Some(exact);
         }
+    }
+    match candidates {
+        [direction] => Some(*direction),
+        _ => None,
     }
 }
 
@@ -231,6 +278,83 @@ impl From<LogicalDirection> for EdgeDirection {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use claims::assert_some;
+
+    fn wall_jump_app(maze: Maze, keys: &[KeyCode]) -> (App, Entity) {
+        let mut app = App::new();
+        let mut input = ButtonInput::default();
+        for &key in keys {
+            input.press(key);
+        }
+        app.insert_resource(input);
+        app.insert_resource(WallJump::default());
+        app.add_systems(Update, player_input);
+        app.world_mut()
+            .spawn((CurrentFloor, MazeConfig::default(), maze));
+        let player = app
+            .world_mut()
+            .spawn((Player, CurrentPosition::default()))
+            .id();
+        (app, player)
+    }
+
+    #[test]
+    fn wall_jump_crosses_one_wall_and_starts_cooldown() {
+        let direction = EdgeDirection::FLAT_NORTH_WEST;
+        let mut maze = Maze::new();
+        maze.insert(hexx::Hex::ZERO);
+        maze.insert(hexx::Hex::ZERO.neighbor(direction));
+        let (mut app, player) =
+            wall_jump_app(maze, &[KeyCode::KeyW, KeyCode::KeyD, KeyCode::Space]);
+
+        app.update();
+
+        assert_eq!(
+            app.world()
+                .get::<MovementTarget>(player)
+                .map(|target| target.0),
+            Some(Some(hexx::Hex::ZERO.neighbor(direction)))
+        );
+        assert!(!assert_some!(app.world().get_resource::<WallJump>()).is_ready());
+    }
+
+    #[test]
+    fn wall_jump_does_not_cross_maze_boundary_or_spend_cooldown() {
+        let mut maze = Maze::new();
+        maze.insert(hexx::Hex::ZERO);
+        let (mut app, player) =
+            wall_jump_app(maze, &[KeyCode::KeyW, KeyCode::KeyD, KeyCode::Space]);
+
+        app.update();
+
+        assert_eq!(
+            app.world()
+                .get::<MovementTarget>(player)
+                .map(|target| target.0),
+            Some(None)
+        );
+        assert!(assert_some!(app.world().get_resource::<WallJump>()).is_ready());
+    }
+
+    #[test]
+    fn wall_jump_cannot_cross_while_on_cooldown() {
+        let direction = EdgeDirection::FLAT_NORTH_WEST;
+        let mut maze = Maze::new();
+        maze.insert(hexx::Hex::ZERO);
+        maze.insert(hexx::Hex::ZERO.neighbor(direction));
+        let (mut app, player) =
+            wall_jump_app(maze, &[KeyCode::KeyW, KeyCode::KeyD, KeyCode::Space]);
+        assert_some!(app.world_mut().get_resource_mut::<WallJump>()).consume();
+
+        app.update();
+
+        assert_eq!(
+            app.world()
+                .get::<MovementTarget>(player)
+                .map(|target| target.0),
+            Some(None)
+        );
+    }
 
     fn movement_target_for(
         keys: &[KeyCode],

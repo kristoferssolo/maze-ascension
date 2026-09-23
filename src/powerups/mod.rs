@@ -1,14 +1,7 @@
-pub mod commands;
-pub mod components;
-mod systems;
+pub(crate) mod wall_jump;
 
 use bevy::prelude::*;
-use commands::SpawnPowerup;
 
 pub(super) fn plugin(app: &mut App) {
-    app.add_plugins(systems::plugin);
-}
-
-pub fn spawn_powerup_command(world: &mut World) {
-    SpawnPowerup.apply(world);
+    app.add_plugins(wall_jump::plugin);
 }
