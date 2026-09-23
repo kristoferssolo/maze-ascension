@@ -13,13 +13,17 @@ const COOLDOWN_SECONDS: f32 = 10.0;
 const PREVIEW_SECONDS: f32 = 5.0;
 
 #[derive(Debug, Default, Resource)]
-struct Pathfinder {
+pub(super) struct Pathfinder {
     cooldown: Option<Timer>,
 }
 
 impl Pathfinder {
     const fn is_ready(&self) -> bool {
         self.cooldown.is_none()
+    }
+
+    pub(super) fn cooldown_remaining_secs(&self) -> Option<f32> {
+        self.cooldown.as_ref().map(Timer::remaining_secs)
     }
 
     fn consume(&mut self) {

@@ -13,6 +13,10 @@ impl WallJump {
         self.cooldown.is_none()
     }
 
+    pub fn cooldown_remaining_secs(&self) -> Option<f32> {
+        self.cooldown.as_ref().map(Timer::remaining_secs)
+    }
+
     pub fn consume(&mut self) {
         self.cooldown = Some(Timer::from_seconds(COOLDOWN_SECONDS, TimerMode::Once));
     }
