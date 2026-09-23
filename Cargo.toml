@@ -13,8 +13,7 @@ tracing = { version = "0.1", features = [
   "release_max_level_warn",
 ] }
 hexx = { version = "0.25", features = ["grid"] }
-# Use the migrated local checkout until hexlab 0.7 is published.
-hexlab = { version = "0.7", path = "../hexlab", features = [
+hexlab = { version = "0.7", features = [
   "pathfinding",
   "bevy",
 ] }
