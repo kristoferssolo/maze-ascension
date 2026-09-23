@@ -31,11 +31,11 @@ pub struct IsActive(bool);
 pub struct Powerup;
 
 impl IsActive {
-    pub fn activate(&mut self) {
+    pub const fn activate(&mut self) {
         self.0 = true;
     }
 
-    pub fn deactivate(&mut self) {
+    pub const fn deactivate(&mut self) {
         self.0 = false;
     }
 }

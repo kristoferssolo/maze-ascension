@@ -6,6 +6,8 @@ use super::systems::spawn_powerup;
 pub struct SpawnPowerup;
 
 impl Command for SpawnPowerup {
+    type Out = ();
+
     fn apply(self, world: &mut World) {
         let _ = world.run_system_once(spawn_powerup);
     }

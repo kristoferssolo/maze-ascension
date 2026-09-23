@@ -13,7 +13,7 @@ pub fn handle_activation(
         if let Some(duration) = &mut duration {
             if **is_active {
                 duration.tick(time.delta());
-                if duration.finished() {
+                if duration.is_finished() {
                     is_active.deactivate();
                     cooldown.reset();
                 }
@@ -21,7 +21,7 @@ pub fn handle_activation(
         }
 
         let mut try_activate = |key: KeyCode| {
-            if cooldown.finished() && input.just_pressed(key) {
+            if cooldown.is_finished() && input.just_pressed(key) {
                 is_active.activate();
                 if let Some(duration) = &mut duration {
                     duration.reset();
@@ -37,7 +37,7 @@ pub fn handle_activation(
             Kind::PathFinder => try_activate(KeyCode::KeyF),
         }
 
-        if cooldown.finished() {
+        if cooldown.is_finished() {
             is_active.deactivate();
         }
     }
