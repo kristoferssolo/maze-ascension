@@ -6,11 +6,20 @@ const COOLDOWN_SECONDS: f32 = 10.0;
 #[derive(Debug, Default, Resource)]
 pub struct WallJump {
     cooldown: Option<Timer>,
+    charges: u32,
 }
 
 impl WallJump {
     pub const fn is_ready(&self) -> bool {
-        self.cooldown.is_none()
+        self.cooldown.is_none() && self.charges > 0
+    }
+
+    pub const fn charges(&self) -> u32 {
+        self.charges
+    }
+
+    pub const fn grant(&mut self) {
+        self.charges = self.charges.saturating_add(1);
     }
 
     pub fn cooldown_remaining_secs(&self) -> Option<f32> {
@@ -18,6 +27,10 @@ impl WallJump {
     }
 
     pub fn consume(&mut self) {
+        if !self.is_ready() {
+            return;
+        }
+        self.charges -= 1;
         self.cooldown = Some(Timer::from_seconds(COOLDOWN_SECONDS, TimerMode::Once));
     }
 
@@ -57,6 +70,8 @@ mod tests {
     #[test]
     fn cooldown_starts_only_when_used_and_expires() {
         let mut wall_jump = WallJump::default();
+        assert!(!wall_jump.is_ready());
+        wall_jump.grant();
         assert!(wall_jump.is_ready());
 
         wall_jump.consume();
@@ -64,6 +79,8 @@ mod tests {
         wall_jump.tick(std::time::Duration::from_secs(9));
         assert!(!wall_jump.is_ready());
         wall_jump.tick(std::time::Duration::from_secs(1));
+        assert!(!wall_jump.is_ready());
+        wall_jump.grant();
         assert!(wall_jump.is_ready());
     }
 }

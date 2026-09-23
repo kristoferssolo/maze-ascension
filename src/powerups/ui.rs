@@ -33,7 +33,7 @@ fn spawn_hud(mut commands: Commands, existing: Query<Entity, With<PowerupHud>>) 
                 position_type: PositionType::Absolute,
                 left: Val::Px(16.0),
                 bottom: Val::Px(16.0),
-                width: Val::Px(360.0),
+                width: Val::Px(420.0),
                 padding: UiRect::all(Val::Px(10.0)),
                 flex_direction: FlexDirection::Column,
                 row_gap: Val::Px(6.0),
@@ -45,10 +45,10 @@ fn spawn_hud(mut commands: Commands, existing: Query<Entity, With<PowerupHud>>) 
             spawn_row(
                 parent,
                 "Space + move",
-                "Cross wall",
+                "Cross wall · green",
                 AbilityStatus::WallJump,
             );
-            spawn_row(parent, "F", "Show route", AbilityStatus::Route);
+            spawn_row(parent, "F", "Show route · gold", AbilityStatus::Route);
         });
 }
 
@@ -84,7 +84,7 @@ fn spawn_row(
                 TextColor(RosePineDawn::Text.to_color()),
             ));
             row.spawn((
-                Text::new("Ready"),
+                Text::new("0 charges"),
                 TextFont {
                     font_size: FontSize::Px(18.0),
                     ..default()
@@ -101,19 +101,20 @@ fn update_hud(
     mut statuses: Query<(&AbilityStatus, &mut Text, &mut TextColor)>,
 ) {
     for (ability, mut text, mut color) in &mut statuses {
-        let remaining = match ability {
-            AbilityStatus::WallJump => wall_jump.cooldown_remaining_secs(),
-            AbilityStatus::Route => pathfinder.cooldown_remaining_secs(),
+        let (charges, remaining) = match ability {
+            AbilityStatus::WallJump => (wall_jump.charges(), wall_jump.cooldown_remaining_secs()),
+            AbilityStatus::Route => (pathfinder.charges(), pathfinder.cooldown_remaining_secs()),
         };
-        let (label, tint) = remaining.map_or_else(
-            || ("Ready".to_owned(), RosePineDawn::Gold.to_color()),
-            |seconds| {
-                (
-                    format!("{}s", seconds.ceil() as u32),
-                    RosePineDawn::Muted.to_color(),
-                )
-            },
-        );
+        let (label, tint) = if charges == 0 {
+            ("0 charges".to_owned(), RosePineDawn::Muted.to_color())
+        } else if let Some(seconds) = remaining {
+            (
+                format!("{charges} · {}s", seconds.ceil() as u32),
+                RosePineDawn::Muted.to_color(),
+            )
+        } else {
+            (format!("{charges} ready"), RosePineDawn::Gold.to_color())
+        };
         if text.0 != label {
             text.0 = label;
         }
@@ -144,7 +145,11 @@ mod tests {
             Text::new("Ready"),
             TextColor::default(),
         ));
-        assert_some!(app.world_mut().get_resource_mut::<WallJump>()).consume();
+        let mut wall_jump = assert_some!(app.world_mut().get_resource_mut::<WallJump>());
+        wall_jump.grant();
+        wall_jump.grant();
+        wall_jump.consume();
+        assert_some!(app.world_mut().get_resource_mut::<Pathfinder>()).grant();
 
         app.update();
 
@@ -156,8 +161,8 @@ mod tests {
                 AbilityStatus::Route => ("route", text.0.as_str()),
             })
             .collect::<Vec<_>>();
-        assert!(labels.contains(&("wall", "10s")));
-        assert!(labels.contains(&("route", "Ready")));
+        assert!(labels.contains(&("wall", "1 · 10s")));
+        assert!(labels.contains(&("route", "1 ready")));
     }
 
     #[test]

@@ -306,6 +306,7 @@ mod tests {
         maze.insert(hexx::Hex::ZERO.neighbor(direction));
         let (mut app, player) =
             wall_jump_app(maze, &[KeyCode::KeyW, KeyCode::KeyD, KeyCode::Space]);
+        assert_some!(app.world_mut().get_resource_mut::<WallJump>()).grant();
 
         app.update();
 
@@ -324,6 +325,7 @@ mod tests {
         maze.insert(hexx::Hex::ZERO);
         let (mut app, player) =
             wall_jump_app(maze, &[KeyCode::KeyW, KeyCode::KeyD, KeyCode::Space]);
+        assert_some!(app.world_mut().get_resource_mut::<WallJump>()).grant();
 
         app.update();
 
@@ -344,7 +346,27 @@ mod tests {
         maze.insert(hexx::Hex::ZERO.neighbor(direction));
         let (mut app, player) =
             wall_jump_app(maze, &[KeyCode::KeyW, KeyCode::KeyD, KeyCode::Space]);
+        assert_some!(app.world_mut().get_resource_mut::<WallJump>()).grant();
         assert_some!(app.world_mut().get_resource_mut::<WallJump>()).consume();
+
+        app.update();
+
+        assert_eq!(
+            app.world()
+                .get::<MovementTarget>(player)
+                .map(|target| target.0),
+            Some(None)
+        );
+    }
+
+    #[test]
+    fn wall_jump_requires_a_collected_charge() {
+        let direction = EdgeDirection::FLAT_NORTH_WEST;
+        let mut maze = Maze::new();
+        maze.insert(hexx::Hex::ZERO);
+        maze.insert(hexx::Hex::ZERO.neighbor(direction));
+        let (mut app, player) =
+            wall_jump_app(maze, &[KeyCode::KeyW, KeyCode::KeyD, KeyCode::Space]);
 
         app.update();
 

@@ -2,6 +2,7 @@ use crate::{
     floor::components::{CurrentFloor, Floor},
     maze::{commands::RespawnMaze, components::MazeConfig, GlobalMazeConfig},
     player::commands::RespawnPlayer,
+    powerups::{pathfinder::Pathfinder, wall_jump::WallJump},
     screens::Screen,
 };
 use bevy::{prelude::*, window::PrimaryWindow};
@@ -79,6 +80,25 @@ pub fn maze_controls_ui(world: &mut World) {
                 .apply(world);
                 RespawnPlayer.apply(world);
             }
+        }
+    });
+
+    egui::Window::new("Powerups").show(egui_context.get_mut(), |ui| {
+        if let Some(mut wall_jump) = world.get_resource_mut::<WallJump>() {
+            ui.horizontal(|ui| {
+                ui.label(format!("Wall Jump: {}", wall_jump.charges()));
+                if ui.button("Grant Wall Jump").clicked() {
+                    wall_jump.grant();
+                }
+            });
+        }
+        if let Some(mut pathfinder) = world.get_resource_mut::<Pathfinder>() {
+            ui.horizontal(|ui| {
+                ui.label(format!("PathFinder: {}", pathfinder.charges()));
+                if ui.button("Grant PathFinder").clicked() {
+                    pathfinder.grant();
+                }
+            });
         }
     });
 }

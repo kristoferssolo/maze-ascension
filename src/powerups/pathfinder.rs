@@ -13,13 +13,22 @@ const COOLDOWN_SECONDS: f32 = 10.0;
 const PREVIEW_SECONDS: f32 = 5.0;
 
 #[derive(Debug, Default, Resource)]
-pub(super) struct Pathfinder {
+pub struct Pathfinder {
     cooldown: Option<Timer>,
+    charges: u32,
 }
 
 impl Pathfinder {
     const fn is_ready(&self) -> bool {
-        self.cooldown.is_none()
+        self.cooldown.is_none() && self.charges > 0
+    }
+
+    pub const fn charges(&self) -> u32 {
+        self.charges
+    }
+
+    pub const fn grant(&mut self) {
+        self.charges = self.charges.saturating_add(1);
     }
 
     pub(super) fn cooldown_remaining_secs(&self) -> Option<f32> {
@@ -27,6 +36,10 @@ impl Pathfinder {
     }
 
     fn consume(&mut self) {
+        if !self.is_ready() {
+            return;
+        }
+        self.charges -= 1;
         self.cooldown = Some(Timer::from_seconds(COOLDOWN_SECONDS, TimerMode::Once));
     }
 
@@ -195,6 +208,7 @@ mod tests {
         let mut app = App::new();
         app.init_resource::<GlobalMazeConfig>();
         app.init_resource::<Pathfinder>();
+        assert_some!(app.world_mut().get_resource_mut::<Pathfinder>()).grant();
         app.init_resource::<RouteVisuals>();
         app.insert_resource(Time::<()>::default());
         let mut input = ButtonInput::default();
@@ -253,6 +267,18 @@ mod tests {
         let mut previews = world.query::<&RoutePreview>();
         assert_eq!(previews.iter(world).count(), 0);
         assert!(assert_some!(world.get_resource::<Pathfinder>()).is_ready());
+    }
+
+    #[test]
+    fn route_requires_a_collected_charge() {
+        let (mut app, _) = route_app(true);
+        *assert_some!(app.world_mut().get_resource_mut::<Pathfinder>()) = Pathfinder::default();
+
+        app.update();
+
+        let world = app.world_mut();
+        let mut previews = world.query::<&RoutePreview>();
+        assert_eq!(previews.iter(world).count(), 0);
     }
 
     #[test]
