@@ -32,8 +32,7 @@ fn toggle_debug_ui(mut options: ResMut<bevy::ui_render::GlobalUiDebugOptions>) {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use bevy::window::PrimaryWindow;
-    use bevy_egui::EguiContext;
+    use bevy_egui::{EguiContext, PrimaryEguiContext};
 
     #[test]
     fn custom_debug_draws_in_egui_primary_pass() {
@@ -41,7 +40,7 @@ mod tests {
         register_custom_debug_ui(&mut app);
         let context = EguiContext::default();
         let mut frame = context.clone();
-        app.world_mut().spawn((PrimaryWindow, context));
+        app.world_mut().spawn((PrimaryEguiContext, context));
 
         frame.get_mut().begin_pass(Default::default());
         let _ = app

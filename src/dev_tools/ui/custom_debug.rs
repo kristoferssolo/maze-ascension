@@ -4,10 +4,10 @@ use crate::{
     player::commands::RespawnPlayer,
     powerups::{pathfinder::Pathfinder, wall_jump::WallJump},
 };
-use bevy::{prelude::*, window::PrimaryWindow};
+use bevy::prelude::*;
 use bevy_egui::{
     egui::{self, emath::Numeric, DragValue, TextEdit, Ui},
-    EguiContext,
+    EguiContext, PrimaryEguiContext,
 };
 use hexx::{Hex, HexOrientation};
 use rand::{rng, RngExt};
@@ -15,7 +15,7 @@ use std::ops::RangeInclusive;
 
 pub fn custom_debug_ui(world: &mut World) {
     let Ok(egui_context) = world
-        .query_filtered::<&mut EguiContext, With<PrimaryWindow>>()
+        .query_filtered::<&mut EguiContext, With<PrimaryEguiContext>>()
         .single(world)
     else {
         return;
