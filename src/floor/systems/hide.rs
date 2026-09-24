@@ -6,7 +6,7 @@ pub fn hide_upper_floors(
     mut query: Query<(&mut Visibility, &Floor)>,
     current_query: Query<&Floor, With<CurrentFloor>>,
 ) {
-    let Ok(current_floor) = current_query.get_single() else {
+    let Ok(current_floor) = current_query.single() else {
         return;
     };
     for (mut visibility, floor) in query.iter_mut() {

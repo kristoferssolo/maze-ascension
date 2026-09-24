@@ -4,19 +4,19 @@ use super::{
 };
 use bevy::{ecs::system::RunSystemOnce, prelude::*};
 
-#[derive(Debug, Reflect)]
+#[derive(Debug)]
 pub struct SpawnMaze {
     pub floor: u8,
     pub config: MazeConfig,
 }
 
-#[derive(Debug, Reflect)]
+#[derive(Debug)]
 pub struct RespawnMaze {
     pub floor: u8,
     pub config: MazeConfig,
 }
 
-#[derive(Debug, Reflect)]
+#[derive(Debug)]
 pub struct DespawnMaze {
     pub floor: u8,
 }
@@ -31,19 +31,25 @@ impl Default for SpawnMaze {
 }
 
 impl Command for SpawnMaze {
+    type Out = ();
+
     fn apply(self, world: &mut World) {
-        let _ = world.run_system_once_with(self, spawn_maze);
+        let _ = world.run_system_once_with(spawn_maze, self);
     }
 }
 
 impl Command for RespawnMaze {
+    type Out = ();
+
     fn apply(self, world: &mut World) {
-        let _ = world.run_system_once_with(self, respawn_maze);
+        let _ = world.run_system_once_with(respawn_maze, self);
     }
 }
 
 impl Command for DespawnMaze {
+    type Out = ();
+
     fn apply(self, world: &mut World) {
-        let _ = world.run_system_once_with(self, despawn_maze);
+        let _ = world.run_system_once_with(despawn_maze, self);
     }
 }

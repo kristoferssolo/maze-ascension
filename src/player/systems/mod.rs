@@ -7,7 +7,7 @@ pub mod spawn;
 mod toggle_pause;
 mod vertical_transition;
 
-use crate::{screens::Screen, AppSet};
+use crate::{screens::Screen, AppSystems};
 use bevy::prelude::*;
 use input::player_input;
 use movement::player_movement;
@@ -21,13 +21,13 @@ pub(super) fn plugin(app: &mut App) {
     app.add_systems(
         Update,
         (
-            player_input.in_set(AppSet::RecordInput),
+            player_input.in_set(AppSystems::RecordInput),
             player_movement,
-            handle_floor_transition.in_set(AppSet::RecordInput),
+            handle_floor_transition.in_set(AppSystems::RecordInput),
             (play_movement_sound)
                 .chain()
                 .run_if(resource_exists::<PlayerAssets>)
-                .in_set(AppSet::Update),
+                .in_set(AppSystems::Update),
         )
             .chain()
             .run_if(in_state(Screen::Gameplay)),

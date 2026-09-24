@@ -6,7 +6,7 @@ use bevy::{
     prelude::*,
 };
 
-use crate::{screens::Screen, theme::prelude::*, AppSet};
+use crate::{screens::Screen, theme::prelude::*, AppSystems};
 
 pub fn plugin(app: &mut App) {
     // Spawn splash screen.
@@ -17,8 +17,8 @@ pub fn plugin(app: &mut App) {
     app.add_systems(
         Update,
         (
-            tick_fade_in_out.in_set(AppSet::TickTimers),
-            apply_fade_in_out.in_set(AppSet::Update),
+            tick_fade_in_out.in_set(AppSystems::TickTimers),
+            apply_fade_in_out.in_set(AppSystems::Update),
         )
             .run_if(in_state(Screen::Splash)),
     );
@@ -30,8 +30,8 @@ pub fn plugin(app: &mut App) {
     app.add_systems(
         Update,
         (
-            tick_splash_timer.in_set(AppSet::TickTimers),
-            check_splash_timer.in_set(AppSet::Update),
+            tick_splash_timer.in_set(AppSystems::TickTimers),
+            check_splash_timer.in_set(AppSystems::Update),
         )
             .run_if(in_state(Screen::Splash)),
     );
@@ -40,7 +40,7 @@ pub fn plugin(app: &mut App) {
     app.add_systems(
         Update,
         continue_to_loading_screen
-            .run_if(input_just_pressed(KeyCode::Escape).and(in_state(Screen::Splash))),
+            .run_if(input_just_pressed(KeyCode::Escape).and_then(in_state(Screen::Splash))),
     );
 }
 
@@ -54,7 +54,7 @@ fn spawn_splash_screen(mut commands: Commands, asset_server: Res<AssetServer>) {
         .insert((
             Name::new("Splash screen"),
             BackgroundColor(SPLASH_BACKGROUND_COLOR),
-            StateScoped(Screen::Splash),
+            DespawnOnExit(Screen::Splash),
         ))
         .with_children(|children| {
             children.spawn((
@@ -64,16 +64,16 @@ fn spawn_splash_screen(mut commands: Commands, asset_server: Res<AssetServer>) {
                     width: Val::Percent(70.0),
                     ..default()
                 },
-                ImageNode::new(asset_server.load_with_settings(
-                    // This should be an embedded asset for instant loading, but that is
-                    // currently [broken on Windows Wasm builds](https://github.com/bevyengine/bevy/issues/14246).
-                    "images/splash.png",
-                    |settings: &mut ImageLoaderSettings| {
-                        // Make an exception for the splash image in case
-                        // `ImagePlugin::default_nearest()` is used for pixel art.
-                        settings.sampler = ImageSampler::linear();
-                    },
-                )),
+                ImageNode::new(
+                    asset_server
+                        .load_builder()
+                        .with_settings(|settings: &mut ImageLoaderSettings| {
+                            // Make an exception for the splash image in case
+                            // `ImagePlugin::default_nearest()` is used for pixel art.
+                            settings.sampler = ImageSampler::linear();
+                        })
+                        .load("images/splash.png"),
+                ),
                 UiImageFadeInOut {
                     total_duration: SPLASH_DURATION_SECS,
                     fade_duration: SPLASH_FADE_DURATION_SECS,

@@ -12,11 +12,11 @@ pub fn update_floor_display(
     floor_query: Query<&Floor, With<CurrentFloor>>,
     mut text_query: Query<&mut Text, With<FloorDisplay>>,
 ) {
-    let Ok(floor) = floor_query.get_single() else {
+    let Ok(floor) = floor_query.single() else {
         return;
     };
 
-    let Ok(mut text) = text_query.get_single_mut() else {
+    let Ok(mut text) = text_query.single_mut() else {
         return;
     };
 
@@ -31,7 +31,7 @@ pub fn update_highest_floor_display(
         return;
     }
 
-    let Ok(mut text) = text_query.get_single_mut() else {
+    let Ok(mut text) = text_query.single_mut() else {
         return;
     };
 

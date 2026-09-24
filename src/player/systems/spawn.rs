@@ -16,7 +16,7 @@ pub fn spawn_player(
     maze_config_query: Query<&MazeConfig, With<CurrentFloor>>,
     global_config: Res<GlobalMazeConfig>,
 ) {
-    let Ok(maze_config) = maze_config_query.get_single() else {
+    let Ok(maze_config) = maze_config_query.single() else {
         return;
     };
     let player_radius = global_config.hex_size * 0.5;

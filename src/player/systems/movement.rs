@@ -29,7 +29,7 @@ pub fn player_movement(
     >,
     maze_config_query: Query<&MazeConfig, With<CurrentFloor>>,
 ) {
-    let Ok(maze_config) = maze_config_query.get_single() else {
+    let Ok(maze_config) = maze_config_query.single() else {
         warn!("Failed to get maze configuration for current floor - cannot move player");
         return;
     };

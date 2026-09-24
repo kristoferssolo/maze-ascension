@@ -28,11 +28,11 @@ pub fn spawn_camera(mut commands: Commands) {
 
 fn camera_zoom(
     mut query: Query<&mut Transform, With<MainCamera>>,
-    mut scrool_evr: EventReader<MouseWheel>,
+    mut scrool_evr: MessageReader<MouseWheel>,
     keyboard: Res<ButtonInput<KeyCode>>,
     time: Res<Time>,
 ) {
-    let Ok(mut transform) = query.get_single_mut() else {
+    let Ok(mut transform) = query.single_mut() else {
         return;
     };
 
@@ -45,15 +45,15 @@ fn camera_zoom(
     let mut zoom_delta = 0.0;
 
     if keyboard.pressed(KeyCode::Equal) || keyboard.pressed(KeyCode::NumpadAdd) {
-        zoom_delta += adjusted_zoom_speed * time.delta_secs() * 25.;
+        zoom_delta = (adjusted_zoom_speed * time.delta_secs()).mul_add(25., zoom_delta);
     }
 
     if keyboard.pressed(KeyCode::Minus) || keyboard.pressed(KeyCode::NumpadSubtract) {
-        zoom_delta -= adjusted_zoom_speed * time.delta_secs() * 25.;
+        zoom_delta = (adjusted_zoom_speed * time.delta_secs()).mul_add(-25., zoom_delta);
     }
 
     for ev in scrool_evr.read() {
-        zoom_delta += ev.y * adjusted_zoom_speed * SCROLL_MODIFIER;
+        zoom_delta = (ev.y * adjusted_zoom_speed).mul_add(SCROLL_MODIFIER, zoom_delta);
     }
 
     if zoom_delta != 0.0 {

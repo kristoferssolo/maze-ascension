@@ -14,24 +14,24 @@ use crate::{
 
 pub fn update_score(
     mut score: ResMut<Score>,
-    hightes_floor: Res<HighestFloor>,
+    highest_floor: Res<HighestFloor>,
     floor_timer: Res<FloorTimer>,
 ) {
-    if !hightes_floor.is_changed() || hightes_floor.is_added() {
+    if !highest_floor.is_changed() || highest_floor.is_added() {
         return;
     }
 
-    score.0 += calculate_score(
-        hightes_floor.0.saturating_sub(1),
+    score.0 = score.0.saturating_add(calculate_score(
+        highest_floor.0.saturating_sub(1),
         floor_timer.elapsed_secs(),
-    );
+    ));
 }
 
 pub fn update_score_display(
     mut text_query: Query<&mut Text, With<ScoreDisplay>>,
     score: Res<Score>,
 ) {
-    let Ok(mut text) = text_query.get_single_mut() else {
+    let Ok(mut text) = text_query.single_mut() else {
         return;
     };
 
@@ -50,7 +50,8 @@ fn calculate_score(floor_number: u8, completion_time: f32) -> usize {
     // Longer times get diminishing returns but never below minimum
     let time_multiplier = if completion_time <= perfect_time {
         // Bonus for being faster than perfect time
-        let speed_ratio = perfect_time / completion_time;
+        // A freshly reset timer can still read zero when an exit is reached.
+        let speed_ratio = perfect_time / completion_time.max(1.0);
         speed_ratio * TIME_BONUS_MULTIPLIER
     } else {
         // Penalty for being slower than perfect time, with smooth degradation
@@ -74,6 +75,25 @@ mod tests {
     use rstest::*;
 
     use super::*;
+
+    #[test]
+    fn rapid_consecutive_ascents_do_not_overflow_score() {
+        let mut app = App::new();
+        app.insert_resource(Score::default());
+        app.insert_resource(HighestFloor(1));
+        app.insert_resource(FloorTimer::default());
+        app.add_systems(Update, update_score);
+
+        app.update();
+        for floor in [2, 3] {
+            assert_some!(app.world_mut().get_resource_mut::<HighestFloor>()).0 = floor;
+            app.update();
+        }
+
+        let score = assert_some!(app.world().get_resource::<Score>()).0;
+        assert_gt!(score, 0);
+        assert_lt!(score, usize::MAX);
+    }
 
     #[fixture]
     fn floors() -> Vec<u8> {

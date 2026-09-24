@@ -16,7 +16,12 @@ impl HintAssets {
 
 impl FromWorld for HintAssets {
     fn from_world(world: &mut World) -> Self {
-        let assets = world.resource::<AssetServer>();
+        let Some(assets) = world.get_resource::<AssetServer>() else {
+            return Self {
+                arrows: default(),
+                interaction: default(),
+            };
+        };
 
         Self {
             arrows: assets.load(Self::PATH_ARROWS),

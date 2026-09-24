@@ -11,7 +11,7 @@ pub fn trigger_on_press(
 ) {
     for (entity, interaction) in &interaction_query {
         if matches!(interaction, Interaction::Pressed) {
-            commands.trigger_targets(OnPress, entity);
+            commands.trigger(OnPress { entity });
         }
     }
 }

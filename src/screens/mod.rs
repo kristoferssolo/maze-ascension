@@ -11,8 +11,6 @@ pub use gameplay::{GameplayElement, GameplayInitialized};
 
 pub(super) fn plugin(app: &mut App) {
     app.init_state::<Screen>();
-    app.enable_state_scoped_entities::<Screen>();
-
     app.add_plugins((
         gameplay::plugin,
         loading::plugin,
