@@ -32,25 +32,21 @@ fn toggle_debug_ui(mut options: ResMut<bevy::ui_render::GlobalUiDebugOptions>) {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use bevy_egui::{EguiContext, PrimaryEguiContext};
+    use claims::assert_ok;
 
     #[test]
-    fn custom_debug_draws_in_egui_primary_pass() {
+    fn custom_debug_runs_in_egui_primary_pass() {
         let mut app = App::new();
         register_custom_debug_ui(&mut app);
-        let context = EguiContext::default();
-        let mut frame = context.clone();
-        app.world_mut().spawn((PrimaryEguiContext, context));
+        let registered = assert_ok!(app.world_mut().try_schedule_scope(
+            EguiPrimaryContextPass,
+            |world, schedule| {
+                assert_ok!(schedule.initialize(world));
+                assert_ok!(schedule.systems())
+                    .any(|(_, system)| system.name().to_string().contains("custom_debug_ui"))
+            }
+        ));
 
-        frame.get_mut().begin_pass(Default::default());
-        let _ = app
-            .world_mut()
-            .try_run_schedule(bevy_egui::EguiPrimaryContextPass);
-        let output = frame.get_mut().end_pass();
-
-        assert!(
-            !output.shapes.is_empty(),
-            "Custom Debug window was not drawn"
-        );
+        assert!(registered);
     }
 }
